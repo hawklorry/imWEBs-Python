@@ -1,0 +1,14 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+Area,Area of subarea,ha,ALL,-99,,NC,,,
+TopographyWeight,Weight for topography,,ALL,-99,,NC,,,
+Slope,Slope,%,ALL,-99,0,RC,1.1,0.9,Y
+MoistureInitial,Initial soil moisture,m3/m3,ALL,-99,0,RC,0,0.8,Y
+WetlandFraction,wetland/reservoir fraction within the subarea,,ALL,-99,,NC,,,
+FlowAccumulationAverage,FlowAccumulationAverage,,ALL,-99,,NC,,,
+TravelTimeAverage2,TravelTimeAverage for 2 yr,,ALL,-99,,NC,,,
+TravelTimeStd2,TravelTimeStd for 2 yr,,ALL,-99,,NC,,,
+TravelTimeAverage10,TravelTimeAverage for 10 yr,,ALL,-99,,NC,,,
+TravelTimeStd10,TravelTimeStd for 10 yr,,ALL,-99,,NC,,,
+TravelTimeAverage100,TravelTimeAverage for 100 yr,,ALL,-99,,NC,,,
+TravelTimeStd100,TravelTimeStd for 100 yr,,ALL,-99,,NC,,,
+LateralWidth,Lateral width for subarea in m,m,ALL,-99,0,RC,100,0.1,Y
