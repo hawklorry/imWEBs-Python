@@ -1,7 +1,7 @@
 
 import numpy as np
 import pandas as pd
-from ...outputs import outputs
+from ...outputs import Outputs
 from .reach_parameter import ReachParameter
 from ...raster_extension import RasterExtension
 
@@ -14,18 +14,18 @@ class Reach:
 
     Replace buildReachParTable
     """
-    def __init__(self, outputs:outputs):
+    def __init__(self, outputs:Outputs):
         self.LnOf2 = 0.693147180559945
         self.minimumSlope = 0.01
 
-        self.subbasin_raster = outputs.subbasin_raster        
+        self.subbasin_raster = outputs.subbasin_raster  
         self.stream_network_raster = outputs.stream_network_raster
         self.reach_length_raster = outputs.flow_length_raster
         self.flow_dir_raster = outputs.flow_direction_raster
         self.stream_order_raster = outputs.stream_order_raster
         self.reach_width_raster = outputs.reach_width_raster
         self.reach_depth_raster = outputs.reach_depth_raster
-        self.dem_raster = outputs.inputs.dem_raster
+        self.dem_raster = outputs.dem_clipped_burned_filled_raster
         self.velocity_raster = outputs.velocity_raster
         self.flow_acc_raster = outputs.flow_acc_raster
 
@@ -202,8 +202,9 @@ class Reach:
     
     def __calculate_reach_order(self):
         """
-        This should be 
+        Just read from stream_order_raster
         """
+        
         rchsum = np.zeros(self.subMax)
         rchcount = np.zeros(self.subMax)
 
@@ -397,7 +398,7 @@ class Reach:
         reach_parameter_table[reach_parameter_columns[9]] = self.__calculate_reach_slope(rch_in_row, rch_in_col)
 
         # Column 10 --- Reach order "order"       
-        #reach_parameter_table[reach_parameter_columns[10]] = self.__calculate_reach_order()
+        reach_parameter_table[reach_parameter_columns[10]] = self.__calculate_reach_order()
 
         # Column 11 --- Manning's coefficient "manning"
         reach_parameter_table[reach_parameter_columns[11]] = self.__calculate_reach_manning(rch_in_row, rch_in_col)

@@ -1,0 +1,18 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+USLE_P,the erosion control practice factor,,ALL,-99,0,RC,1,-1,Y
+flow_acc,the number of flow accumulation cells of each cell,,ALL,-99,0,NC,0,0,Y
+adj_pkr,peak rate adjustment factor,,ALL,1,0,AC,3,0.1,Y
+rain_yrs,number of yeares of data used to obtain values for RAINHHMX,,ALL,10,0,AC,10,5,Y
+decay,dacay constant,1/day,ChannelRouting,0.184,0,NC,1,0,Y
+spcon,"Coefficient in sediment transport equation, SPCON",,ChannelRouting,0.01,0.0001,AC,0.1,0.0001,Y
+p_rf,"Peak rate adjustment factor, PRF",,ChannelRouting,2,0,AC,3,1,Y
+spexp,"Exponent in sediment transport equation, SPEXP",,ChannelRouting,2,0,AC,3,1,Y
+sed_chi,Initial channel sediment concentration,ton/m^3,ChannelRouting,0.03,0,AC,1,0,Y
+vcrit,critical veloctiy for sediment deposition,m/s,ChannelRouting,0.3,0,AC,1,0,Y
+downcut,"whether do the channel downcutting and widening, IDEG",,ChannelRouting,0,0,NC,1,0,Y
+rsd_covco,residue cover factor for computing fraction of cover,,MUSLEC_LAI,0.3,0,AC,0.5,0,Y
+flow_dir,,,ALL,-99,0,NC,0,0,
+flow_path,,,ALL,-99,0,NC,0,0,
+flow_order,,,ALL,-99,0,NC,0,0,
+flow_dir,,,ALL,-99,0,NC,0,0,
+snow_cover_factor,,,ALL,3,0,,5,0,

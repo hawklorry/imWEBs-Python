@@ -1,0 +1,60 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+intialResidue,intial residue cover,kg/ha,NC_Q2K,10,0,AC,20000,0,Y
+activeNRatio,the ratio of active N in total active and stable N,,NC_Q2K,0.02,0,AC,0.05,0,Y
+rainNO3,"concentration of nitrogen in the rainfall, RCN",mg/L,NC_Q2K,1,0,AC,2,0,Y
+rainNH4,concentration of ammonia in the rainfall,mg/L,NC_Q2K,0,0,AC,2,0,Y
+denitriRateCo,"rate coefficient for denitrification, CDN",,NC_Q2K,1.4,0,AC,3,0,Y
+denitriThersholdWaterFactor,"threshold value of water factor for denitrification to occur, SDNCO",,NC_Q2K,1.1,0,AC,2,0,Y
+humusMinRate,"the rate coefficient for mineralization, CMN",,NC_Q2K,0.0001,0,AC,0.02,0,Y
+minDecayRate,the minimum decay rate,,NC_Q2K,0,0,AC,0.05,0,Y
+anionExcludeFraction,fraction of porosity from which aninons are exclueded,,NC_Q2K,0.5,0,AC,1,0,Y
+nitratePercoCo,"nitrate percolation coefficient, NPERCO",,NC_Q2K,0.2,0,AC,1,0,Y
+phosphrusPartiCo,phosphorus partitioning coefficient,m^3/kg,NC_Q2K,175,0,AC,500,0,Y
+phosphrusPercoCo,phosphorus percolation coefficient,10m^3/kg,NC_Q2K,10,0,AC,20,0,Y
+gwNO3,NO3 concentration in groundwater loading to reach,mg/L,NR_Q2K,0,0,AC,5,0,Y
+gwSolutionP,solution P concentration in groundwater loading to reach,mg/L,NR_Q2K,0,0,AC,5,0,Y
+initialReachAlgae,intial algae concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachNH4,intial ammonia concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachNO2,intial nitrite concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachNO3,intial nitrate concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachOrganicN,intial organic N concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachDissolvedP,intial dissolved P concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachOrganicP,intial organic P concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachCBOD,intial CBOD concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+initialReachO2,intial dissolved oxygen concentration of reach,mg/L,ChannelRouting,0,0,AC,10,0,Y
+algaeCHLARatio,ratio of chlorophyll a to algel biomass,ug chla/mg alg,ChannelRouting,10,0,AC,100,10,Y
+activeRadiationFraction,Fraction of solar radiation that is photosyntheically active,NULL,ChannelRouting,0.1,0,AC,1,0.01,Y
+nonAlgelLightExtinctionCoefficient,Non-algal portion of the light extinction coefficient,/m,ChannelRouting,1,0,AC,2,0,Y
+linearAlgalSelfShadingCoefficient,linear algal self shading coefficient,m^-1 * (ug-chla/L)^-1,ChannelRouting,0.01,0,AC,0.065,0.0065,Y
+nonLinearAlgalSelfShadingCoefficient,nonlinear algal self shading coefficient,m^-1 * (ug-chla/L)^(2/3),ChannelRouting,0.054,0,AC,0.1,0.01,Y
+halfSaturationLight,half-saturation coefficient for light,MJ/m^2-hr,ChannelRouting,0.55,0,AC,1.135,0.2227,Y
+halfSaturationN,Michaelis-Menton half-saturation constant for nitrogen,mg N/L,ChannelRouting,0.01,0,AC,0.03,0.01,Y
+halfSaturationP,Michaelis-Menton half-saturation constant for phophorus,mg P/L,ChannelRouting,0.01,0,AC,0.05,0.001,Y
+algaeMaxGrowthRate,maximum specific algal growth rate,/day,ChannelRouting,1,0,AC,3,1,Y
+algaeRespirationRate,Local algal respiration rate at 20 oC,/day,ChannelRouting,0.1,0,AC,0.5,0.05,Y
+algaeNFraction,"Fraction of algal biomass that is nitrogen, AI1",mg N/mg alg biomass,ChannelRouting,0.07,0,AC,0.09,0,Y
+nh4PreferenceFactor,Preference factor for ammonia nitrogen,,ChannelRouting,0.5,0,AC,1,0.01,Y
+algaeOxygenProductionRate,Rate of oxygen production per unit algal photosynthesis,mg O2/mg alg,ChannelRouting,1.6,0,AC,1.8,1.4,Y
+o2UptakeRateAlgaeRespiration,Rate of oxygen uptake per unit algal respiration,mg O2/mg alg,ChannelRouting,2,0,AC,2.3,1.6,Y
+o2UptakeRateNH4Oxidation,Rate of oxygen uptake per unit NH4 oxidation,mg O2/mg N,ChannelRouting,3.5,0,AC,4,3,Y
+o2UptakeRateNO2Oxidation,Rate of oxygen uptake per unit NO2 oxidation,mg O2/mg N,ChannelRouting,1.07,0,AC,1.14,1,Y
+algaePFraction,"Fraction of algal biomass that is phosphorus, AI2",mg P/mg alg biomass,ChannelRouting,0.02,0,AC,0.02,0,Y
+algaeGrowthEquation,algel growth equation,,ChannelRouting,2,0,AC,3,1,Y
+organicN_enrich,"organic nitrogen enrichment ratio, ERORGN",,NC_Q2K,1,0,AC,20,0,Y
+P_enrich,phosphorous enrichment ratio,,NC_Q2K,1,0,AC,5,0,Y
+organic_C_enrich,organic carbon enrichment ratio,,NC_Q2K,1,0,AC,5,0,Y
+initialSoilNO3,"Initial NO3 concentration in soil, SOL_NO3",mg N/kg soil or ppm,NC_Q2K,25,0,,1000,0,
+initialSoilOrganicN,"Initial organic N concentration in soil, SOL_ORGN",mg N/kg soil or ppm,NC_Q2K,20,0,,3000,0,
+initialSoilSolutionP,"Initial soluble P concentration in soil,SOL_SOLP",mg P/kg soil or ppm,NC_Q2K,0.05,0,,1000,0,
+initialSoilOrganicP,"Initial organic P concentration in soil, SOL_ORGP",mg P/kg soil or ppm,NC_Q2K,0.5,0,,2000,0,
+phosphrusAvailabilityIndex,"Phosphorus availability index, PSP",,NC_Q2K,0.4,0,,1,0,
+residueDecompositionCoefficient,"Residue decompostion coefficient, RSDCO",,NC_Q2K,0.05,0,,1,0,
+chlaOverlandCoA,Chla overland simulation coefficient A,,NC_Q2K,3.327,0,AC,10,5,Y
+chlaOverlandCoB,Chla overland simulation coefficient B,,NC_Q2K,-5.026,0,AC,0,-10,Y
+chlaOverlandEquation,"Chlorophyll a overland equation ID, 0 use IMWEBs equation, 1 use SWAT equation",,NC_Q2K,0,0,AC,1,0,Y
+chlaSubco,SWAT chla simulation coefficient,,NC_Q2K,1,0,AC,10,0,Y
+organicN_coefficient,organic nitrogen adjustment coeffcient,,NC_Q2K,1,0,AC,100,0,Y
+organicP_coefficient,organic phosphorous adjustment coeffcient,,NC_Q2K,1,0,AC,100,0,Y
+nitrateLateralFlowConcLimit,Maximum laterflow NO3 concentraion,mg N/mm lateral flow,NC_Q2K,10,0,AC,1000,0,Y
+gwOrganicN,Organic N concentration in groundwater loading to reach,mg/L,NR_Q2K,0.25,0,AC,5,0,Y
+gwOrganicP,Organic P concentration in groundwater loading to reach,mg/L,NR_Q2K,0.025,0,AC,5,0,Y

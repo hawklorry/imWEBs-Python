@@ -19,23 +19,24 @@ class Outputs(FolderBase):
     """
     Output folder where all intermediate and final processed files are saved
     """
-    def __init__(self, output_folder:str, input_folder:str, database_folder:str,
-                 stream_threshold_area_ha:float = 10,
-                 wetland_min_area_ha:float = 0.1,
-                 wetland_riparian_contribution_area_ha:float = 300,
-                 wetland_stream_buffer_distance_m: float = 0) -> None:
+    def __init__(self, output_folder:str, input_folder:str, database_folder:str, 
+                 stream_threshold_area_ha:float = 10) -> None:
         super().__init__(output_folder)
-
-        self.stream_threshold_area_ha = stream_threshold_area_ha
-        self.wetland_min_area_ha = wetland_min_area_ha
-        self.wetland_riparian_contribution_area_ha = wetland_riparian_contribution_area_ha
-        self.wetland_stream_buffer_distance_m = wetland_stream_buffer_distance_m
 
         self.inputs = Inputs(input_folder)
         self.parameter = parameters(database_folder)
+        self.stream_threshold_area_ha = stream_threshold_area_ha
+        self.__create_structure_dictonary()
+
+
+    def __create_structure_dictonary(self):
+        """
+        Create structure dictionary
+        Only add structures that would change the flow direction
         
+        """
         self.structures = {}
-        for type in Structure.structure_types:
+        for type in Structure.structure_types_affection_flow_direction:
             boundary_vector = getattr(self.inputs, f"{type}_boundary_vector")
             if boundary_vector is not None:
                 self.structures[type] = Structure(
@@ -46,7 +47,7 @@ class Outputs(FolderBase):
                     structure_outlet_point_vector = getattr(self.inputs, f"{type}_outlet_vector"),
                     structure_area_threshold_ha = self.wetland_min_area_ha if type == "wetland" else 0, 
                     structure_split_max_num = 3 if type == "wetland" else 1)
-
+                
 #region DEM processing
 
     @property
@@ -61,7 +62,7 @@ class Outputs(FolderBase):
                 raster = raster.con(f"value = {raster.configs.nodata}", self.inputs.nodata, 1)                
             #try use soil and landuse 
             elif self.inputs.soil_raster is not None and self.inputs.landuse_raster is not None:
-                logger.debug(f"Creating mask using user-defined boundary shapefile ... ")
+                logger.debug(f"Creating mask using soil and landuse ... ")
                 raster = self.inputs.create_new_raster()
                 raster = self.inputs.dem_raster.con(f"value = {self.inputs.nodata}", self.inputs.nodata, 1)
                 raster = self.inputs.soil_raster.con(f"value = {self.inputs.soil_raster.configs.nodata}", self.inputs.nodata, raster)
@@ -93,6 +94,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.demClippedName)
 
         if raster is None:
+            logger.debug("Masking DEM ...")
             raster = self.mask_raster.con("value = 1", self.inputs.dem_raster, self.inputs.nodata)
             self.save_raster(raster, Names.demClippedName)
 
@@ -106,6 +108,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.demBurnedName)
 
         if raster is None:
+            logger.debug("Burning stream ...")
             raster = self.wbe.fill_burn(dem = self.dem_clipped_raster, streams = self.inputs.stream_network_user_vector)
             self.save_raster(raster, Names.demBurnedName)
 
@@ -119,6 +122,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.demFilledName)
 
         if raster is None:
+            logger.debug("Filling depression ...")
             raster = self.wbe.fill_depressions(self.dem_clipped_burned_raster)
             self.save_raster(raster, Names.demFilledName)
 
@@ -163,7 +167,7 @@ class Outputs(FolderBase):
 
         if raster is None:
             raster = self.__remove_non_agriculture_cell(self.farm_raster)
-            raster = self.mask_raster.con("value = 1", raster, raster.configs.nodata)
+            raster = self.mask_refined_with_subbasin_raster.con("value = 1", raster, raster.configs.nodata)
             self.save_raster(raster, Names.farmWithOnlyAgricultureRasName)
 
         return raster
@@ -186,7 +190,7 @@ class Outputs(FolderBase):
 
         if raster is None:
             raster = self.__remove_non_agriculture_cell(self.field_raster)
-            raster = self.mask_raster.con("value = 1", raster, raster.configs.nodata)
+            raster = self.mask_refined_with_subbasin_raster.con("value = 1", raster, raster.configs.nodata)
             self.save_raster(raster, Names.fieldWithOnlyAgricultureRasName)
 
         return raster
@@ -208,6 +212,18 @@ class Outputs(FolderBase):
 
         return raster
     
+    @property
+    def soil_k_raster(self)->Raster:
+        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AverageK","soil"), self.subbasin_raster)
+
+    @property
+    def soil_porosity_raster(self)->Raster:
+        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AveragePorosity","soil"), self.subbasin_raster)
+
+    @property
+    def landuse_rootdepth_raster(self)->Raster:
+        return RasterExtension.reclassify(self.mapped_landuse_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+
     @property
     def mapped_landuse_raster(self)->Raster:
         """
@@ -563,21 +579,26 @@ class Outputs(FolderBase):
             if len(self.structures) > 0:                
                 #if there are some structure, use the structure to get the flow direction
                 #merge all structure boundary and outlets to get the final flow direction.
+
+                logger.debug("Merging all flow-direction-affecting structures ...")
                 structure_boundary_rasters = []
                 structure_outlet_rasters = []
                 for type,struc in self.structures.items():
+                    logger.debug(type)
                     structure_outlet_rasters.append(struc.outlet_raster)
                     structure_boundary_rasters.append(struc.boundary_raster)    
                 combined_structure_boundary_raster = RasterExtension.combine_structure_rasters(rasters=structure_boundary_rasters, shape_type="polygon")
                 combined_structure_outlet_raster = RasterExtension.combine_structure_rasters(rasters=structure_outlet_rasters, shape_type="point")
                 
                 #get flow direction considering the impact of structures
+                logger.debug("Creating flow direction based on dem and structures ...")
                 flow_dir_raster = Structure.get_flow_direction(
                     combined_structure_boundary_raster, 
                     combined_structure_outlet_raster, 
                     self.dem_clipped_burned_filled_raster)
             else:
                 #if there are no structure, use the dem directly
+                logger.debug("Creating flow direction based on dem ...")
                 flow_dir_raster = self.wbe.d8_pointer(dem = self.dem_clipped_burned_filled_raster)
             self.save_raster(flow_dir_raster, Names.flowDirD8FinalName)
         
@@ -588,6 +609,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.flowAccName)
 
         if raster is None:  
+            logger.debug("Creating flow accumulation raster ...")
             raster = self.wbe.d8_flow_accum(raster = self.flow_direction_raster, input_is_pointer = True)
             self.save_raster(raster, Names.flowAccName)
 
@@ -608,11 +630,13 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.streamNetworkRasName)
    
         if raster is None:       
-            #get streams from the flow accumuation     
+            #get streams from the flow accumuation 
+            logger.debug(f"Extracting stream raster with threashold area of {self.stream_threshold_area_ha}ha ...")    
             raster = self.wbe.extract_streams(flow_accumulation = self.flow_acc_raster, threshold = self.stream_threshold_area_ha / self.inputs.cellsize_ha)
             
-            #fix it as some of the structure streams may be below the threshold            
-            raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.stream_outlets_raster)
+            #fix it as some of the structure streams may be below the threshold 
+            logger.debug("Fixing stream network so the structure stream segment that is below threashold will be added back ...")           
+            raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.stream_outlets_original_raster)
 
             #save it
             self.save_raster(raster, Names.streamNetworkRasName)
@@ -630,30 +654,75 @@ class Outputs(FolderBase):
         return vector    
     
     @property
-    def stream_outlets_raster(self)->Raster:
-        """
-        the raster of all stream outlets
-        """
-        raster = self.get_raster(Names.streamOutletsRasName)
+    def stream_outlets_original_raster(self)->Raster:
+        """Single raster of all possible stream outlets"""
+        raster = self.get_raster(Names.streamOutletsOriginalRasName)
 
         if raster is None:
-            raster = self.wbe.raster_to_vector_points(self.stream_outlets_vector)
-            self.save_raster(raster, Names.streamOutletsRasName)
+            logger.debug("Converting stream outlets orginal vector to raster ...")
+            raster = self.wbe.raster_to_vector_points(self.stream_outlets_original_vector)
+            self.save_raster(raster, Names.streamOutletsOriginalRasName)
 
         return raster
 
     @property
-    def stream_outlets_vector(self)->Vector:
+    def stream_outlets_original_vector(self)->Vector:
+        """Single vector of all possible stream outlets"""
+        vector = self.get_vector(Names.streamOutletsOriginalShpName)
+
+        if vector is None:
+            logger.debug("Merging all possible stream outlets to a single vector ...")
+
+            #merge the pour points and user-provided reservoir and outlets
+            outlet_vectors = []
+          
+            #add user-defined outlets
+            if self.inputs.outlet_vector is not None:
+                outlet_vectors.append(self.inputs.outlet_vector)
+
+            #add reach bmp points but exclude wetland
+            for reach_bmp in self.inputs.reach_bmp_vectors:
+                if reach_bmp is not None:
+                    outlet_vectors.append(reach_bmp)
+
+            #add structure outlets
+            if len(self.structures) > 0:
+                outlet_vectors.append([structure.outlet_vector for structure in self.structures])
+
+            vector = self.wbe.merge_vectors(outlet_vectors)
+            self.save_vector(vector, Names.streamOutletsOriginalShpName)
+
+        return vector
+    
+    @property
+    def stream_outlets_pour_point_raster(self)->Raster:
+        """
+        the raster of all stream outlets
+        """
+        raster = self.get_raster(Names.streamOutletsPourPointRasName)
+
+        if raster is None:
+            logger.debug("Converting stream outlets pour point vector to raster ...")
+            raster = self.wbe.raster_to_vector_points(self.stream_outlets_pour_points_vector)
+            self.save_raster(raster, Names.streamOutletsPourPointRasName)
+
+        return raster
+
+    @property
+    def stream_outlets_pour_points_vector(self)->Vector:
         """
         the stream outlets considering structures, user-defined outlets and reservoirs
         """
         vector = self.get_vector(Names.streamOutletsShpName)
 
         if vector is None:
+            logger.debug("Merging all possible stream outlets pour points to a single vector ...")
+
             #merge the pour points and user-provided reservoir and outlets
             outlet_vectors = []
 
             #add the pour point
+            logger.debug("Creating pour points from structures ...")
             pour_points_vector = Delineation.get_pour_points(
                 self.stream_network_raster, 
                 self.flow_direction_raster, 
@@ -664,9 +733,10 @@ class Outputs(FolderBase):
             if self.inputs.outlet_vector is not None:
                 outlet_vectors.append(self.wbe.jenson_snap_pour_points(pour_pts = self.inputs.outlet_vector,streams = self.stream_network_raster))
 
-            #add reservoir points
-            if self.inputs.reservoir_vector is not None:
-                outlet_vectors.append(self.wbe.jenson_snap_pour_points(pour_pts = self.inputs.reservoir_vector,streams = self.stream_network_raster))
+            #add reach bmp points but exclude wetland
+            for reach_bmp in self.inputs.reach_bmp_vectors:
+                if reach_bmp is not None:
+                    outlet_vectors.append(self.wbe.jenson_snap_pour_points(pour_pts = reach_bmp,streams = self.stream_network_raster))
 
             #add structure outlets
             if len(self.structures) > 0:
@@ -683,17 +753,23 @@ class Outputs(FolderBase):
 
         if raster is None:
             #get subbasins
-            raster = self.wbe.watershed(d8_pointer=self.flow_direction_raster, pour_points=self.stream_outlets_vector)
+            logger.debug("creating subbasins ...")
+            raster = self.wbe.watershed(d8_pointer=self.flow_direction_raster, pour_points=self.stream_outlets_pour_points_vector)
 
             #fix the subbasins considering the structures
+            logger.debug("Fixing subbasin so the structure is in a single subbasin ...")
             for type,structure in self.structures:
+                logger.debug(type)
                 structure.repair_subbasin(raster)
             
             #reorder the subbasin starting from 1
+            logger.debug("Reordering subbasin ...")
             Delineation.reorder_raster_id(raster)
 
             #reorder the structure
+            logger.debug("Reordering structure ...")
             for type,structure in self.structures:
+                logger.debug(type)
                 structure.reorder_after_subbasin(raster)
 
             #save the subbasin raster
@@ -723,11 +799,11 @@ class Outputs(FolderBase):
 
     @property
     def stream_order_raster(self)->Raster:
-        raster = self.get_raster(Names.streamOrderName)  
+        raster = self.get_raster(Names.streamOrderRasName)  
 
         if raster is None:
             rater = self.wbe.strahler_stream_order(d8_pntr = self.flow_direction_raster, streams_raster = self.stream_network_raster)
-            self.save_raster(raster, Names.streamOrderName)
+            self.save_raster(raster, Names.streamOrderRasName)
 
         return raster
             
@@ -745,126 +821,6 @@ class Outputs(FolderBase):
             self.save_raster(raster, Names.reachRasName)
 
         return raster
-
-    # def raster_streams_to_vector_imwebs(self):
-    #     """
-    #     replace RasterStreamsToVectorIMWEBs
-    #     """
-    #     row, col, x, y = 0, 0, 0, 0
-    #     LnOf2 = 0.693147180559945
-    #     dX = [1, 1, 1, 0, -1, -1, -1, 0]
-    #     dY = [-1, 0, 1, 1, 1, 0, -1, -1]
-    #     inflowing_vals = [16, 32, 64, 128, 1, 2, 4, 8]
-
-    #     try:
-    #         streams = WhiteboxRaster(streams_header, "r")
-    #         rows = streams.get_number_rows()
-    #         cols = streams.get_number_columns()
-    #         no_data = streams.get_no_data_value()
-    #         grid_res_x = streams.get_cell_size_x()
-    #         grid_res_y = streams.get_cell_size_y()
-    #         diag_grid_res = math.sqrt(grid_res_x * grid_res_x + grid_res_y * grid_res_y)
-    #         grid_lengths = [diag_grid_res, grid_res_x, diag_grid_res, grid_res_y, diag_grid_res, grid_res_x, diag_grid_res, grid_res_y]
-    #         east = streams.get_east() - grid_res_x / 2.0
-    #         west = streams.get_west() + grid_res_x / 2.0
-    #         EW_range = east - west
-    #         north = streams.get_north() - grid_res_y / 2.0
-    #         south = streams.get_south() + grid_res_y / 2.0
-    #         NS_range = north - south
-
-    #         pntr = WhiteboxRaster(pointer_header, "r")
-
-    #         fields = [DBFField() for _ in range(1)]
-    #         fields[0].set_name("VALUE")
-    #         fields[0].set_data_type(DBFField.DBFDataType.NUMERIC)
-    #         fields[0].set_field_length(10)
-    #         fields[0].set_decimal_count(3)
-
-    #         output = ShapeFile(output_file_name, ShapeType.POLYLINE, fields)
-
-    #         FID = 0
-    #         stream_parts = defaultdict(list)
-    #         stream_points = defaultdict(PointsList)
-
-    #         for row in range(rows):
-    #             for col in range(cols):
-    #                 stream_value = streams.get_value(row, col)
-    #                 if stream_value > 0:
-    #                     num_neighbouring_stream_cells = 0
-    #                     is_upstream_different = False
-    #                     for c in range(8):
-    #                         x = col + dX[c]
-    #                         y = row + dY[c]
-    #                         if streams.get_value(y, x) > 0 and pntr.get_value(y, x) == inflowing_vals[c]:
-    #                             num_neighbouring_stream_cells += 1
-    #                             if streams.get_value(y, x) != stream_value:
-    #                                 is_upstream_different = True
-    #                     if num_neighbouring_stream_cells != 1 or is_upstream_different:
-    #                         FID += 1
-    #                         link_length = 0
-    #                         points = PointsList()
-    #                         if stream_value in stream_parts:
-    #                             points = stream_points[stream_value]
-    #                             stream_parts[stream_value].append(len(points))
-    #                         else:
-    #                             stream_parts[stream_value].append(0)
-    #                             stream_points[stream_value] = points
-
-    #                         x = col
-    #                         y = row
-    #                         previous_flow_dir = -99
-    #                         flag = True
-    #                         while flag:
-    #                             flow_dir = pntr.get_value(y, x)
-    #                             if flow_dir > 0:
-    #                                 if flow_dir != previous_flow_dir:
-    #                                     x_coord = west + (x / cols) * EW_range
-    #                                     y_coord = north - (y / rows) * NS_range
-    #                                     points.add_point(x_coord, y_coord)
-    #                                     previous_flow_dir = flow_dir
-
-    #                                 c = int(math.log(flow_dir) / LnOf2)
-    #                                 if c > 7:
-    #                                     return
-
-    #                                 x += dX[c]
-    #                                 y += dY[c]
-    #                                 link_length += grid_lengths[c]
-
-    #                                 if streams.get_value(y, x) <= 0 or streams.get_value(y, x) != stream_value:
-    #                                     flag = False
-    #                                 else:
-    #                                     num_neighbouring_stream_cells = 0
-    #                                     for d in range(8):
-    #                                         x2 = x + dX[d]
-    #                                         y2 = y + dY[d]
-    #                                         if streams.get_value(y2, x2) > 0 and pntr.get_value(y2, x2) == inflowing_vals[d]:
-    #                                             num_neighbouring_stream_cells += 1
-    #                                     if num_neighbouring_stream_cells > 1:
-    #                                         flag = False
-    #                             else:
-    #                                 flag = False
-
-    #                             if not flag:
-    #                                 x_coord = west + (x / cols) * EW_range
-    #                                 y_coord = north - (y / rows) * NS_range
-    #                                 points.add_point(x_coord, y_coord)
-
-    #         for stream_id in stream_parts.keys():
-    #             parts = stream_parts[stream_id]
-    #             array = [parts[i] for i in range(len(parts))]
-    #             line = PolyLine(array, stream_points[stream_id].get_points_array())
-    #             row_data = [stream_id]
-    #             output.add_record(line, row_data)
-
-    #         output.write()
-
-    #         pntr.close()
-    #         streams.close()
-
-    #     except (OutOfMemoryError, Exception) as oe:
-    #         Logger.getLogger(Watershed.class.get_name()).log(Level.SEVERE, None, oe)
-
 
     @property
     def reach_width_raster(self)->Raster:
@@ -901,11 +857,70 @@ class Outputs(FolderBase):
 
 #endregion
 
+#region bmps
+
+    @property
+    def marginal_crop_land_raster(self):
+        """
+        generate marginal crop land
+
+        replace MarginalCropland
+        """
+        raster = self.get_raster(Names.marCroplandRasName)  
+
+        if raster is None and self.marginal_crop_land_landuse_ids is not None and len(self.marginal_crop_land_landuse_ids) > 0:
+            filtered_landuse_raster = RasterExtension.filter_by_values(self.mapped_landuse_raster, self.marginal_crop_land_landuse_ids)
+            buffered_landuser_raster = self.wbe.buffer_raster(input = filtered_landuse_raster, buffer_size = self.marginal_crop_land_buffer_size_m) #need test
+
+            slope_threshod_deg = max(math.atan(self.marginal_crop_land_slope_threshod / 100) * 180.0 / math.pi, 0.0)
+            
+            raster = self.field_without_agriculture_raster.deep_copy()
+            raster = buffered_landuser_raster.con("value > 0", raster, raster.configs.nodata)
+            raster = self.slope_degree_raster.con(f"value >= {slope_threshod_deg}", raster, raster.configs.nodata)    
+            raster = self.mask_refined_with_subbasin_raster.con(f"value > 0", raster, raster.configs.nodata)
+
+            self.save_raster(raster, Names.marCroplandRasName)
+                    
+        return raster
+    
+    @property
+    def pasture_land_raster(self):
+        """
+        generate pasture land
+
+        replace BuildMapOnLandUse
+        """
+        raster = self.get_raster(Names.pastureLandRasName)  
+
+        if raster is None and self.pasture_land_landuse_ids is not None and len(self.pasture_land_landuse_ids) > 0:
+            filtered_landuse_raster = RasterExtension.filter_by_values(self.mapped_landuse_raster, self.pasture_land_landuse_ids)
+            
+            raster = self.field_without_agriculture_raster.deep_copy()
+            raster = filtered_landuse_raster.con("value > 0", raster, raster.configs.nodata)
+            raster = self.mask_refined_with_subbasin_raster.con(f"value > 0", raster, raster.configs.nodata)
+
+            self.save_raster(raster, Names.pastureLandRasName)
+                    
+        return raster
+
+
+#endregion
+
+#region interpolation
+
+
+
+#endregion
+
+    def delineate_watershed(self):
+        """watershed delineation which basically delineate stream and subbasins"""
+        subbasin = self.subbasin_raster
+
     def generate_bmp_database(self):
         self.parameter.bmp_database.populate_database(
             self.subbasin_raster, 
-            self.inputs.field_raster, 
-            self.inputs.farm_raster,
+            self.field_without_agriculture_raster, 
+            self.farm_without_agriculture_raster,
             self.flow_acc_raster,
             self.potential_ruoff_coefficient_raster,
             self.depression_storage_capacity_raster,

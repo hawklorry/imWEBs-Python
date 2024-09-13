@@ -45,3 +45,11 @@ class SoilLookup(ParameterTable):
     INTERFLOW_SCALE_FACTOR2 = Column(Float)
     TEXTURE = Column(Float)
     HG = Column(Float)
+
+    @property
+    def AverageK(self)->float:
+        return (getattr(self, "KS1") + getattr(self, "KS2")) / 2
+    
+    @property
+    def AveragePorosity(self)->float:
+        return (getattr(self, "POROSITY1") + getattr(self, "POROSITY2")) / 2    

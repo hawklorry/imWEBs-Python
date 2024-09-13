@@ -1,0 +1,32 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+WTI,Wetness index,,SUR_SA,-99,0,RC,1.2,0.8,Y
+Slope,Slope,%,ALL,-99,0,RC,1.1,0.9,Y
+Moist_in,Initial soil moisture,m3/m3,ALL,-99,0,RC,0,0.8,Y
+soiltemp0,Initial soil temperature,oC,SOI_EB,-99,0,RC,1.2,0.8,Y
+K_run,Runoff exponent when net rainfall approaches to zero,,SUR_MR,2.5,0,AC,5,0,Y
+P_max,Maximum rainfall intensity when k_run = 1.0,mm,SUR_MR,30,15,AC,60,10,Y
+Depre_in,Initial depression storage coefficient,,ALL,0,0,RC,1,0,Y
+soil_ta0,Empirical coefficient for estimating soil temperature,oC,STP_FP,4.7,-6.7,AC,10,0,Y
+soil_ta1,Empirical coefficient for estimating soil temperature,,STP_FP,0.174,0,AC,1,0,Y
+soil_ta2,Empirical coefficient for estimating soil temperature,,STP_FP,0.163,0,AC,1,0,Y
+soil_ta3,Empirical coefficient for estimating soil temperature,,STP_FP,0.223,0,AC,1,0,Y
+soil_tb1,Empirical coefficient for estimating soil temperature,oC,STP_FP,-1.361,0,AC,0,-5,Y
+soil_tb2,Empirical coefficient for estimating soil temperature,oC,STP_FP,-3.762,0,AC,0,-5,Y
+soil_td1,Empirical coefficient for estimating soil temperature,oC,STP_FP,0.057,0,AC,1,0,Y
+soil_td2,Empirical coefficient for estimating soil temperature,oC,STP_FP,0.339,0,AC,1,0,Y
+k_soil10,ratio between soil temperature at 10 cm and the mean,,STP_FP,1,0,AC,3,0,Y
+gw0,"Initial groundwater storage, DEEPST",mm,soilwater,10,0,AC,500,0,Y
+gwmax,Maximum groundwater storage,mm,soilwater,1000,0,AC,1000,0,Y
+rv_co,"Groundwater revap coefficient, GW_REVAP",,soilwater,0.1,0,AC,0.2,0,Y
+kg,"Baseflow recession coefficient, ALPHA_BF",,soilwater,0.001,0,AC,1,0,Y
+base_ex,Baseflow recession exponent,,soilwater,1,0,AC,3,1,Y
+ki,Interflow scale factor,,soilwater,30,0,AC,10000,0,Y
+t_soil,Soil freezing temperature,oC,ALL,0,0,AC,20,-15,Y
+s_frozen,Frozen moisture relative to porosity with no infiltration,,ALL,0.5,0,AC,1,0,Y
+SoilT_downup_ratio,The ratio of down soil layer temperature to up soil layer temperature,,STP_RA,0.5,0,,1,0,
+wetland,wetland distribution,,ALL,-99,0,NC,1000,1,
+BaseFlow_A,Threshold reach contrubution area for reach to has base flow input,ha,ALL,100,0,AC,200,50,Y
+MinGWStorage,Minimum groundwater storage (mm) below which irrigation will not be performed.,mm,ALL,0,0,AC,1000,0,Y
+Surface_lag,Surface flow fraction that gets to the subbasin outlet in one simulation step,,ALL,1,0,AC,1,0.5,Y
+SR_Min,Minimum surface runoff that activate Surface_lag,mm,ALL,0.01,0,AC,1,0.005,Y
+LateralFlowSoilProfileLimit,Maximum laterflow (mm) is allowed to be generated in one time step.,mm,ALL,100,0,AC,1000,0,Y

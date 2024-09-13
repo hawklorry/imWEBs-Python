@@ -8,6 +8,18 @@ logger = logging.getLogger(__name__)
 
 class RasterExtension:
 
+    flow_dir_xy_delta_dic = {1: (1, -1), 2: (1, 0), 4: (1, 1), 8: (0, 1), 16: (-1, 1), 32: (-1, 0), 64: (-1, -1), 128: (0, -1)}    
+
+    @staticmethod
+    def flow_dir_to_index_delta(flow_dir):
+        if  int(flow_dir) not in RasterExtension.flow_dir_to_index_delta:
+            raise ValueError(f"{flow_dir} is not an invalid flow direction value.")
+        
+        delta = RasterExtension.flow_dir_to_index_delta[int(flow_dir)]
+        dx = delta[0]
+        dy = delta[1]
+        return dx, dy
+
     @staticmethod
     def reclassify(raster:Raster, lookup_dict, mask_raster:Raster = None)->Raster:
         """
@@ -35,6 +47,20 @@ class RasterExtension:
 
         return mapped_raster
 
+    @staticmethod
+    def filter_by_values(raster:Raster, values:list)->Raster:
+        """
+        remove values that are not included in the given value list
+        """
+        wbe = WbEnvironment()
+        filtered_raster = wbe.new_raster(raster.configs)
+        no_data = raster.configs.nodata
+        for row in range(raster.configs.rows):
+            for col in range(raster.configs.columns):
+                if raster[row, col] != no_data and raster[row, col] in values:
+                    filtered_raster[row, col] = raster[row, col]
+
+        return filtered_raster
 
     @staticmethod
     def combine_structure_rasters(rasters:list, shape_type:str)->Raster:
@@ -75,7 +101,8 @@ class RasterExtension:
             standar_raster_config.epsg_code == check_raster_config.epsg_code
     
     @staticmethod
-    def compare_rasters(rasters):
+    def check_rasters(rasters:dict)->bool:
+        """Compare all the rasters in the dictionary and return trun only when all of them has the same resolution and dimension."""
         if len(rasters) <= 1:
             return True
         
@@ -87,8 +114,7 @@ class RasterExtension:
                 continue
             
             if not RasterExtension.compare_raster_extent(standard_raster, value):
-                is_same = False
-                logger.warning(f"The extend of {value.file_name} doesn't match {standard_raster.file_name}")
+                raise ValueError(f"The extend of {value.file_name} doesn't match {standard_raster.file_name}")
 
         return is_same
 

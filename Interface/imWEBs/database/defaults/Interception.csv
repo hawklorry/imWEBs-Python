@@ -1,0 +1,5 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+Pi_b,Interception Storage Capacity Exponent,,PISC_SIN,1.35,0,AC,1.5,0.5,Y
+K_pet,Correction Factor for PET,,PETC_LAI,1,0,AC,2,0,Y
+Init_IS,Initial interception storage,mm,PI_MSM,0,0,AC,1,0,
+24HourlyPET,the hour when the hourly PET equals to 1/24 of daily PET,hr,ALL,9,0,AC,23,0,

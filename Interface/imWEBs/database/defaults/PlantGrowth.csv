@@ -1,0 +1,11 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+nFixFactor,nitrogen fixation factor,,PG_EPIC,0.5,0,NC,1,0,
+nFixMax,maximum daily-n fixation,kg/ha,PG_EPIC,10,0,NC,20,1,
+wDis,water use distribution parameter,,PG_EPIC,10,0,NC,20,0,
+wCom,"water uptake compensation factor, EPCO",,PG_EPIC,1,0,NC,1,0,
+nDis,"nitrogen uptake distribution parameter, N_IPDIS",,PG_EPIC,10,0,NC,50,0,
+pDis,"phosphorous uptake distribution parameter, P_UPDIS",,PG_EPIC,15,0,NC,20,0,
+frPerennial,perennial biomass loss fraction,,PG_EPIC,0.1,0,NC,1,0,
+startYear,the start year of rotation,,ALL,2000,0,NC,0,0,
+landUse,the initial distribution of crops,,ALL,-99,0,NC,109,1,
+minGrazingBio,minimum plant biomass for grazing,kg/ha,PG_EPIC,0,0,NC,20,0,

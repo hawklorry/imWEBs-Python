@@ -1,4 +1,4 @@
-from .imwebs_config import imWEBsConfig
+from .config.model_config import ModelConfig
 from .outputs import Outputs
 
 class imWEBs:
@@ -10,11 +10,14 @@ class imWEBs:
         """
         config_file: the imWEBs model configuration file
         """
-        self.config = imWEBsConfig(config_file)
+        self.model_config = ModelConfig(config_file)
 
-    def delineate(self):
+    def delineate_watershed(self):
         """
         watershed delineation
         """
-        pass  
+        self.model_config.delineate_watershed()
+
+    def create_model(self):
+        pass
 

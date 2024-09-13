@@ -1,0 +1,43 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+clay,Clay proportion,,ALL,,0,RC,0,0,Y
+CN2,Curve number in condition II,,ALL,,0,RC,100,0,Y
+ConcentrationN,concentration of total nitrogen in suspended solid load,mg N/kg,ALL,,0,NC,10,0,
+ConcentrationNO3,concentration of nitrate in suspended solid load,mg N/kg,ALL,,0,NC,10,0,
+ConcentrationP,concentration of total phophorous in suspended solid load,mg P/kg,ALL,,0,NC,10,0,Y
+conductivity_layer1,soil hydraulic conductivity,mm/hr,ALL,,0,RC,10000,0,Y
+ConnectedImperviousFraction,fraction of urban land type area that is connected impervious,,ALL,,0,NC,1,0,
+CurbLengthDensity,curb length density in urban land type,km/ha,ALL,,0,NC,10,0,
+density_layer1,Soil bulk density,mg/cm3,ALL,,0,RC,10000,0,Y
+depression,Depression storage capacity,mm,ALL,,0,RC,100,0,Y
+fieldcap_layer1,Soil field capacity,m3/m3,ALL,,0,RC,1,0,Y
+HalfBuildDays,number of days for amount of solids on impervious area to build up from 0kg/curb km to 1/2 MaxBuildUp,day,ALL,,0,NC,10,0,
+interc_max,Maximum Interception Capacity,mm,ALL,,0,RC,100,0,Y
+interc_min,Minimum Interception Capacity,mm,ALL,,0,RC,100,0,Y
+manning,manning coefficient,,ALL,,0,NC,1,0,
+MaxBuildUp,maxinum amount of solids allowed to build up on impervious areas,kg/curb km,ALL,,0,NC,100,0,
+petLAIco,The PET change coefficient depends on LAI,,ALL,,0,NC,10,0,
+poreindex_layer1,Pore size distribution index,,ALL,,0,RC,100,0,Y
+porosity_layer1,soil porosity,m3/m3,ALL,,0,RC,1,0,Y
+residual_layer1,residual moisture,,ALL,,0,RC,1,0,Y
+rootdepth,root depth,mm,ALL,,0,RC,100000,0,Y
+runoff_co,Potential runoff coefficient,,ALL,,0,RC,10,0,Y
+sand_layer1,Sand proportion,,ALL,,0,RC,1,0,Y
+silt_layer1,Silt proportion,,ALL,,0,RC,1,0,Y
+soil_t10,,,ALL,,0,NC,100,-50,
+TotalImperviousFraction,fraction of urban type land type area that is impervious,,ALL,,0,NC,1,0,
+UrbanCN2,SCS moisture condition II curve number for impervious areas,,ALL,,0,NC,100,0,
+usle_c,C-factor for MUSLE,,ALL,,0,NC,1,0,
+usle_k_layer1,K-factor for MUSLE,,ALL,,0,NC,1,0,
+washOffCoefficient,wash off coefficient,/mm,ALL,,0,NC,1000,0,
+wiltingpoint_layer1,Plant wilting point moisture,m3/m3,ALL,,0,RC,1,0,Y
+shc,Snow holding capacity,mm,ALL,,0,RC,100,0,Y
+conductivity_layer2,soil hydraulic conductivity,mm/hr,ALL,,0,RC,10000,0,Y
+density_layer2,Soil bulk density,mg/cm3,ALL,,0,RC,10000,0,Y
+fieldcap_layer2,Soil field capacity,m3/m3,ALL,,0,RC,1,0,Y
+poreindex_layer2,Pore size distribution index,,ALL,,0,RC,100,0,Y
+porosity_layer2,soil porosity,m3/m3,ALL,,0,RC,1,0,Y
+residual_layer2,residual moisture,,ALL,,0,RC,1,0,Y
+sand_layer2,Sand proportion,,ALL,,0,RC,1,0,Y
+silt_layer2,Silt proportion,,ALL,,0,RC,1,0,Y
+usle_k_layer2,K-factor for MUSLE,,ALL,,0,NC,1,0,
+wiltingpoint_layer2,Plant wilting point moisture,m3/m3,ALL,,0,RC,1,0,Y

@@ -74,7 +74,7 @@ class LanduseLookup(ParameterTable):
     @property
     def field_capacity(self):
         return getattr(self, "FC1")
-
+    
     def getPotentialRunoffCoefficient(self, soil_texture:int)->float:
         """Get potential runoff coefficient for given soil texture"""
         return getattr(self, f"PRC_ST{soil_texture}")

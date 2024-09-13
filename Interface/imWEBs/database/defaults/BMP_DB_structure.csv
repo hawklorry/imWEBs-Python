@@ -1,0 +1,827 @@
+TableID,TableName,ColumnID,ColumnName,ColumnType,Description,DefaultValue,IsDate,IsSelector,SelectRange,IsLinkFile,IsEditable
+1,BMP_scenarios,1,ID,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+1,BMP_scenarios,2,NAME,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+1,BMP_scenarios,3,BMP,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+1,BMP_scenarios,4,DISTRIBUTION,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+1,BMP_scenarios,5,PARAMETER,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+2,BMP_index,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+2,BMP_index,2,Name,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+2,BMP_index,3,Type,INT,-,0.0,0.0,0.0,,0.0,0.0
+2,BMP_index,4,CODE,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,2,Reach,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,3,PointSource,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,4,FlowDiversion,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,5,Reservoir,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,6,Wetland,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,7,CatchBasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,8,GrassWaterway,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,9,Dugout,INT,-,0.0,0.0,0.0,,0.0,0.0
+3,Reach_BMP,10,AccessManagement,INT,-,0.0,0.0,0.0,,0.0,0.0
+4,crop_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+4,crop_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+4,crop_management,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+4,crop_management,4,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+4,crop_management,5,ActualYear,INT,-,0.0,1.0,0.0,,0.0,0.0
+4,crop_management,6,CropCode,INT,-,27.0,0.0,1.0,1-97,0.0,1.0
+4,crop_management,7,PlantingMon,INT,-,6.0,1.0,0.0,,0.0,1.0
+4,crop_management,8,PlantingDay,INT,-,5.0,1.0,0.0,,0.0,1.0
+4,crop_management,9,HarvestMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+4,crop_management,10,HarvestDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+4,crop_management,11,HarvestType,INT,-,0.0,0.0,1.0,"0,1,2",0.0,1.0
+4,crop_management,12,HarvestEfficiency,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+4,crop_management,13,HarvestIndexOverride,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+4,crop_management,14,StoverFraction,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+4,crop_management,15,CNOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+4,crop_management,16,IsGrain,INT,-,1.0,0.0,1.0,"0,1",0.0,1.0
+4,crop_management,17,PRCOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+5,crop_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+5,crop_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+5,crop_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+5,crop_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+6,crop_parameter,1,ICNUM,INT,-,0.0,0.0,0.0,,0.0,0.0
+6,crop_parameter,2,CPNM,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+6,crop_parameter,3,DESCRIPTION,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+6,crop_parameter,4,IDC,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,5,BIO_E,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,6,HVSTI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,7,BLAI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,8,FRGRW1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,9,LAIMX1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,10,FRGRW2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,11,LAIMX2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,12,DLAI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,13,CHTMX,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,14,RDMX,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,15,T_OPT,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,16,T_BASE,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,17,CNYLD,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,18,CPYLD,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,19,BN1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,20,BN2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,21,BN3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,22,BP1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,23,BP2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,24,BP3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,25,WSYF,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,26,USLE_C,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,27,GSI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,28,VPDFR,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,29,FRGMAX,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,30,WAVP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,31,CO2HI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,32,BIOEHI,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,33,RSDCO_PL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,34,OV_N,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,35,CN2A,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,36,CN2B,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,37,CN2C,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,38,CN2D,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,39,FERTFIELD,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,40,ALAI_MIN,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,41,BIO_LEAF,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,42,PHU,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,43,CNOP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,44,LAI_INIT,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,45,BIO_INIT,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+6,crop_parameter,46,CURYR_INIT,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+7,grazing_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+7,grazing_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+7,grazing_management,3,Year,INT,-,0.0,1.0,1.0,,0.0,1.0
+7,grazing_management,4,GraMonth,INT,-,9.0,1.0,1.0,,0.0,1.0
+7,grazing_management,5,GraDay,INT,-,1.0,1.0,1.0,,0.0,1.0
+7,grazing_management,6,Days,INT,-,45.0,0.0,1.0,1-365,0.0,1.0
+7,grazing_management,7,ManureType,INT,-,45.0,0.0,1.0,0.0,0.0,1.0
+7,grazing_management,8,Eat,DOUBLE,-,6.75,0.0,0.0,,0.0,1.0
+7,grazing_management,9,Trample,DOUBLE,-,13.5,0.0,0.0,,0.0,1.0
+7,grazing_management,10,Deposit,DOUBLE,-,58.0,0.0,0.0,,0.0,1.0
+7,grazing_management,11,N,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+7,grazing_management,12,AnimalType,INT,-,2.0,0.0,1.0,1-9,0.0,1.0
+8,FlowDiversion,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+8,FlowDiversion,2,XLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+8,FlowDiversion,3,YLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+8,FlowDiversion,4,OPERATION,TEXT,-,0.0,0.0,0.0,,0.0,1.0
+8,FlowDiversion,5,TABLENAME,TEXT,-,0.0,0.0,0.0,,0.0,1.0
+9,PointSource,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+9,PointSource,2,XLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+9,PointSource,3,YLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+9,PointSource,4,OPERATION,TEXT,-,0.0,0.0,0.0,,0.0,1.0
+9,PointSource,5,TABLENAME,TEXT,-,0.0,0.0,0.0,,0.0,1.0
+10,tillage_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+10,tillage_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+10,tillage_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+10,tillage_management,4,TillMon,INT,-,5.0,1.0,0.0,,0.0,1.0
+10,tillage_management,5,TillDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+10,tillage_management,6,TillCode,INT,-,1.0,0.0,1.0,1-108,0.0,1.0
+11,tillage_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+11,tillage_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+11,tillage_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+11,tillage_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+12,tillage_parameter,1,ITNUM,INT,-,0.0,0.0,0.0,,0.0,0.0
+12,tillage_parameter,2,TILLNM,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+12,tillage_parameter,3,DESCRIPTION,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+12,tillage_parameter,4,EFFMIX,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+12,tillage_parameter,5,DEPTIL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+12,tillage_parameter,6,CNOP_CN2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+12,tillage_parameter,7,PRC,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+12,tillage_parameter,8,DSC,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+13,fertilizer_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+13,fertilizer_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+13,fertilizer_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+13,fertilizer_management,4,FerMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+13,fertilizer_management,5,FerDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+13,fertilizer_management,6,FerType,INT,-,1.0,0.0,1.0,1-54,0.0,1.0
+13,fertilizer_management,7,FerRate,DOUBLE,-,500.0,0.0,0.0,,0.0,1.0
+13,fertilizer_management,8,FerSurface,DOUBLE,-,0.3,0.0,0.0,,0.0,1.0
+14,fertilizer_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+14,fertilizer_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+14,fertilizer_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+14,fertilizer_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+15,fertilizer_parameter,1,IFNUM,INT,-,0.0,0.0,0.0,,0.0,0.0
+15,fertilizer_parameter,2,FERTNM,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+15,fertilizer_parameter,3,DESCRIPTION,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+15,fertilizer_parameter,4,FMINN,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,5,FMINP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,6,FORGN,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,7,FORGP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,8,FNH3N,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,9,BACTPDB,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,10,BACTLPDB,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,11,BACKTKDDB,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+15,fertilizer_parameter,12,IsManure,INT,-,0.0,0.0,0.0,,0.0,1.0
+16,irrigation_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+16,irrigation_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+16,irrigation_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+16,irrigation_management,4,IrrMon,INT,-,5.0,1.0,0.0,,0.0,1.0
+16,irrigation_management,5,IrrDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+16,irrigation_management,6,Days,INT,-,1.0,0.0,1.0,1-100,0.0,1.0
+16,irrigation_management,7,IrrType,INT,-,2.0,0.0,1.0,"1,2",0.0,1.0
+16,irrigation_management,8,IrrSource,DOUBLE,-,4.0,0.0,1.0,"1,2,3,4",0.0,1.0
+16,irrigation_management,9,IrrSourceID,INT,-,0.0,0.0,1.0,,0.0,1.0
+16,irrigation_management,10,IrrRate,DOUBLE,-,200.0,0.0,0.0,,0.0,1.0
+16,irrigation_management,11,IrrMax,DOUBLE,-,20.0,0.0,0.0,,0.0,1.0
+16,irrigation_management,12,IrrEffi,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+16,irrigation_management,13,ReturnFlowCo,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+16,irrigation_management,14,WstrMax,DOUBLE,-,0.9,0.0,0.0,,0.0,1.0
+17,irrigation_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+17,irrigation_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+17,irrigation_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+17,irrigation_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,1,IrrType,INT,-,1.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,2,IRRNM,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,3,Year,INT,-,0.0,1.0,0.0,,0.0,0.0
+18,irrigation_parameter,4,IrrMon,INT,-,0.0,1.0,0.0,,0.0,0.0
+18,irrigation_parameter,5,IrrDay,INT,-,0.0,1.0,0.0,,0.0,0.0
+18,irrigation_parameter,6,IrrSource,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,7,IrrSourceID,INT,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,8,IrrRate,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,9,IrrMax,DOUBLE,-,20.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,10,IrrEffi,DOUBLE,-,1.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,11,ReturnFlowCo,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+18,irrigation_parameter,12,WstrMax,DOUBLE,-,0.9,0.0,0.0,,0.0,0.0
+19,asq_1,1,AREA,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+20,asq_2,1,STORAGE,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+21,asq_3,1,DISCHARGE,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+22,Reservoir,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+22,Reservoir,2,XLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+22,Reservoir,3,YLL,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+22,Reservoir,4,OPERATION,TEXT,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,5,SA_EM,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,6,V_EM,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,7,SA_PR,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,8,V_PR,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,9,INI_S,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,10,Q_REL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,11,k_res,DOUBLE,-,0.3,0.0,0.0,,0.0,1.0
+22,Reservoir,12,OFLOWMN01,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,13,OFLOWMN02,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,14,OFLOWMN03,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,15,OFLOWMN04,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,16,OFLOWMN05,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,17,OFLOWMN06,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,18,OFLOWMN07,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,19,OFLOWMN08,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,20,OFLOWMN09,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,21,OFLOWMN10,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,22,OFLOWMN11,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,23,OFLOWMN12,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,24,OFLOWMX01,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,25,OFLOWMX02,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,26,OFLOWMX03,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,27,OFLOWMX04,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,28,OFLOWMX05,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,29,OFLOWMX06,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,30,OFLOWMX07,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,31,OFLOWMX08,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,32,OFLOWMX09,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,33,OFLOWMX10,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,34,OFLOWMX11,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,35,OFLOWMX12,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,36,METHOD,TEXT,-,0.0,0.0,1.0,"RAT_RES,MDO_RES,MMO_RES,AAR_RES,TRR_RES",0.0,1.0
+22,Reservoir,37,SEDMETHOD,TEXT,-,0.0,0.0,1.0,"SMB_RES, UNKNOWN",0.0,1.0
+22,Reservoir,38,INT_SC,DOUBLE,-,0.03,0.0,0.0,,0.0,1.0
+22,Reservoir,39,NSED,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+22,Reservoir,40,D50,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+22,Reservoir,41,NUTMETHOD,TEXT,-,0.0,0.0,1.0,"RES_NUTR_BAL, UNKNOWN",0.0,1.0
+22,Reservoir,42,FILE,TEXT,-,0.0,0.0,0.0,,1.0,1.0
+22,Reservoir,43,PSETLR,DOUBLE,-,50.0,0.0,0.0,,0.0,1.0
+22,Reservoir,44,NSETLR,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+22,Reservoir,45,CHLAR,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+22,Reservoir,46,SECCIR,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+22,Reservoir,47,ORGP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,48,SOLP,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,49,ORGN,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,50,NO3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,51,NH3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,52,NO2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+22,Reservoir,53,IFLOD1R,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+22,Reservoir,54,IFLOD2R,DOUBLE,-,3.0,0.0,0.0,,0.0,1.0
+22,Reservoir,55,NDTARGR,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+22,Reservoir,56,STARG01,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,57,STARG02,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,58,STARG03,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,59,STARG04,DOUBLE,-,2.0,0.0,0.0,,0.0,1.0
+22,Reservoir,60,STARG05,DOUBLE,-,2.0,0.0,0.0,,0.0,1.0
+22,Reservoir,61,STARG07,DOUBLE,-,2.0,0.0,0.0,,0.0,1.0
+22,Reservoir,62,STARG08,DOUBLE,-,2.0,0.0,0.0,,0.0,1.0
+22,Reservoir,63,STARG09,DOUBLE,-,2.0,0.0,0.0,,0.0,1.0
+22,Reservoir,64,STARG10,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,65,STARG11,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,66,STARG12,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+22,Reservoir,67,SELECTION,INT,-,0.0,0.0,0.0,,0.0,0.0
+23,wetland_Parameter,1,ID,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+23,wetland_Parameter,2,OperationYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+23,wetland_Parameter,3,Subbasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+23,wetland_Parameter,4,Type,TEXT,-,0.0,0.0,1.0,"Isolated,Riparian",0.0,1.0
+23,wetland_Parameter,5,ContributionArea_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,6,NormalArea_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,7,NormalVolume_104M3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,8,MaxArea_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,9,MaxVolume_104M3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,10,K_mmHr,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,11,SedimentConEqui_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,12,D50_um,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,13,SettVolN_mYr,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,14,SettVolP_mYr,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,15,ChlaProCo,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,16,WaterCalCo,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,17,InflowFrac,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,18,InitialVolume_104M3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,19,InitialSediment_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,20,InitialNO3_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,21,InitialNO2_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,22,InitialNH3_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,23,InitialSolP_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,24,InitialOrgN_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,25,InitialOrgP_mgL,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,26,RoutingConstant,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+23,wetland_Parameter,27,WetlandIDOld,INT,-,0.0,0.0,0.0,,0.0,0.0
+23,wetland_Parameter,28,ClassType,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+23,wetland_Parameter,29,SELECTION,INT,-,0.0,0.0,0.0,,0.0,0.0
+24,wetland_Management,1,ID,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,1,#reach_id,INT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,2,subbasin_id,INT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,3,outlet_id,INT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,4,length,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,5,width,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,6,main_side_slope,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,7,floodplain_side_slope,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,8,w_ratio,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,9,depth,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,10,slope,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,11,order,INT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,12,manning,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,13,velocity,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,14,t0,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,15,d0,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,16,max_elevation,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,17,min_elevation,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,18,Ave_elevation,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,19,receive_reach_id,INT,-,0.0,0.0,0.0,,0.0,0.0
+25,Reach_Parameter,20,contribution_area,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,21,erodibility_factor,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,22,cover_factor,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,23,bc1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,24,bc2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,25,bc3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,26,bc4,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,27,rk1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,28,rk2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,29,rk3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,30,rk4,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,31,rs1,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,32,rs2,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,33,rs3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,34,rs4,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+25,Reach_Parameter,35,rs5,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+26,manure_and_nutrient_parameter,1,BMP_ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+26,manure_and_nutrient_parameter,2,Code,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+26,manure_and_nutrient_parameter,3,Description,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+26,manure_and_nutrient_parameter,4,Parameter,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+26,manure_and_nutrient_parameter,5,Value,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+26,manure_and_nutrient_parameter,6,Value_String,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,5,BMP_ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,6,Parameter,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+27,manure_and_nutrient_management,7,Value,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+28,manure_and_nutrient_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+28,manure_and_nutrient_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+28,manure_and_nutrient_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+28,manure_and_nutrient_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+28,manure_and_nutrient_management_dist,5,BMP_ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+29,field_subbasin,1,Field,INT,-,0.0,0.0,0.0,,0.0,0.0
+29,field_subbasin,2,Subbasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+29,field_subbasin,3,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+29,field_subbasin,4,ToField,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+29,field_subbasin,5,ToSubbasin,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+30,field_farm,1,Field,INT,-,0.0,0.0,0.0,,0.0,0.0
+30,field_farm,2,Farm,INT,-,0.0,0.0,0.0,,0.0,0.0
+30,field_farm,3,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+30,field_farm,4,ToField,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+30,field_farm,5,ToFarm,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+31,farm_subbasin,1,Farm,INT,-,0.0,0.0,0.0,,0.0,0.0
+31,farm_subbasin,2,Subbasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+31,farm_subbasin,3,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+31,farm_subbasin,4,ToFarm,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+31,farm_subbasin,5,ToSubbasin,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+32,field_info,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+32,field_info,2,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+33,subbasin_info,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+33,subbasin_info,2,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+34,farm_info,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+34,farm_info,2,Area_Ha,DOUBLE,-,0.0,0.0,0.0,,0.0,0.0
+35,MI48H_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+35,MI48H_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+35,MI48H_management,3,FerSurface,DOUBLE,-,0.2,0.0,0.0,0.0,0.0,1.0
+35,MI48H_management,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+36,MASB_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+36,MASB_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+36,MASB_management,3,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+37,NAOS_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+37,NAOS_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+37,NAOS_management,3,StartYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,4,StartMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,5,StartDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,6,EndYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,7,EndMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,8,EndDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,9,IsAnnually,INT,-,0.0,1.0,0.0,,0.0,1.0
+37,NAOS_management,10,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+38,SAFA_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+38,SAFA_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+38,SAFA_management,3,StartYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,4,StartMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,5,StartDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,6,EndYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,7,EndMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,8,EndDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,9,IsAnnually,INT,-,0.0,1.0,0.0,,0.0,1.0
+38,SAFA_management,10,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+39,ASNL_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+39,ASNL_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+39,ASNL_management,3,NO3_N_Limit_kg_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+39,ASNL_management,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+40,ASPL_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+40,ASPL_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+40,ASPL_management,3,Soil_P_Limit_kg_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+40,ASPL_management,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+41,MCBI_Parameter,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+41,MCBI_Parameter,2,OperationYear,INT,-,0.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,3,Subbasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+41,MCBI_Parameter,4,receive_reach_id,INT,-,0.0,0.0,0.0,,0.0,0.0
+41,MCBI_Parameter,5,MaxL_m,DOUBLE,-,100.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,6,MaxW_m,DOUBLE,-,50.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,7,MaxD_m,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,8,SideSlope,DOUBLE,-,1.5,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,9,EndSlope,DOUBLE,-,4.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,10,MaxVolume_104M3,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,11,FDLT_Ratio,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,12,NonFDLT_Ratio,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,13,NSED,DOUBLE,-,5.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,14,CB_Dcc,DOUBLE,-,0.184,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,15,SettVolP_mYr,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,16,SettVolN_mYr,DOUBLE,-,10.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,17,K_mmHr,DOUBLE,-,0.05,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,18,CHLAR,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,19,SECCIR,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,20,InitialVolume_%,DOUBLE,-,100.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,21,InitialSediment_mgL,DOUBLE,-,5.0,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,22,InitialNO3_mgL,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,23,InitialSolP_mgL,DOUBLE,-,0.05,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,24,InitialOrgN_mgL,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,25,InitialOrgP_mgL,DOUBLE,-,0.05,0.0,0.0,,0.0,1.0
+41,MCBI_Parameter,26,SELECTION,INT,-,0.0,0.0,0.0,,0.0,0.0
+42,MCBI_Selection,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+43,MI48H_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+43,MI48H_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+43,MI48H_management_dist,3,FerSurface,DOUBLE,-,0.2,0.0,0.0,0.0,0.0,1.0
+43,MI48H_management_dist,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+44,MASB_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+44,MASB_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+44,MASB_management_dist,3,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+45,NAOS_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+45,NAOS_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+45,NAOS_management_dist,3,StartYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,4,StartMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,5,StartDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,6,EndYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,7,EndMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,8,EndDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,9,IsAnnually,INT,-,0.0,1.0,0.0,,0.0,1.0
+45,NAOS_management_dist,10,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+46,SAFA_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+46,SAFA_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+46,SAFA_management_dist,3,StartYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,4,StartMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,5,StartDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,6,EndYear,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,7,EndMon,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,8,EndDay,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,9,IsAnnually,INT,-,0.0,1.0,0.0,,0.0,1.0
+46,SAFA_management_dist,10,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+47,ASNL_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+47,ASNL_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+47,ASNL_management_dist,3,NO3_N_Limit_kg_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+47,ASNL_management_dist,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+48,ASPL_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+48,ASPL_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+48,ASPL_management_dist,3,Soil_P_Limit_kg_ha,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+48,ASPL_management_dist,4,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+49,FDLT_management,1,Scenario,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+49,FDLT_management,2,Location,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+49,FDLT_management,3,Year,INT,-,0.0,1.0,0.0,0.0,0.0,1.0
+49,FDLT_management,4,FDLMon,INT,-,3.0,1.0,0.0,0.0,0.0,1.0
+49,FDLT_management,5,FDLDay,INT,-,31.0,1.0,0.0,0.0,0.0,1.0
+49,FDLT_management,6,Days,INT,-,150.0,1.0,1.0,1-365,0.0,1.0
+49,FDLT_management,7,AniAdult,INT,Number of adult animals,50.0,0.0,0.0,0.0,0.0,1.0
+49,FDLT_management,8,AniNonAdult,INT,Number of non-adult animals,50.0,0.0,0.0,0.0,0.0,1.0
+49,FDLT_management,9,ManStoID,TEXT,-,0.0,0.0,0.0,0.0,0.0,1.0
+49,FDLT_management,10,ManStoDis,TEXT,-,0.0,0.0,0.0,0.0,0.0,1.0
+49,FDLT_management,11,ManRemMon,INT,-,10.0,1.0,0.0,0.0,0.0,1.0
+49,FDLT_management,12,ManRemDay,INT,-,31.0,1.0,0.0,0.0,0.0,1.0
+49,FDLT_management,13,ManRemFra,DOUBLE,-,1.0,0.0,0.0,0.0,0.0,1.0
+50,FDLT_Design,1,ID,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+51,FDLT_management_dist,1,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+51,FDLT_management_dist,2,ProducerID,INT,-,0.0,0.0,0.0,,0.0,0.0
+51,FDLT_management_dist,3,Subbasin,INT,-,0.0,0.0,0.0,,0.0,0.0
+51,FDLT_management_dist,4,CatBasID,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+51,FDLT_management_dist,5,ManStoID,TEXT,-,0.0,0.0,0.0,0.0,0.0,0.0
+51,FDLT_management_dist,6,ManStoDis,TEXT,-,0.0,0.0,0.0,0.0,0.0,0.0
+51,FDLT_management_dist,7,SELECTION,INT,-,0.0,0.0,0.0,0.0,0.0,0.0
+52,Livestock_Parameter,1,ID,INT,Animal ID,0.0,0.0,0.0,0.0,0.0,0.0
+52,Livestock_Parameter,2,Name,TEXT,Animal name,0.0,0.0,0.0,0.0,0.0,0.0
+52,Livestock_Parameter,3,Description,TEXT,Description,0.0,0.0,0.0,0.0,0.0,0.0
+52,Livestock_Parameter,4,Man_ID,INT,Manure ID corresponding the fertilizer table,0.0,0.0,0.0,0.0,0.0,1.0
+52,Livestock_Parameter,5,Ani_Weight,DOUBLE,Animal weight,0.0,0.0,0.0,0.0,0.0,1.0
+52,Livestock_Parameter,6,Man_Day,DOUBLE,Fresh manure production per 1000kg live animal mass per day,0.0,0.0,0.0,0.0,0.0,1.0
+52,Livestock_Parameter,7,Mass_Intake,DOUBLE,Dry mass intake per day in percent of body weight,0.0,0.0,0.0,0.0,0.0,1.0
+52,Livestock_Parameter,8,Ani_nonadult,DOUBLE,Average non-adult weight / adult weight,0.0,0.0,0.0,0.0,0.0,1.0
+52,Livestock_Parameter,9,Man_TSS_Fra,DOUBLE,TSS percentage of the manure ,,,,0.0,,
+53,MSCD_Parameter,1,ManStorageID,INT,Manure storage ID,0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,2,Name,TEXT,Name,0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,3,Description,TEXT,Description,0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,4,ProducerID,INT,Producer ID,0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,5,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,6,FeedlotID,INT,Corresponding feedlot ID,0.0,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,7,ManLength_m,DOUBLE,Length of the manure storage (m),20.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,8,ManWidth_m,DOUBLE,Width of the Manure storage (m),20.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,9,ManArea_m2,DOUBLE,Area of the Manure storage (m2),400.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,10,DraArea_ha,DOUBLE,Drainage area of the manure storage (ha),0.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,11,DraFraction,DOUBLE,Manure drainage area fraction of the subbasin area (-),1.0,0.0,0.0,0.0,0.0,0.0
+53,MSCD_Parameter,12,HigReach_m,DOUBLE,Height to the nearby stream,0.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,13,DisReach_m,DOUBLE,Distance to the nearby stream,0.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,14,ThDisReach,DOUBLE,Threshold value of storage distance to the nearby stream (100m),0.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,15,ThHigReach,DOUBLE,Threshold value of storage height to the nearby stream (10m),0.0,0.0,0.0,0.0,0.0,1.0
+53,MSCD_Parameter,16,ManInitial,DOUBLE,Initial storage (kg),0.0,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,17,CN_change,DOUBLE,CN change fraction compared to non-storage area,0.3,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,18,PRC_change,DOUBLE,PRC change fraction compared to non-storage area,0.3,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,19,Manure_EMC,DOUBLE,Manure event mean concentration (mg/l),10000.0,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,20,ReachID,INT,Closest (distance or height difference) reach ID,0.0,0.0,1.0,0.0,0.0,1.0
+53,MSCD_Parameter,21,SELECTION,INT,SELECTION,0.0,0.0,0.0,0.0,0.0,0.0
+54,MSCD_Selection,1,ID,INT,SELECTION,0.0,0.0,0.0,,0.0,0.0
+55,GRAMG_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+55,GRAMG_management,2,Location,INT,Location ID,0.0,0.0,0.0,,0.0,0.0
+55,GRAMG_management,3,Year,INT,BMP start year,1.0,1.0,0.0,,0.0,1.0
+55,GRAMG_management,4,GraMon,INT,BMP start month,9.0,1.0,0.0,,0.0,1.0
+55,GRAMG_management,5,GraDay,INT,BMP start day,1.0,1.0,0.0,,0.0,1.0
+55,GRAMG_management,6,Days,INT,BMP lasting days,45.0,1.0,1.0,1-365,0.0,1.0
+55,GRAMG_management,7,Ani_ID,INT,Animal ID,1.0,0.0,1.0,1-9,0.0,1.0
+55,GRAMG_management,8,Ani_adult,INT,Adult animal percentage,50.0,0.0,1.0,0-100,0.0,1.0
+55,GRAMG_management,9,GR_Density,DOUBLE,Grazing density (1/ha),15.0,0.0,0.0,0.0,0.0,1.0
+55,GRAMG_management,10,DayFra,DOUBLE,Fraction of day animal stay in field,0.3,0.0,0.0,0.0,0.0,1.0
+55,GRAMG_management,11,Source,INT,"Water source type, 0 - outside watershed e.g. deep groundwater, 1 - reach, 2 - reservoir, 3 - catch basin, 4 - groundwater, 5 - wetland, 6 - dugout",1.0,0.0,1.0,0-6,0.0,1.0
+55,GRAMG_management,12,SourceID,INT,Water source ID,0.0,0.0,1.0,0.0,0.0,1.0
+55,GRAMG_management,13,Dugout_ID,INT,Dugout IDs in the grazing area,0.0,0.0,1.0,0.0,0.0,1.0
+55,GRAMG_management,14,Access,INT,"0 – accessible, 1 – managed access, 2 – no access",0.0,0.0,1.0,0-2,0.0,1.0
+55,GRAMG_management,15,Fencing,INT,"0 – no fencing, 1- fencing",0.0,0.0,0.0,0-1,0.0,0.0
+55,GRAMG_management,16,StreamAniPerc,Real,Percent of animals drinking in streams. Default is 1,1.0,0.0,0.0,0.0,0.0,1.0
+55,GRAMG_management,17,Drinking_time,Real,"Percent of day time for drinking, default is 0.02 (0.5/24)",0.02,0.0,0.0,0.0,0.0,1.0
+55,GRAMG_management,18,BankK_Change,Real,Average bank erodibility change compared to no-fencing ,0.3,0.0,0.0,0.0,0.0,1.0
+56,GRAMG_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+56,GRAMG_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+56,GRAMG_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+56,GRAMG_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+57,GRAMG_parameter,1,ID,INT,Graze type ID,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,1,ID,INT,ID,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,2,Name,INT,Name,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,3,Description,INT,Description,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,4,ProducerID,INT,Producer ID. Not used in the module,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,5,Subbasin,INT,Subbasin. Not used in the module,0.0,0.0,0.0,0.0,0.0,0.0
+58,FDLT_Parameter,6,AniID,INT,The id of animal whose parameter could be found in livestok_parameter table,1.0,0.0,1.0,1-9,0.0,1.0
+58,FDLT_Parameter,7,CatBasID,INT,The id of catch basin which the feedlot would drains to.,0.0,0.0,1.0,0.0,0.0,1.0
+58,FDLT_Parameter,8,ManInitial,DOUBLE,Initial manure storage of the feedlot,0.0,0.0,0.0,0.0,0.0,1.0
+58,FDLT_Parameter,9,CN_change,DOUBLE,Average CN increase fraction compare to non-feedlot area,0.2,0.0,0.0,0.0,0.0,1.0
+58,FDLT_Parameter,10,PRC_change,DOUBLE,Average PRC increase fraction compare to non-feedlot area,0.2,0.0,0.0,0.0,0.0,1.0
+58,FDLT_Parameter,11,Manure_EMC,DOUBLE,Manure event mean concentration,10000.0,0.0,0.0,0.0,0.0,1.0
+58,FDLT_Parameter,12,SELECTION,INT,SELECTION,0.0,0.0,0.0,0.0,0.0,0.0
+59,MSCD_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,0.0,0.0,0.0
+59,MSCD_management,2,Location,INT,Manure Storage ID,0.0,0.0,0.0,0.0,0.0,0.0
+59,MSCD_management,3,Year,INT,,0.0,1.0,0.0,0.0,0.0,1.0
+59,MSCD_management,4,ManAppMon,INT,Month of manure application,11.0,1.0,0.0,0.0,0.0,1.0
+59,MSCD_management,5,ManAppDay,INT,Day of manure application,15.0,1.0,0.0,0.0,0.0,1.0
+59,MSCD_management,6,ManAppFra,INT,Fraction of manure amount applied to the field,1.0,0.0,0.0,-,0.0,1.0
+60,MCL_crop_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+60,MCL_crop_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+60,MCL_crop_management,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+60,MCL_crop_management,4,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+60,MCL_crop_management,5,ActualYear,INT,-,0.0,1.0,0.0,,0.0,0.0
+60,MCL_crop_management,6,CropCode,INT,-,27.0,0.0,1.0,1-97,0.0,1.0
+60,MCL_crop_management,7,PlantingMon,INT,-,6.0,1.0,0.0,,0.0,1.0
+60,MCL_crop_management,8,PlantingDay,INT,-,5.0,1.0,0.0,,0.0,1.0
+60,MCL_crop_management,9,HarvestMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+60,MCL_crop_management,10,HarvestDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+60,MCL_crop_management,11,HarvestType,INT,-,0.0,0.0,1.0,"0,1,2",0.0,1.0
+60,MCL_crop_management,12,HarvestEfficiency,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+60,MCL_crop_management,13,HarvestIndexOverride,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+60,MCL_crop_management,14,StoverFraction,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+60,MCL_crop_management,15,CNOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+60,MCL_crop_management,16,IsGrain,INT,-,1.0,0.0,1.0,"0,1",0.0,1.0
+60,MCL_crop_management,17,PRCOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+61,MCL_crop_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+61,MCL_crop_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+61,MCL_crop_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+61,MCL_crop_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+62,MCL_tillage_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+62,MCL_tillage_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+62,MCL_tillage_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+62,MCL_tillage_management,4,TillMon,INT,-,5.0,1.0,0.0,,0.0,1.0
+62,MCL_tillage_management,5,TillDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+62,MCL_tillage_management,6,TillCode,INT,-,1.0,0.0,1.0,1-108,0.0,1.0
+63,MCL_tillage_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+63,MCL_tillage_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+63,MCL_tillage_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+63,MCL_tillage_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+64,MCL_fertilizer_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+64,MCL_fertilizer_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+64,MCL_fertilizer_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+64,MCL_fertilizer_management,4,FerMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+64,MCL_fertilizer_management,5,FerDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+64,MCL_fertilizer_management,6,FerType,INT,-,1.0,0.0,1.0,1-54,0.0,1.0
+64,MCL_fertilizer_management,7,FerRate,DOUBLE,-,500.0,0.0,0.0,,0.0,1.0
+64,MCL_fertilizer_management,8,FerSurface,DOUBLE,-,0.3,0.0,0.0,,0.0,1.0
+65,MCL_fertilizer_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+65,MCL_fertilizer_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+65,MCL_fertilizer_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+65,MCL_fertilizer_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,1,ID,INT,Wintering site ID,0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,2,ProducerID,INT,Producer ID,0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,3,Area_ha,DOUBLE,Wintering site area (ha),0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,4,Slope_%,DOUBLE,Slope of the Wintering site area (%),0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,5,Distance_m,DOUBLE,Distance to creek (m),0.0,0.0,0.0,,0.0,0.0
+66,WSMG_parameter,6,SELECTION,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+67,WSMG_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+67,WSMG_management,2,Location,INT,Location ID,0.0,0.0,0.0,,0.0,0.0
+67,WSMG_management,3,Year,INT,BMP start year,1.0,1.0,0.0,,0.0,1.0
+67,WSMG_management,4,GraMon,INT,BMP start month,9.0,1.0,0.0,,0.0,1.0
+67,WSMG_management,5,GraDay,INT,BMP start day,1.0,1.0,0.0,,0.0,1.0
+67,WSMG_management,6,Days,INT,BMP lasting days,45.0,1.0,1.0,1-365,0.0,1.0
+67,WSMG_management,7,Ani_ID,INT,Animal ID,1.0,0.0,1.0,1-9,0.0,1.0
+67,WSMG_management,8,Ani_adult,INT,Adult animal percentage,50.0,0.0,1.0,0-100,0.0,1.0
+67,WSMG_management,9,GR_Density,DOUBLE,Grazing density (1/ha),15.0,0.0,0.0,0.0,0.0,1.0
+67,WSMG_management,10,DayFra,DOUBLE,Fraction of day animal stay in field,0.3,0.0,0.0,0.0,0.0,1.0
+67,WSMG_management,11,Source,INT,"Water source type, 0 - outside watershed e.g. deep groundwater, 1 - reach, 2 - reservoir, 3 - catch basin, 4 - groundwater, 5 - wetland, 6 - dugout",1.0,0.0,1.0,0-6,0.0,1.0
+67,WSMG_management,12,SourceID,INT,Water source ID,0.0,0.0,1.0,0.0,0.0,1.0
+67,WSMG_management,13,Dugout_ID,INT,Dugout IDs in the grazing area,0.0,0.0,1.0,0.0,0.0,1.0
+67,WSMG_management,14,Access,INT,"0 – accessible, 1 – managed access, 2 – no access",0.0,0.0,1.0,0-2,0.0,1.0
+67,WSMG_management,15,Fencing,INT,"0 – no fencing, 1- fencing",0.0,0.0,0.0,0-1,0.0,0.0
+67,WSMG_management,16,StreamAniPerc,Real,Percent of animals drinking in streams. Default is 1,1.0,0.0,0.0,0.0,0.0,1.0
+67,WSMG_management,17,Drinking_time,Real,"Percent of day time for drinking, default is 0.02 (0.5/24)",0.02,0.0,0.0,0.0,0.0,1.0
+67,WSMG_management,18,BankK_Change,Real,Average bank erodibility change compared to no-fencing ,0.3,0.0,0.0,0.0,0.0,1.0
+68,WSMG_selection,1,ID,INT,ID,0.0,0.0,0.0,,0.0,0.0
+69,RipaBuffer_VegeFilter_parameter,1,ID,INT,"Vegetation ID, corresponding to VegetationID in the vegetation filter or riparian buffer management table",0.0,0.0,0.0,,0.0,0.0
+69,RipaBuffer_VegeFilter_parameter,2,Runoff_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,3,Runoff_c2,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,4,Runoff_c3,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,5,Sed_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,6,Sed_c2,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,7,Sed_c3,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,8,OrgN_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,9,OrgN_c2,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,10,NO3_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,11,NO3_c2,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,12,PP_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,13,DP_c1,DOUBLE,,0.0,0.0,0.0,,0.0,1.0
+69,RipaBuffer_VegeFilter_parameter,14,DP_c2,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,2,ID,INT,"Vegetation filter drainage part id used for IMWEBs model calculation, one Vegetation filter may contain several drainage parts",0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,3,Year,INT,Year of operation,1.0,1.0,0.0,,0.0,1.0
+70,VegeFilter_management,4,VFST_ID,INT,Group vegetation filter ID,0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,5,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,6,VegetationID,INT,Vegetation ID,6.0,0.0,1.0,"6,7,8,15",0.0,1.0
+70,VegeFilter_management,7,Length,DOUBLE,Length of the vegetation filter (m),0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,8,Width,DOUBLE,Width of the vegetation filter (m),0.0,0.0,0.0,,0.0,1.0
+70,VegeFilter_management,9,Area_ha,DOUBLE,Area of the vegetation filter (ha),0.0,0.0,0.0,,0.0,1.0
+70,VegeFilter_management,10,Drainage_Area,DOUBLE,Drainage area (ha),0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,11,Area_Ratio,DOUBLE,Vegetation filter drainage area to Vegetation filter area ratio,0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,12,Slope,DOUBLE,Slope of the Vegetation filter (%),0.0,0.0,0.0,,0.0,0.0
+70,VegeFilter_management,13,Sol_K,DOUBLE,Vegetation filter soil saturation hydraulic conductivity (mm/hr),0.25,0.0,0.0,,0.0,1.0
+70,VegeFilter_management,14,Sol_porosity,DOUBLE,Vegetation filter soil porosity,0.0,0.0,0.0,,0.0,1.0
+70,VegeFilter_management,15,Root_Depth,DOUBLE,Vegetation filter root depth (mm),0.0,0.0,0.0,,0.0,1.0
+70,VegeFilter_management,16,SELECTION,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+71,PS_crop_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+71,PS_crop_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+71,PS_crop_management,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+71,PS_crop_management,4,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+71,PS_crop_management,5,ActualYear,INT,-,0.0,1.0,0.0,,0.0,0.0
+71,PS_crop_management,6,CropCode,INT,-,27.0,0.0,1.0,1-97,0.0,1.0
+71,PS_crop_management,7,PlantingMon,INT,-,6.0,1.0,0.0,,0.0,1.0
+71,PS_crop_management,8,PlantingDay,INT,-,5.0,1.0,0.0,,0.0,1.0
+71,PS_crop_management,9,HarvestMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+71,PS_crop_management,10,HarvestDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+71,PS_crop_management,11,HarvestType,INT,-,0.0,0.0,1.0,"0,1,2",0.0,1.0
+71,PS_crop_management,12,HarvestEfficiency,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+71,PS_crop_management,13,HarvestIndexOverride,DOUBLE,-,0.5,0.0,0.0,,0.0,1.0
+71,PS_crop_management,14,StoverFraction,DOUBLE,-,0.0,0.0,0.0,,0.0,1.0
+71,PS_crop_management,15,CNOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+71,PS_crop_management,16,IsGrain,INT,-,1.0,0.0,1.0,"0,1",0.0,1.0
+71,PS_crop_management,17,PRCOP,DOUBLE,-,1.0,0.0,0.0,,0.0,1.0
+72,PS_crop_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+72,PS_crop_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+72,PS_crop_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+72,PS_crop_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+73,PS_tillage_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+73,PS_tillage_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+73,PS_tillage_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+73,PS_tillage_management,4,TillMon,INT,-,5.0,1.0,0.0,,0.0,1.0
+73,PS_tillage_management,5,TillDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+73,PS_tillage_management,6,TillCode,INT,-,1.0,0.0,1.0,1-108,0.0,1.0
+74,PS_tillage_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+74,PS_tillage_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+74,PS_tillage_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+74,PS_tillage_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+75,PS_fertilizer_management,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+75,PS_fertilizer_management,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+75,PS_fertilizer_management,3,Year,INT,-,1.0,1.0,0.0,,0.0,1.0
+75,PS_fertilizer_management,4,FerMon,INT,-,8.0,1.0,0.0,,0.0,1.0
+75,PS_fertilizer_management,5,FerDay,INT,-,10.0,1.0,0.0,,0.0,1.0
+75,PS_fertilizer_management,6,FerType,INT,-,1.0,0.0,1.0,1-54,0.0,1.0
+75,PS_fertilizer_management,7,FerRate,DOUBLE,-,500.0,0.0,0.0,,0.0,1.0
+75,PS_fertilizer_management,8,FerSurface,DOUBLE,-,0.3,0.0,0.0,,0.0,1.0
+76,PS_fertilizer_management_dist,1,Scenario,INT,-,0.0,0.0,0.0,,0.0,0.0
+76,PS_fertilizer_management_dist,2,Location,INT,-,0.0,0.0,0.0,,0.0,0.0
+76,PS_fertilizer_management_dist,3,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+76,PS_fertilizer_management_dist,4,Level,TEXT,-,0.0,0.0,0.0,,0.0,0.0
+77,PSGM_parameter,1,ID,INT,Pasture grazing land ID,0.0,0.0,0.0,,0.0,0.0
+77,PSGM_parameter,2,ProducerID,INT,Producer ID,0.0,0.0,0.0,,0.0,0.0
+77,PSGM_parameter,3,Area_ha,DOUBLE,Pasture grazing area (ha),0.0,0.0,0.0,,0.0,0.0
+77,PSGM_parameter,4,SELECTION,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+78,PSGM_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+78,PSGM_management,2,Location,INT,Location ID,0.0,0.0,0.0,,0.0,0.0
+78,PSGM_management,3,Year,INT,BMP start year,1.0,1.0,0.0,,0.0,1.0
+78,PSGM_management,4,GraMon,INT,BMP start month,9.0,1.0,0.0,,0.0,1.0
+78,PSGM_management,5,GraDay,INT,BMP start day,1.0,1.0,0.0,,0.0,1.0
+78,PSGM_management,6,Days,INT,BMP lasting days,45.0,1.0,1.0,1-365,0.0,1.0
+78,PSGM_management,7,Ani_ID,INT,Animal ID,1.0,0.0,1.0,1-9,0.0,1.0
+78,PSGM_management,8,Ani_adult,INT,Adult animal percentage,50.0,0.0,1.0,0-100,0.0,1.0
+78,PSGM_management,9,GR_Density,DOUBLE,Grazing density (1/ha),15.0,0.0,0.0,0.0,0.0,1.0
+78,PSGM_management,10,DayFra,DOUBLE,Fraction of day animal stay in field,0.3,0.0,0.0,0.0,0.0,1.0
+78,PSGM_management,11,Source,INT,"Water source type, 0 - outside watershed e.g. deep groundwater, 1 - reach, 2 - reservoir, 3 - catch basin, 4 - groundwater, 5 - wetland, 6 - dugout",1.0,0.0,1.0,0-6,0.0,1.0
+78,PSGM_management,12,SourceID,INT,Water source ID,0.0,0.0,1.0,0.0,0.0,1.0
+78,PSGM_management,13,Dugout_ID,INT,Dugout IDs in the grazing area,0.0,0.0,1.0,0.0,0.0,1.0
+78,PSGM_management,14,Access,INT,"0 – accessible, 1 – managed access, 2 – no access",0.0,0.0,1.0,0-2,0.0,1.0
+78,PSGM_management,15,Fencing,INT,"0 – no fencing, 1- fencing",0.0,0.0,0.0,0-1,0.0,0.0
+78,PSGM_management,16,StreamAniPerc,Real,Percent of animals drinking in streams. Default is 1,1.0,0.0,0.0,0.0,0.0,1.0
+78,PSGM_management,17,Drinking_time,Real,"Percent of day time for drinking, default is 0.02 (0.5/24)",0.02,0.0,0.0,0.0,0.0,1.0
+78,PSGM_management,18,BankK_Change,Real,Average bank erodibility change compared to no-fencing ,0.3,0.0,0.0,0.0,0.0,1.0
+79,PSGM_selection,1, I think it is better to be the erodibility increase when not fenced. Fence means not need to change stream bank K,,0.0,0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,2,ID,INT,"Riparian buffer drainage part id used for IMWEBs model calculation, one RIBUF may contain several drainage parts",0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,3,Year,INT,Year of operation,1.0,1.0,0.0,,0.0,1.0
+80,RipaBuffer_management,4,RIBUF_ID,INT,Group riparian buffer ID,0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,5,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,6,VegetationID,INT,Vegetation ID,6.0,0.0,1.0,"6,7,8,15",0.0,1.0
+80,RipaBuffer_management,7,Length,DOUBLE,Length of the riparian buffer (m),0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,8,Width,DOUBLE,Width of the riparian buffer (m),0.0,0.0,0.0,,0.0,1.0
+80,RipaBuffer_management,9,Area_ha,DOUBLE,Area of the riparian buffer (ha),0.0,0.0,0.0,,0.0,1.0
+80,RipaBuffer_management,10,Drainage_Area,DOUBLE,Drainage area (ha),0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,11,Area_Ratio,DOUBLE,Riparian buffer drainage area to riparian buffer area ratio,0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,12,Slope,DOUBLE,Slope of the riparian buffer (%),0.0,0.0,0.0,,0.0,0.0
+80,RipaBuffer_management,13,Sol_K,DOUBLE,Riparian buffer soil saturation hydraulic conductivity (mm/hr),0.25,0.0,0.0,,0.0,1.0
+80,RipaBuffer_management,14,Sol_porosity,DOUBLE,Riparian buffer soil porosity,0.0,0.0,0.0,,0.0,1.0
+80,RipaBuffer_management,15,Root_Depth,DOUBLE,Riparian buffer root depth (mm),0.0,0.0,0.0,,0.0,1.0
+80,RipaBuffer_management,16,SELECTION,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+81,GWW_management,1,ID,INT,"Riparian buffer drainage part id used for IMWEBs model calculation, one RIBUF may contain several drainage parts",0.0,0.0,0.0,,0.0,0.0
+81,GWW_management,2,Year,INT,Year of operation,0.0,0.0,0.0,,0.0,1.0
+81,GWW_management,3,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,,0.0,0.0
+81,GWW_management,4,Length,DOUBLE,GWW length (m),0.0,0.0,0.0,0.0,0.0,1.0
+81,GWW_management,5,BFwidth,DOUBLE,"GWW bankfull width (m), default is 10 m",10.0,0.0,0.0,,0.0,1.0
+81,GWW_management,6,BFdepth,DOUBLE,"GWW bankfull depth (m), default is 0.5 m",0.5,0.0,0.0,,0.0,1.0
+81,GWW_management,7,SideSlope,DOUBLE,"GWW channel side slope, default is 0.25 (1:4)",0.25,0.0,0.0,,0.0,1.0
+81,GWW_management,8,Slope_perc,DOUBLE,GWW channel slope (%),0.0,0.0,0.0,,0.0,1.0
+81,GWW_management,9,Manning,DOUBLE,"GWW roughness coefficient, default is 0.25",0.25,0.0,0.0,,0.0,1.0
+81,GWW_management,10,BFvelocity,DOUBLE,GWW bankfull velocity (m/s),0.0,0.0,0.0,,0.0,1.0
+81,GWW_management,11,Conductivity,DOUBLE,"GWW bottom conductivity (mm/hr), default is 10",10.0,0.0,0.0,,0.0,1.0
+81,GWW_management,12,Erodibility,DOUBLE,"GWW erodibility factor, default is 0",0.0,0.0,0.0,,0.0,1.0
+81,GWW_management,13,Cover,DOUBLE,"GWW cover factor, default is 0",0.0,0.0,0.0,,0.0,1.0
+81,GWW_management,14,SELECTION,DOUBLE,,0.0,0.0,0.0,,0.0,0.0
+82,DGOT_parameter,1,Scenario,INT,Scenario ID,0.0,0.0,0.0,,0.0,0.0
+82,DGOT_parameter,2,ID,INT,"Dugout ID, obtained from dugout input data",0.0,0.0,0.0,,0.0,0.0
+82,DGOT_parameter,3,Type,INT,"Dugout type, 0 – filled with runoff, 1 – connected to a water course",0.0,0.0,1.0,"0,1",0.0,1.0
+82,DGOT_parameter,4,Year,INT,Operation starting year (designed for setting up dugout scenarios),0.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,5,Subbasin,INT,"Subbasin number, obtained from the watershed delineation",0.0,0.0,0.0,,0.0,0.0
+82,DGOT_parameter,6,MaxL_m,DOUBLE,Length of dugout when filled (m),100.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,7,MaxW_m,DOUBLE,Width of dugout when filled (m),50.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,8,MaxD_m,DOUBLE,Dugout depth when filled (m),10.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,9,SideSlope,DOUBLE,Dugout side slope (-),1.5,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,10,EndSlope,DOUBLE,Dugout end slope (-),4.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,11,MaxVolume_104M3,DOUBLE,"Dugout volume capacity (104m3), calculated from above 4 parameters",0.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,12,Drainage_Area,DOUBLE,"Dugout drainage area (ha), obtained from dugout drainage area distribution",0.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,13,AniID,INT,Animal ID,2.0,0.0,1.0,1-9,0.0,1.0
+82,DGOT_parameter,14,AniAdult,INT,Adult animal number,20.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,15,AniNonAdult,INT,Non-adult animal number,20.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,16,NSED,DOUBLE,Normal (equilibrium) sediment concentration in wetland (mg/l),5.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,17,Dcc,DOUBLE,Sediment settling decay constant (1/day),0.184,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,18,D50,DOUBLE,Median partical size,10.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,19,SettVolP_mYr,DOUBLE,Phosphorous settling rate in catch basin (m/year),10.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,20,SettVolN_mYr,DOUBLE,Nitrogen settling rate in catch basin (m/year),10.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,21,K_mmHr,DOUBLE,Hydraulic conductivity of catch basin bottom (mm/hr),0.05,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,22,CHLAR,DOUBLE,Chlorophyll production coefficient of catch basin,1.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,23,SECCIR,DOUBLE,Water clarity coefficient of catch basin (m),1.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,24,InitialVolume,DOUBLE,"Initial water volume in catch basin (% of capacity),",100.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,25,InitialSediment_mgL,DOUBLE,Initial sediment concentration in catch basin (mg/l),5.0,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,26,InitialNO3_mgL,DOUBLE,Initial concentration of NO3-N in catch basin (mg/l),0.5,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,27,InitialSolP_mgL,DOUBLE,Initial concentration of soluble P in catch basin (mg/l),0.05,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,28,InitialOrgN_mgL,DOUBLE,Initial concentration of organic N in catch basin (mg/l),0.5,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,29,InitialOrgP_mgL,DOUBLE,Initial concentration of organic P in catch basin (mg/l),0.05,0.0,0.0,,0.0,1.0
+82,DGOT_parameter,30,SELECTION,INT,-,0.0,0.0,0.0,,0.0,0.0
+83,DGOT_selection,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+84,OFSW_parameter,1,ID,INT,Off-site watering ID,0.0,0.0,0.0,,0.0,0.0
+84,OFSW_parameter,2,Year,INT,Operation starting year (designed for setting up dugout scenarios),0.0,0.0,0.0,,0.0,1.0
+84,OFSW_parameter,3,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,,0.0,0.0
+84,OFSW_parameter,4,Source,INT,"Water source type,  1 - reach, 2 - reservoir, 3 - catch basin, 4 - groundwater, 5 - wetland, 6 - dugout",0.0,0.0,1.0,0-6,0.0,1.0
+84,OFSW_parameter,5,SourceID,INT,ID for the source,0.0,0.0,1.0,,0.0,1.0
+84,OFSW_parameter,6,SELECTION,INT,-,0.0,0.0,0.0,,0.0,0.0
+85,OFSW_selection,1,ID,INT,-,0.0,0.0,0.0,,0.0,0.0
+86,MAIF_parameter,1,ID,INT,Reach ID,0.0,0.0,0.0,,0.0,0.0
+86,MAIF_parameter,2,Subbasin,INT,Subbasin ID,0.0,0.0,0.0,0.0,0.0,0.0
+86,MAIF_parameter,3,Year,INT,Operation starting year,0.0,0.0,0.0,0.0,0.0,1.0
+86,MAIF_parameter,4,SELECTION,INT,SELECTION,0.0,0.0,0.0,0.0,0.0,0.0
+87,MAIF_selection,1,ID,INT,Reach ID,0.0,0.0,0.0,,0.0,0.0
+88,FLDV_parameter,1,ID,INT,Flow diversion ID,0.0,0.0,0.0,,0.0,0.0
+88,FLDV_parameter,2,XLL,DOUBLE,X coordinates,0.0,0.0,0.0,,0.0,0.0
+88,FLDV_parameter,3,YLL,DOUBLE,Y coordinates,0.0,0.0,0.0,,0.0,0.0
+88,FLDV_parameter,4,OPERATION,TEXT,Operation date,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,5,Source,INT,"Diversion source type, 0 - outside watershed e.g. deep groundwater, 1 - reach",1.0,0.0,1.0,0-1,0.0,1.0
+88,FLDV_parameter,6,Source_ID,INT,Source ID,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,7,Target,INT,"Diversion target type, 0 - outside watershed e.g. deep groundwater, 1 - reach",1.0,0.0,1.0,0-1,0.0,1.0
+88,FLDV_parameter,8,Target_ID,INT,Target ID,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,9,div_type,INT,"Diversion rate type, 1 - divert fraction of water in source, 2 - leave minimum volume in source, 3 - divert rate (m3/s)",1.0,0.0,1.0,1-3,0.0,1.0
+88,FLDV_parameter,10,Q_REL,DOUBLE,"Constant diversion rate (fraction, m3, or m3/s)",0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,11,METHOD,TEXT,"Flow diverting method, i.e. MEA_DIV - diversion using measured rate, CONS_DIV - diversion using constant rate (as Q_REL), MON_CONS_DIV - diversion using constant rate in monthes specified in start_mon and end_mon",0.0,0.0,1.0,"MEA_DIV, CONS_DIV, MON_CONS_DIV",0.0,1.0
+88,FLDV_parameter,12,SEDMETHOD,TEXT,Sediment diverting method,0.0,0.0,1.0,SMB_DIV,0.0,1.0
+88,FLDV_parameter,13,NUTMETHOD,TEXT,Nutrients diverting method,0.0,0.0,1.0,NMB_DIV,0.0,1.0
+88,FLDV_parameter,14,FILE,TEXT,Measured data table name in HydroClimate DB (must specify if selecting MEA_DIV method),0.0,0.0,0.0,,1.0,1.0
+88,FLDV_parameter,15,start_mon,INT,Start diversion month (only functional if selecting MON_CONS_DIV method),4.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,16,end_mon,INT,End diversion month (only functional if selecting MON_CONS_DIV method),10.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,17,length,DOUBLE,Diversion channel length (m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,18,width,DOUBLE,Diversion channel width (m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,19,main_side_slope,DOUBLE,Diversion channel main side slope (m/m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,20,floodplain_side_slope,DOUBLE,Diversion channel floodplain side slope (m/m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,21,w_ratio,DOUBLE,Diversion channel main side slope (m/m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,22,depth,DOUBLE,Diversion channel depth (m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,23,slope,DOUBLE,Diversion channel average channel slope (m/m),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,24,manning,DOUBLE,Diversion channel manning coefficient,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,25,velocity,DOUBLE,Diversion channel flow velocity (m/s),0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,26,t0,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,27,d0,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,28,max_elevation,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,29,min_elevation,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,30,Ave_elevation,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,31,erodibility_factor,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,32,cover_factor,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,33,bc1,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,34,bc2,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,35,bc3,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,36,bc4,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,37,rk1,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,38,rk2,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,39,rk3,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,40,rk4,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,41,rs1,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,42,rs2,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,43,rs3,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,44,rs4,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0
+88,FLDV_parameter,45,rs5,DOUBLE,-,0.0,0.0,0.0,0.0,0.0,1.0

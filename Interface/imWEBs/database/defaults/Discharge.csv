@@ -1,0 +1,26 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+Ki,Interflow scaling factor,,SSR_DA,3,0,AC,10,0,Y
+k_chb,"channel bottom hydraulic conductivity, CH_K",mm/hr,ALL,0,0,AC,100,0,Y
+k_bank,"channel bank hydraulic conductivity, CH_K",mm/hr,ALL,0,0,AC,100,0,Y
+ep_ch,reach evaporation adjustment factor,,ALL,1,0,AC,1,0,Y
+bnk0,Initial bank storage,m3/m,ALL,0,0,AC,1,0,Y
+chs0,initial channel storage,m3/m,ALL,0,0,AC,100,0,Y
+a_bnk,bank flow recession constant,,ALL,0.2,0,AC,1,0,Y
+b_bnk,bank storage loss coefficient,,ALL,0.05,0,AC,0.2,0.02,Y
+ReachParameter,the parameters of each reach,,ALL,-999,0,NC,0,0,Y
+MSK_X,Muskingum weighting factor,,ChannelRouting,0.2,0,AC,0.5,0,
+MSK_co1,Weighting factor of bankful flow,,ChannelRouting,0.15,0,AC,1,0,
+q_iter,Thrashold of storage change rate,m3/s,ChannelRouting,0.01,0,AC,0.1,0.001,
+n_iter,maximum number of iteration,,ChannelRouting,10,0,AC,30,3,
+s_iter,Threshold of reservoir storage change rate,m3,ALL,50,0,AC,1000,10,Y
+n_iter_rs,Maximum number of reservoir routing iteration,,ALL,10,0,AC,30,3,Y
+radiusA10,Network constant to calculate average hydraulic radius of cell for 10 year,,ALL,0.12,0,NC,1,0,
+radiusB10,Geometry scaling exponet to calculate average hydraulic radius of cell for 10 year,,ALL,0.52,0,NC,1,0,
+maxV,maximum velocity for IUH generation,m/s,ALL,3,0,NC,5,0,
+minV,minimum velocity for IUH generation,m/s,ALL,0.005,0,NC,5,0,
+stream_network,,,ALL,-99,0,NC,0,0,
+radiusA2,Network constant to calculate average hydraulic radius of cell for 2 year,,ALL,0.04,0,NC,0.1,0,
+radiusB2,Geometry scaling exponet to calculate average hydraulic radius of cell for 2 year,,ALL,0.45,0,NC,1,0,
+radiusA100,Network constant to calculate average hydraulic radius of cell for 100 year,,ALL,0.18,0,NC,1,0,
+radiusB100,Geometry scaling exponet to calculate average hydraulic radius of cell for 100 year,,ALL,0.55,0,NC,1,0,
+stream_order,,,ALL,-99,0,NC,0,0,

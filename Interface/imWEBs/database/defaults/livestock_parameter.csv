@@ -1,0 +1,10 @@
+ID,Name,Description,Man_ID,Ani_Weight,Man_Day,Mass_Intake,Ani_nonadult,Man_TSS_Fra,Max_GR_Density,Mass_Trample,Water_Drink,CN2_Multi,PRC_Multi,DSC_Multi,USLE_C_Multi,Water_scr,NoWater_scr,MaxWaterDist_m,InitWater_Dist_m,MaxSlope_deg,InitSlope_Deg
+1,Dairy,Dairy manure,44,640,86,2.25,50,25,15,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+2,Beef,Beef manure,45,360,58,2.25,50,25,25,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+3,Cow-Calf,Cow-Calf manure,45,360,58,2.25,50,25,25,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+4,Swine,Swine manure,47,61,84,2.25,50,25,145,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+5,Sheep,Sheep manure,48,27,40,2.25,50,25,300,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+6,Goat,Goat manure,49,64,41,2.25,50,25,140,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+7,Horse,Horse manure,50,450,51,2.25,50,25,20,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+8,Turkey,Turkey manure,53,6.8,47,2.25,50,25,1000,2.25,2.25,1,1,1,1,10,1,2000,100,40,3
+9,Duck,Duck manure,54,1.4,110,2.25,50,25,3000,2.25,2.25,1,1,1,1,10,1,2000,100,40,3

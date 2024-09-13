@@ -1,0 +1,28 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+Wet_Area_0,Threshold wetlandarea below which the wetland will not be considered in the model simulation,ha,ALL,0.04,0,AC,0.25,0,Y
+A_Mainstream,Threshold area for determining mainstream network,ha,ALL,100,0,AC,1000,0,Y
+A_WetStream,Threshold area for determining wetland stream network,ha,All,0.04,0,AC,0.25,0,Y
+A_WetVolume,Threshold wetland area for determining which equation is used to calculate wetland volume,ha,ALL,70,0,AC,100,0,Y
+Wet_Co1,Area coefficient for calculating wetland volume when wetland area is less than 70 ha,,Wet_Water,2.85,0,AC,5,0,Y
+Wet_Ex1,Area exponent for calculating wetland volume when wetland area is less than 70 ha,,Wet_Water,1.22,0,AC,3,0,Y
+Wet_Co2,Area coefficient for calculating wetland volume when wetland area is greater than 70 ha,,Wet_Water,7.1,0,AC,10,0,Y
+Wet_Cons,Area constant for calculating wetland volume when wetland area is greater than 70 ha,,Wet_Water,9.97,0,AC,15,0,Y
+Wet_Dis,Denominator for estimating drained-altered wetland discharge,,Wet_Water,10,0,AC,20,1,Y
+Wet_K,Hydraulic conductivity of wetland bottom,,Wet_Water,0.05,1,AC,0.5,0,Y
+Wet_Ivol,"Initial volume of water in wetland, percent of normal volume",%,Wet_Water,100,0,AC,100,0,Y
+Wet_Ised,Initial sediment concentration in wetland,mg/l,Wet_Sediment,5,0,AC,50,0,Y
+Wet_Nsed,Normal sediment concentration in wetland,mg/l,Wet_Sediment,5,0,AC,20,0,Y
+Wet_Dcc,Sediment settling decay constant,1/day,Wet_Sediment,0.184,0,AC,0.5,0.05,Y
+Wet_Isolp,Initial concentration of soluble P in wetland,mg/l,Wet_Nutrient,0.05,0,AC,1,0,Y
+Wet_Iorgp,Initial concentration of organic P in wetland,mg/l,Wet_Nutrient,0.05,0,AC,1,0,Y
+Wet_Ino3,Initial concentration of NO3-N in wetland,mg/l,Wet_Nutrient,0.5,0,AC,10,0,Y
+Wet_Iorgn,Initial concentration of organic N in wetland,mg/l,Wet_Nutrient,0.5,0,AC,10,0,Y
+Wet_Psetl,phosphorous settling rate in wetland,m/year,Wet_Nutrient,10,0,AC,30,0,Y
+Wet_Nsetl,nitrogen settling rate in wetland,m/year,Wet_Nutrient,10,0,AC,30,0,Y
+Wet_Chlaw,Chlorophyll production coefficient for wetlands,,Wet_Nutrient,1,0,AC,2,0.5,Y
+Wet_Secciw,Water clarity coefficient for wetlands,m,Wet_Nutrient,1,0,AC,2,0.5,Y
+Wet_D50,Median partical diameter of sediment,um,Wet_Sediment,10,0,AC,1000,1,Y
+Wet_Ino2,Initial NO2,mg/l,Wet_Nutrient,0.1,0,AC,1,0,Y
+Wet_Inh3,Initial NH3,mg/l,Wet_Nutrient,0.1,0,AC,1,0,Y
+RoutingConstant,Wetland outflow decaying constant,,Wet_Water,10,0,AC,100,1,Y
+InflowFrac,Wetland inflow fraction,,Wet_Water,1,0,AC,1,0,Y

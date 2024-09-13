@@ -14,11 +14,16 @@ class Structure(FolderBase):
     A structure will have a boundary polygon shapefile and an optional outlet point shapefile. 
     """
 
-    structure_types = ["wetland","feedlot","dugout", "catchbasin", "manure_storage"]
-    structure_types_affection_flow_direction = ["wetland","feedlot"]
+    #structure_types = ["wetland","feedlot","dugout", "catchbasin", "manure_storage"]
+    structure_types_affection_flow_direction = ["wetland","feedlot","wascob","dugout"]
 
+    #this is the ERSI pointer, different from the Whitebox pointer
     dmove = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
     dmove_dic = {1: (0, 1), 2: (1, 1), 4: (1, 0), 8: (1, -1), 16: (0, -1), 32: (-1, -1), 64: (-1, 0), 128: (-1, 1)}    
+
+    #this is the whitebox direction
+    dmove = [(-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0)]
+    dmove_dic = {1: (-1, 1), 2: (0, 1), 4: (1, 1), 8: (1, 0), 16: (1, -1), 32: (0, -1), 64: (-1, -1), 128: (-1, 0)}  
 
     def __init__(self, structure_type:str, 
                  output_folder:str, 
@@ -70,10 +75,11 @@ class Structure(FolderBase):
 
     @property
     def boundary_original_raster(self):
+        """Original boundary raster"""
         raster = self.get_raster(self.__structure_boundary_original_raster_name)
         
         if raster is None:
-            logger.debug(f"Convert {self.structure_type} boundary from shapefile ({self.__structure_polygon_vector.file_name}) to raster ...")
+            logger.debug(f"Converting {self.structure_type} boundary from shapefile ({self.__structure_polygon_vector.file_name}) to raster ...")
             raster = self.wbe.vector_polygons_to_raster(self.__structure_polygon_vector, base_raster = self.__dem_raster, field_name = self.__structure_polygon_vector_id_field_name)
             self.save_raster(raster, self.__structure_boundary_original_raster_name)
 
@@ -81,11 +87,13 @@ class Structure(FolderBase):
     
     @property
     def boundary_processed_raster(self)->Raster:
+        """Process boundary raster"""
         outlet_processed_raster = self.outlet_processed_raster
         return self.get_raster(self.__structure_boundary_processed_raster_name)
     
     @property
     def boundary_raster(self)->Raster:
+        """Final boundary raster"""
         if self.boundary_processed_raster is None:
             return self.boundary_original_raster
         
@@ -93,23 +101,27 @@ class Structure(FolderBase):
     
     @property
     def outlet_raster(self)->Raster:
+        """Final outlet raster"""
         return self.outlet_processed_raster
     
     @property
     def outlet_vector(self)->Vector:
+        """Final outlet vector"""
         vector = self.get_vector(self.__structure_outlet_processed_vector_name)
 
         if vector is None:
+            logger.debug(f"Converting {self.structure_type} outlet from raster to vector ...")
             vector = self.wbe.raster_to_vector_points(self.outlet_raster)
             self.save_vector(vector, self.__structure_outlet_processed_vector_name)
 
         return vector
     
     @property
-    def outlet_original_raster(self)->Raster:      
+    def outlet_original_raster(self)->Raster:
+        """Original outlet raster"""      
         raster = self.get_raster(self.__structure_outlet_original_raster_name)        
         if raster is None and self.__structure_outlet_point_vector is not None:            
-            logger.debug(f"Convert {self.structure_type} outlet from shapefile ({self.__structure_outlet_point_vector.file_name}) to raster ...")
+            logger.debug(f"Converting {self.structure_type} outlet from shapefile ({self.__structure_outlet_point_vector.file_name}) to raster ...")
             raster = self.wbe.vector_polygons_to_raster(self.__structure_outlet_point_vector, base_raster = self.__dem_raster, field_name = self.__structure_outlet_point_vector_id_field_name)
             self.save_raster(raster, self.__structure_outlet_original_raster_name)
 
@@ -117,14 +129,15 @@ class Structure(FolderBase):
 
     @property
     def outlet_processed_raster(self):
+        """Processed outlet raster"""
         raster = self.get_raster(self.__structure_outlet_processed_raster_name)        
 
         if raster is None:
             if self.outlet_original_raster is not None:
-                logger.debug(f"Offset user-defined {self.structure_type} outlets ...")
+                logger.debug(f"Offseting user-defined {self.structure_type} outlets ...")
                 raster = self.__offset_structure_outlets()
             else:
-                logger.debug(f"Look for {self.structure_type} outlets ...")
+                logger.debug(f"Looking for {self.structure_type} outlets ...")
                 raster, modified_boundary_raster = self.__find_structure_outlets()
                 self.save_raster(modified_boundary_raster, self.__structure_boundary_processed_raster_name)
             self.save_raster(raster,self.__structure_outlet_processed_raster_name)
@@ -381,6 +394,8 @@ class Structure(FolderBase):
                                             pop_cells.insert(0, next_cell)
 
         return flow_dir_raster
+
+#region Find Outlet
 
     def __find_structure_outlets(self):
         """
@@ -656,66 +671,31 @@ class Structure(FolderBase):
         # 输出结果
         #return wetland_upstream_raster, wetland_extent_raster, wetland_outlet_raster, wetland_modified_raster, flow_dir_raster, wetland_out_raster
         return wetland_outlet_raster, wetland_modified_raster
-
-    def __find_flow_path(self, structure_raster, structure_outlet_raster, flow_dir_raster, structure_upstream_raster):
+    
+    def __get_upstream_cell(self, flow_dir_raster:Raster, row:int, col:int):
         """
-        Build the flow path within the wetlands.
-
-        :param OutLet: Outlets of wetlands
-        :param Dir: Flow direction
-        :param Wetland: Raster of the wetlands
-        :param LS: Output result, Upstream of the wetlands
-        :param nodata: Nodata of the Wetland
-        :return:
+        查询输入栅格的上游栅格
+        :param dir: array of dir
+        :param row: row of the cell
+        :param col:
+        :return: [(i,j),(),]
         """
-        row = structure_raster.configs.rows
-        col = structure_raster.configs.columns
-        wetland_nodata = structure_raster.configs.nodata
+        up_cell = []
+        row_num = flow_dir_raster.configs.rows
+        col_num = flow_dir_raster.configs.columns
 
-        Done = np.zeros((row, col))
-        Vis = np.zeros((row, col))
+        for i in range(8):
+            now_loc = (row + self.dmove[i][0], col + self.dmove[i][1])
+            # print(now_loc)
+            if 0 <= now_loc[0]<row_num and 0 <= now_loc[1]<col_num:
+                if flow_dir_raster[now_loc[0], now_loc[1]] == 2 ** ((i + 4) % 8):
+                    up_cell.append(now_loc)
 
-        flow_tree = {}
-        wbe = WbEnvironment()
-        out_configs = structure_raster.configs
-        out_configs.data_type = RasterDataType.I8
-        out_configs.nodata = 0
-        wetland_flowpath_raster = wbe.new_raster(structure_raster.configs)
+        return up_cell
 
-        for i in range(row):
-            for j in range(col):
-                if structure_outlet_raster[i, j] != -9999:
-                    # 找到出口，开始寻找下游
-                    pop_cells = [(i, j)]
-                    temp_road = [(i, j)]
-                    # Vis[i, j] = 1
-                    next_wetland_id = -1  # 没有下游湿地（流向边界外的或者洼地）为-1
-                    now_wetland_id = structure_upstream_raster[i, j]
-                    while pop_cells:
-                        pop_cell = pop_cells.pop()
-                        # print(pop_cell)
-                        now_dir = flow_dir_raster[pop_cell[0], pop_cell[1]]
-                        if now_dir in self.dmove_dic:
-                            next_cell = (pop_cell[0] + self.dmove_dic[now_dir][0], pop_cell[1] + self.dmove_dic[now_dir][1])
-                            if 0 <= next_cell[0] < row and 0 <= next_cell[1] < col:
-                                if Vis[next_cell[0], next_cell[1]] == 0:
-                                    if structure_raster[next_cell[0], next_cell[1]] != wetland_nodata and structure_raster[next_cell[0], next_cell[1]] != now_wetland_id:
-                                        next_wetland_id = structure_upstream_raster[next_cell[0], next_cell[1]]
-                                        if structure_outlet_raster[next_cell[0], next_cell[1]] != -9999:
-                                            break
-                                    pop_cells.append(next_cell)
-                                    if next_cell in temp_road:
-                                        break
-                                    temp_road.append(next_cell)
-                                    # Vis[next_cell[0], next_cell[1]] = 1
-                    # 回溯路径
-                    # print(temp_road)
-                    for cell in temp_road:
-                        Done[cell[0], cell[1]] = next_wetland_id
-                        wetland_flowpath_raster[cell[0], cell[1]] = 1
-                    flow_tree.setdefault(structure_raster[i, j], set()).add(next_wetland_id)
+#endregion
 
-        return flow_tree, wetland_flowpath_raster    
+#region Offset Outlet
 
     def __offset_structure_outlets(self)->Raster:
         """
@@ -822,24 +802,66 @@ class Structure(FolderBase):
                 break
 
         return flag
-    
-    def __get_upstream_cell(self, flow_dir_raster:Raster, row:int, col:int):
-        """
-        查询输入栅格的上游栅格
-        :param dir: array of dir
-        :param row: row of the cell
-        :param col:
-        :return: [(i,j),(),]
-        """
-        up_cell = []
-        row_num = flow_dir_raster.configs.rows
-        col_num = flow_dir_raster.configs.columns
 
-        for i in range(8):
-            now_loc = (row + self.dmove[i][0], col + self.dmove[i][1])
-            # print(now_loc)
-            if 0 <= now_loc[0]<row_num and 0 <= now_loc[1]<col_num:
-                if flow_dir_raster[now_loc[0], now_loc[1]] == 2 ** ((i + 4) % 8):
-                    up_cell.append(now_loc)
 
-        return up_cell
+#endregion
+
+    def __find_flow_path(self, structure_raster, structure_outlet_raster, flow_dir_raster, structure_upstream_raster):
+        """
+        Build the flow path within the wetlands.
+
+        :param OutLet: Outlets of wetlands
+        :param Dir: Flow direction
+        :param Wetland: Raster of the wetlands
+        :param LS: Output result, Upstream of the wetlands
+        :param nodata: Nodata of the Wetland
+        :return:
+        """
+        row = structure_raster.configs.rows
+        col = structure_raster.configs.columns
+        wetland_nodata = structure_raster.configs.nodata
+
+        Done = np.zeros((row, col))
+        Vis = np.zeros((row, col))
+
+        flow_tree = {}
+        wbe = WbEnvironment()
+        out_configs = structure_raster.configs
+        out_configs.data_type = RasterDataType.I8
+        out_configs.nodata = 0
+        wetland_flowpath_raster = wbe.new_raster(structure_raster.configs)
+
+        for i in range(row):
+            for j in range(col):
+                if structure_outlet_raster[i, j] != -9999:
+                    # 找到出口，开始寻找下游
+                    pop_cells = [(i, j)]
+                    temp_road = [(i, j)]
+                    # Vis[i, j] = 1
+                    next_wetland_id = -1  # 没有下游湿地（流向边界外的或者洼地）为-1
+                    now_wetland_id = structure_upstream_raster[i, j]
+                    while pop_cells:
+                        pop_cell = pop_cells.pop()
+                        # print(pop_cell)
+                        now_dir = flow_dir_raster[pop_cell[0], pop_cell[1]]
+                        if now_dir in self.dmove_dic:
+                            next_cell = (pop_cell[0] + self.dmove_dic[now_dir][0], pop_cell[1] + self.dmove_dic[now_dir][1])
+                            if 0 <= next_cell[0] < row and 0 <= next_cell[1] < col:
+                                if Vis[next_cell[0], next_cell[1]] == 0:
+                                    if structure_raster[next_cell[0], next_cell[1]] != wetland_nodata and structure_raster[next_cell[0], next_cell[1]] != now_wetland_id:
+                                        next_wetland_id = structure_upstream_raster[next_cell[0], next_cell[1]]
+                                        if structure_outlet_raster[next_cell[0], next_cell[1]] != -9999:
+                                            break
+                                    pop_cells.append(next_cell)
+                                    if next_cell in temp_road:
+                                        break
+                                    temp_road.append(next_cell)
+                                    # Vis[next_cell[0], next_cell[1]] = 1
+                    # 回溯路径
+                    # print(temp_road)
+                    for cell in temp_road:
+                        Done[cell[0], cell[1]] = next_wetland_id
+                        wetland_flowpath_raster[cell[0], cell[1]] = 1
+                    flow_tree.setdefault(structure_raster[i, j], set()).add(next_wetland_id)
+
+        return flow_tree, wetland_flowpath_raster    

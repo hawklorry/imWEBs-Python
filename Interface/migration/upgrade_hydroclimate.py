@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Replace the database file path
 # Make the backup before use this script
-hydroclimate_database_file = r"D:\imWEBs\test\05_SubareaBasedModel\database\Hydroclimate - Copy.db3"
+hydroclimate_database_file = r"C:\Work\imWEBs\test\Final_IMWEBs_Input_Package_Garvey Glenn\Hydroclimate.db3"
 
 sql_change_stations_table_name = """
     ALTER TABLE stations

@@ -24,60 +24,128 @@ class Inputs(FolderBase):
     def create_new_raster(self)->Raster:
         self.wbe.new_raster(self.dem_raster.configs)
 
+#region Watershed
+
     @property
     def dem_raster(self)->Raster:
         """
         Original DEM Raster
         """
-        return self.get_raster(Names.demName)
+        return self.get_raster(Names.get_standard_file_name("dem_raster"))
 
     @property
     def landuse_raster(self)->Raster:
-        return self.get_raster(Names.landuseName)
+        return self.get_raster(Names.get_standard_file_name("landus_raster"))
     
     @property
     def soil_raster(self)->Raster:
-        return self.get_raster(Names.soilName)
+        return self.get_raster(Names.get_standard_file_name("soil_raster"))
     
     @property
     def stream_network_user_vector(self)->Vector:
-        return self.get_vector(Names.streamNetworUserShpName)  
+        return self.get_vector(Names.get_standard_file_name("stream_shapefile"))  
     
     @property
     def boundary_vector(self)->Vector:
-        return self.get_vector(Names.boundaryShpName)
+        return self.get_vector(Names.get_standard_file_name("boundary_shapefile"))
     
     @property
     def outlet_vector(self)->Vector:
-        return self.get_vector(Names.outletName)
+        return self.get_vector(Names.get_standard_file_name("outlet_shapefile"))
   
     @property
     def farm_vector(self)->Vector:
-        return self.get_vector(Names.farmShpName)  
+        return self.get_vector(Names.get_standard_file_name("farm_shapefile"))  
     
     @property
     def field_vector(self)->Vector:
-        return self.get_vector(Names.fieldShpName) 
+        return self.get_vector(Names.get_standard_file_name("field_shapefile")) 
+
+#endregion
+
+#region Lookup
 
     @property
     def soil_lookup_csv(self):
-        return self.find_file(Names.soilLookupName)       
+        return self.find_file(Names.get_standard_file_name("soil_lookup"))       
     
     @property
     def landuse_lookup_csv(self):
-        return self.find_file(Names.landuseLookupName)   
-    
+        return self.find_file(Names.get_standard_file_name("landuse_lookup"))       
+
+#endregion 
+
+#region Reach BMP
+
     @property
-    def wetland_boundary_vector(self)->Vector:
-        return self.get_vector(Names.wetlandShpName)  
-    
+    def reach_bmp_vectors(self)->list:
+        return [self.point_source_vector, self.flow_diversion_vector, self.reservoir_vector, 
+                self.catchbasin_vector, self.grass_waterway_vector, self.access_management_vector,
+                self.water_use_vector]
+
     @property
-    def wetland_outlet_vector(self)->Vector:
-        return self.get_vector(Names.wetlandOutletsUserShpName)  
+    def point_source_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("point_source_shapefile")) 
+
+    @property
+    def flow_diversion_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("flow_diversion_shapefile")) 
 
     @property
     def reservoir_vector(self)->Vector:
-        return self.get_vector(Names.reservoirShpName)  
+        return self.get_vector(Names.get_standard_file_name("reservoir_shapefile")) 
+    
+    @property
+    def wetland_boundary_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("wetland_boundary_shapefile"))  
+    
+    @property
+    def wetland_outlet_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("wetland_outlet_shapefile"))       
+   
+    @property
+    def reservoir_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("reservoir_shapefile"))  
+     
+    @property
+    def catchbasin_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_catch_basin_shapefile"))
+    
+    @property
+    def grass_waterway_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("grass_waterway_shapefile"))
+    
+    @property
+    def access_management_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("access_management_shapefile"))
+    
+    @property
+    def water_use_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("water_use_shapefile"))
+
+#endregion
+
+#region Structure BMP
+
+    @property
+    def dugout_boundary_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("dugout_boundary_shapefile"))
+    
+    @property
+    def dugout_outlet_vector(self)->Vector:
+        return None
+    
+    @property
+    def wascob_boundary_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("wascob_boundary_shapefile"))
+    
+    @property
+    def wascob_outlet_vector(self)->Vector:
+        return None
+
+#endregion
+
+#region areal non-structure bmp
 
     @property
     def feedlot_boundary_vector(self)->Vector:
@@ -85,51 +153,10 @@ class Inputs(FolderBase):
     
     @property
     def feedlot_outlet_vector(self)->Vector:
-        return self.get_vector(Names.feedlotOutletUserShpName)
+        return None
 
-    @property
-    def catchbasin_boundary_vector(self)->Vector:
-        return self.get_vector(Names.catchbasinShpName)
-    
-    @property
-    def catchbasin_outlet_vector(self)->Vector:
-        return self.get_vector(Names.catchbasinOutletUserShpName)
-    
-    @property
-    def manure_storage_boundary_vector(self)->Vector:
-        return self.get_vector(Names.manureStorageShpName)
-    
-    @property
-    def manure_storage_outlet_vector(self)->Vector:
-        return self.get_vector(Names.manureStorageOutletUserShpName)
-    
-    @property
-    def dugout_boundary_vector(self)->Vector:
-        return self.get_vector(Names.dugoutShpName)
-    
-    @property
-    def dugout_outlet_vector(self)->Vector:
-        return self.get_vector(Names.dugoutOutletUserShpName)
-    
-    @property
-    def wintering_site_vector(self)->Vector:
-        return self.get_vector(Names.winteringSiteShpName)
 
-    @property
-    def vegetation_filter_strip_vector(self)->Vector:
-        return self.get_vector(Names.vegetationFilterStripShpName)
-    
-    @property
-    def riparian_buffer_strip_vector(self)->Vector:
-        return self.get_vector(Names.riparianBufferStripShpName)
-    
-    @property
-    def pasture_grazing_strip_vector(self)->Vector:
-        return self.get_vector(Names.pastureGrazingShpName)
-        
-    @property
-    def offsite_wintering_vector(self)->Vector:
-        return self.get_vector(Names.offsiteWinteringShpName)
+#endregion
     
     def __validate(self):
         """

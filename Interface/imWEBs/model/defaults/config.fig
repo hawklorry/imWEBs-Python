@@ -1,0 +1,45 @@
+10 | Water quality
+0 | TimeSeries_P | | TSD_RD
+0 | TimeSeries_TMIN | | TSD_RD
+0 | TimeSeries_TMAX | | TSD_RD
+0 | TimeSeries_WS | | TSD_RD
+0 | TimeSeries_SR | | TSD_RD
+0 | TimeSeries_RM | | TSD_RD
+0 | TimeSeries_WD | | TSD_RD
+1 | PET | Hargreaves | PET_H
+2 | Interpolation_P_1 | Average uniform | ITP
+3 | Interpolation_TMAX_1 | Average uniform | ITP
+3 | Interpolation_TMIN_1 | Average uniform | ITP
+4 | Interpolation_PET_1 | Average uniform | ITP
+5 | PET landcover | Landuse | PETC_LAI
+6 | Interception storage capacity | Sin curve | PISC_SIN
+7 | Interception | Mass balance | PI_MSM
+8 | Snow redistribution | Mass balance | SRD_MB
+9 | Snow sublimation | PET fraction | SSM_PE
+10 | Snowmelt | Degree day | SNO_DD
+11 | Snow balance | Water balance | SNO_WB
+12 | Soil temperature | Finn Plauborg| STP_FP
+#13 | Infiltration | SCS curve number | SUR_CN
+13 | Infiltration | Modified rational | SUR_MR
+14 | Depression | Fill and spill | DEP_FS
+#15 | Percolation | Pore index | PER_PI
+#16 | Subsurface runoff | Darcy | SSR_DA
+#17 | Soil ET | Linear moisture | SET_LM
+#18 | Groundwater | Reservoir | GWA_RE
+#19 | Soil water | Water balance | SOL_WB
+0 | soilwater_PI_DA_LM_RE | Water balance | soilwater
+14 | Structure Flow | Structure Flow | STRU_FLOW
+20 | Overland flow | IUH overland | IUH_OL
+21 | Interflow | IUH interflow | IUH_IF
+#22 | Flow routing | Non-linear storage | NLS_CH
+23 | Erosion C-factor | Landuse | MUSLEC_LU
+24 | Erosion | MUSLE_AS | MUSLE_AS
+24 | Structure Sediment | Structure Sediment | STRU_SEDI
+25 | Sediment transport | Stream power | SEDI
+#26 | Sediment routing | Variable channel dimension | VCD_SR
+27 | Plant growth | EPIC | PG_EPIC
+28 | Soil nutrients | Nutrient cycle | NC_Q2K
+28 | Structure Nutrient | Structure Nutrient | STRU_NUTR
+29 | Overland nutrient routing | Nutrient routing | NR_Q2K
+#30 | Channel nutrient routing | Qual2k | NC_Q2K
+0 | ChannelRouting_IUH_VCD_Q2K | | ChannelRouting

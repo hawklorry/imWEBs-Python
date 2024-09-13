@@ -1,0 +1,43 @@
+ID,Name,Type,CODE
+1,Point source,1,PTSR
+2,Stream flow diversion,1,SFDV
+3,Reservoir,1,RESV
+4,Riparian wetland,1,RIWET
+5,Riparian buffer,2,RIBUF
+6,Grass waterway,1,GWW
+7,Vegetation filter strip,2,VFST
+8,Pond,2,POND
+9,Isolated wetland,1,ISWET
+10,Terrace,2,TERR
+11,Overland flow diversion,2,OLFDV
+12,Crop management,3,CRPMG
+13,Residual management,3,RSDMG
+14,Tillage management,3,TILMG
+15,Fertilizer management,3,FERMG
+16,Grazing management,3,GRAMG
+17,Pesticide management,3,PESMG
+18,Irrigation management,3,IRRMG
+19,Tile drain management,2,TLDMG
+20,Urban management,2,URBMG
+21,Manure incorporation with 48h,4,MI48H
+22,Manure application setback,4,MASB
+23,No application on snow,4,NAOS
+24,Spring application rather than fall application,4,SAFA
+25,Application based on soil nitrogen limit,4,ASNL
+26,Application based on soil phosphorous limit,4,ASPL
+27,Manure storage capacity and design,3,MSCD
+28,Manure catch basin/impondment,1,MCBI
+29,Manure feedlot,3,FDLT
+30,Marginal crop management,3,MCLCM
+31,Marginal fertilizer management,3,MCLFM
+32,Marginal tillage management,3,MCLTM
+33,Wintering site management,3,WSMG
+34,Pasture crop management,3,PSCM
+35,Pasture fertilizer management,3,PSFM
+36,Pasture tillage management,3,PSTM
+37,Pasture grazing management,3,PSGM
+38,Dugout,2,DGOT
+39,Off site watering,0,OFSW
+40,Managed access inluding fencing,1,MAIF
+41,Water and sediment control basin,2,WSCB
+42,Water Use,1,WAUS

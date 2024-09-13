@@ -1,0 +1,30 @@
+BMP_ID,Code,Description,Parameter,Value,Value_String
+22,MASB,Manure application setback,Slope <= 0.04,30,30
+22,MASB,Manure application setback,0.04 < Slope <= 0.06,60,60
+22,MASB,Manure application setback,0.06 < Slope <= 0.12,90,90
+22,MASB,Manure application setback,Slope > 0.12,10000,10000
+21,MI48H,Manure incorporation with 48h,FerSurface,0.2,0
+23,NAOS,No application on snow,Snow cover mm/dd,0,10/20-03/31
+24,SAFA,Spring application rather than fall application,Fall m/d,0,08/01-10/30
+25,ASNL,Application based on soil nitrogen limit,NO3_N_limit_kg_ha,135,135
+26,ASPL,Application based on soil phosphorous limit,Soil_P_limit_kg_ha,90,90
+27,MSCD,Manure storage capacity and design,Manure_EMC_mgl,10000,10000
+27,MSCD,Manure storage capacity and design,Sediment_EMC_mgl,500,500
+27,MSCD,Manure storage capacity and design,CN_increase,0.2,0
+27,MSCD,Manure storage capacity and design,PRC_increase,0.2,0
+28,MCBI,Manure catch basin/impoundment,Manure_EMC_mgl,10000,10000
+28,MCBI,Manure catch basin/impoundment,Sediment_EMC_mgl,1000,1000
+28,MCBI,Manure catch basin/impoundment,CN_increase,0.3,0
+28,MCBI,Manure catch basin/impoundment,PRC_increase,0.3,0
+28,MCBI,Manure catch basin/impoundment,SedimentConEqui_mgl,15,15
+28,MCBI,Manure catch basin/impoundment,SettVelN_mYr,10,10
+28,MCBI,Manure catch basin/impoundment,SettVelP_mYr,10,10
+27,MSCD,Manure storage capacity and design,Storage period mm/dd,0,10/20-03/31
+27,MSCD,Manure storage capacity and design,ManureType,45,45
+30,MCLCM,Marginal cropland,Buffer_m,100,100
+30,MCLCM,Marginal cropland,Slope_%,5,5
+34,VFST,Vegetation filter strip,Con_Area_ha,10,10.0
+39,RIBUF,Riparian buffer strip,Con_Area_ha,5,5.0
+39,RIBUF,Riparian buffer strip,Group_factor_ha,0.5,0.5
+39,RIBUF,Riparian buffer strip,NO3_Reduc_C1,2.1661,2.1661
+39,RIBUF,Riparian buffer strip,NO3_Reduc_C2,5.1302,5.1302

@@ -41,10 +41,12 @@ class Names:
     # mainStreamRasName = "mainStream" + raster_extension    
     streamNetworkRasName = "stream_network" + raster_extension
     streamNetworkShpName = "stream_network" + shapefile_extension
-    streamOutletsShpName = "stream_outlets" + shapefile_extension
-    streamOutletsRasName = "stream_outlets" + raster_extension
+    streamOutletsOriginalShpName = "stream_outlets_original" + shapefile_extension
+    streamOutletsOriginalRasName = "stream_outletsoriginal" + raster_extension
+    streamOutletsPourPointShpName = "stream_outlets_pour_point" + shapefile_extension
+    streamOutletsPourPointRasName = "stream_outlets_pour_point" + raster_extension
     # streamLinkName = "stream_link" + raster_extension
-    # streamOrderName = "stream_order" + raster_extension
+    streamOrderRasName = "stream_order" + raster_extension
     # streamOrderShpName = "stream_order" + shapefile_extension
     # streamSlopeName = "streamSlope" + raster_extension
     # streamDemName = "streamDem" + raster_extension
@@ -145,6 +147,15 @@ class Names:
     insertOutletsName = "insertOutlets"
     combinedOutletsName = "combinedOutlets"
     flowDirD8FinalName = "flow_dir"
+   
+    #point source
+    pointSourceShpName = "point_source" + shapefile_extension
+    pointSourceRastername = pointSourceShpName.replace(shapefile_extension, raster_extension)
+
+    #flow diversion
+    flowDiversionShpName = "flow_diversion" + shapefile_extension
+    flowDiversionRastername = flowDiversionShpName.replace(shapefile_extension, raster_extension)
+
 
     # Reservoir
     reservoirShpName = "reservoir" + shapefile_extension
@@ -158,17 +169,30 @@ class Names:
     # Catch basin
     catchbasinShpName = "catchbasin" + shapefile_extension
     catchbasinRasName = catchbasinShpName.replace(shapefile_extension, raster_extension)
-    catchbasinOutletUserShpName = "catchbasinOutletUser" + shapefile_extension
+
+    #grass waterway
+    grassWaterwayShpName = "grass_waterway" + shapefile_extension
+    grassWaterwayRasName = grassWaterwayShpName.replace(shapefile_extension, raster_extension)
+
+    #access management
+    accessManagementShpName = "access_management" + shapefile_extension
+    accessManagementRasName = accessManagementShpName.replace(shapefile_extension, raster_extension)
+
+    #water use
+    waterUseShpName = "water_use" + shapefile_extension
+    waterUseRasName = waterUseShpName.replace(shapefile_extension, raster_extension)
 
     # dugout
     dugoutShpName = "dugout" + shapefile_extension
     dugoutRasName = dugoutShpName.replace(shapefile_extension, raster_extension)
-    dugoutOutletUserShpName = "dugoutOutletUser" + shapefile_extension
+
+    # wascob
+    wascobShpName = "wascob" + shapefile_extension
+    wascobRasName = wascobShpName.replace(shapefile_extension, raster_extension)
 
     # Cattle Feedlot
     feedlotShpName = "feedlot" + shapefile_extension
     feedlotRasName = feedlotShpName.replace(shapefile_extension, raster_extension)
-    feedlotOutletUserShpName = "feedlotOutletUser" + shapefile_extension
 
     # offsite wintering - OFSW
     offsiteWinteringShpName = "offsiteWintering" + shapefile_extension
@@ -246,7 +270,7 @@ class Names:
     # riparianBufferStripDrainageShpName = "riparianBufferStripDrainage" + shapefile_extension
 
     #Pasture
-    # pastureLandRasterName = "PasCropland" + raster_extension
+    pastureLandRasName = "PasCropland" + raster_extension
     # pastureLandShpName = "PasCropland" + shapefile_extension
     # pastureLandH5RasterName = "PasCropland_H5" + raster_extension
 
@@ -269,7 +293,51 @@ class Names:
     # grazingOffsiteWateringRasterName = "GrazingOffsiteWatering" + raster_extension
 
     #Marginal Crop Land
-    # marCroplandRasterName = "MarCropland" + raster_extension
+    marCroplandRasName = "MarCropland" + raster_extension
     # marCroplandShpName = "MarCropland" + shapefile_extension
     # marCroplandH5RasterName = "MarCropland_H5" + raster_extension
+
+    #standard names
+    config_item_standard_name_lookup = {
+        #watershed
+        "dem_raster": demName,
+        "soil_raster": soilName,
+        "landuse_raster": landuseName,
+        "stream_shapefile": streamNetworUserShpName,
+        "boundary_shapefile": boundaryShpName,
+        "farm_shapefile": farmShpName,
+        "field_shapefile": fieldShpName,
+        "outlet_shapefile": outletName,
+
+        #lookup tables
+        "soil_lookup":soilLookupName,
+        "landuse_lookup":landuseLookupName,
+
+        #db3 database
+        "hydroclimate":hydroclimateDatabasename,
+
+        #reach bmp
+        "point_source_shapefile": pointSourceShpName,
+        "flow_diversion_shapefile": flowDiversionShpName,
+        "reservoir_shapefile": reservoirShpName,
+        "wetland_boundary_shapefile": wetlandShpName,
+        "wetland_outlet_shapefile": wetlandOutletsUserShpName,
+        "manure_catch_basin_shapefile" : catchbasinShpName,
+        "grass_waterway_shapefile": grassWaterwayShpName,
+        "access_management_shapefile":accessManagementShpName,
+        "water_use_shapefile": waterUseShpName,
+
+        #structure_bmp
+        "dugout_boundary_shapefile":dugoutShpName,
+        "wascob_boundary_shapefile":wascobShpName,
+
+        #areal non-structure bmp
+        "manure_feedlot_boundary_shapefile": feedlotShpName
+    }
+
+    def get_standard_file_name(item_name:str)->str:
+        if item_name in Names.config_item_standard_name_lookup:
+            return Names.config_item_standard_name_lookup[item_name]
+        
+        raise ValueError(f"{item_name} is not a valide name for standard file name.")
 
