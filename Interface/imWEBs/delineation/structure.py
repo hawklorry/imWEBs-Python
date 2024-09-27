@@ -18,8 +18,8 @@ class Structure(FolderBase):
     structure_types_affection_flow_direction = ["wetland","feedlot","wascob","dugout"]
 
     #this is the ERSI pointer, different from the Whitebox pointer
-    dmove = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
-    dmove_dic = {1: (0, 1), 2: (1, 1), 4: (1, 0), 8: (1, -1), 16: (0, -1), 32: (-1, -1), 64: (-1, 0), 128: (-1, 1)}    
+    #dmove = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+    #dmove_dic = {1: (0, 1), 2: (1, 1), 4: (1, 0), 8: (1, -1), 16: (0, -1), 32: (-1, -1), 64: (-1, 0), 128: (-1, 1)}    
 
     #this is the whitebox direction
     dmove = [(-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0)]
@@ -40,8 +40,10 @@ class Structure(FolderBase):
         self.structure_type = structure_type
         self.__structure_polygon_vector = structure_polygon_vector
         self.__structure_polygon_vector_id_field_name = structure_polygon_vector_id_field_name
+
         self.__structure_outlet_point_vector = structure_outlet_point_vector
         self.__structure_outlet_point_vector_id_field_name = structure_outlet_point_vector_id_field_name
+        
         self.__dem_raster = dem_raster
 
         if self.__structure_polygon_vector is None:
@@ -57,6 +59,8 @@ class Structure(FolderBase):
 
         #area threshold lower that which the structures will be removed.
         self.__structure_area_threshold_ha = structure_area_threshold_ha
+        if structure_area_threshold_ha > 0:
+            self.__structure_polygon_vector = self.wbe.filter_vector_features_by_area(self.__structure_polygon_vector, structure_area_threshold_ha * 10000)
 
         #number of sub-structures that one structure will be split.
         #default 3 for wetland
@@ -78,9 +82,11 @@ class Structure(FolderBase):
         """Original boundary raster"""
         raster = self.get_raster(self.__structure_boundary_original_raster_name)
         
-        if raster is None:
-            logger.debug(f"Converting {self.structure_type} boundary from shapefile ({self.__structure_polygon_vector.file_name}) to raster ...")
-            raster = self.wbe.vector_polygons_to_raster(self.__structure_polygon_vector, base_raster = self.__dem_raster, field_name = self.__structure_polygon_vector_id_field_name)
+        if raster is None:  
+            logger.info(f"Converting {self.structure_type} boundary from shapefile ({self.__structure_polygon_vector.file_name}) to raster ...")
+            raster = self.wbe.vector_polygons_to_raster(self.__structure_polygon_vector, 
+                                                        base_raster = self.__dem_raster, 
+                                                        field_name = self.__structure_polygon_vector_id_field_name)
             self.save_raster(raster, self.__structure_boundary_original_raster_name)
 
         return raster
@@ -110,7 +116,7 @@ class Structure(FolderBase):
         vector = self.get_vector(self.__structure_outlet_processed_vector_name)
 
         if vector is None:
-            logger.debug(f"Converting {self.structure_type} outlet from raster to vector ...")
+            logger.info(f"Converting {self.structure_type} outlet from raster to vector ...")
             vector = self.wbe.raster_to_vector_points(self.outlet_raster)
             self.save_vector(vector, self.__structure_outlet_processed_vector_name)
 
@@ -121,8 +127,8 @@ class Structure(FolderBase):
         """Original outlet raster"""      
         raster = self.get_raster(self.__structure_outlet_original_raster_name)        
         if raster is None and self.__structure_outlet_point_vector is not None:            
-            logger.debug(f"Converting {self.structure_type} outlet from shapefile ({self.__structure_outlet_point_vector.file_name}) to raster ...")
-            raster = self.wbe.vector_polygons_to_raster(self.__structure_outlet_point_vector, base_raster = self.__dem_raster, field_name = self.__structure_outlet_point_vector_id_field_name)
+            logger.info(f"Converting {self.structure_type} outlet from shapefile ({self.__structure_outlet_point_vector.file_name}) to raster ...")
+            raster = self.wbe.vector_points_to_raster(self.__structure_outlet_point_vector, base_raster = self.__dem_raster, field_name = self.__structure_outlet_point_vector_id_field_name)
             self.save_raster(raster, self.__structure_outlet_original_raster_name)
 
         return raster
@@ -134,10 +140,10 @@ class Structure(FolderBase):
 
         if raster is None:
             if self.outlet_original_raster is not None:
-                logger.debug(f"Offseting user-defined {self.structure_type} outlets ...")
+                logger.info(f"Offseting user-defined {self.structure_type} outlets ...")
                 raster = self.__offset_structure_outlets()
             else:
-                logger.debug(f"Looking for {self.structure_type} outlets ...")
+                logger.info(f"Looking for {self.structure_type} outlets ...")
                 raster, modified_boundary_raster = self.__find_structure_outlets()
                 self.save_raster(modified_boundary_raster, self.__structure_boundary_processed_raster_name)
             self.save_raster(raster,self.__structure_outlet_processed_raster_name)
@@ -305,7 +311,7 @@ class Structure(FolderBase):
         wbe = WbEnvironment()
         outlet_raster_no_data = outlet_raster.configs.nodata
    
-        #generate origial flow direction from dem
+        #generate original flow direction from dem
         flow_dir_raster = wbe.d8_pointer(dem = dem_raster)
 
         #get structure basic data
@@ -314,18 +320,18 @@ class Structure(FolderBase):
         row = structure_raster.configs.rows
         col = structure_raster.configs.columns
 
-        Vis = np.zeros((row, col))
+        Vis = np.zeros((row, col))              #search flag
         wetland_extent = np.zeros((row, col))
-        wetland_extent[:, :] = -9999  #边界标记为1
+        wetland_extent[:, :] = wetland_nodata  #边界标记为1,出口标记为2
 
         for i in range(row):
             for j in range(col):
                 if structure_raster[i, j] != wetland_nodata:
                     # print(id)
-                    extent = [] #
+                    extent = [] #边界cell
                     wetland_cells = []
                     Wetland_Area = 0
-                    outlets = []
+                    outlets = []#出口cell,outlets is in extent
 
                     if Vis[i, j] == 0:
                         # 搜索邻域内湿地并标记边界栅格
@@ -372,6 +378,8 @@ class Structure(FolderBase):
                         # print(pop_cells)
                         for cell_1 in outlets:
                             wetland_extent[cell_1[0], cell_1[1]] = 2
+
+                        #保证所有的边界cell都指向出口
                         while pop_cells:
                             pop_cell = pop_cells.pop()
                             # print(pop_cell)
@@ -389,7 +397,7 @@ class Structure(FolderBase):
                                             if 0 <= temp_next_cell[0] < row and 0 <= temp_next_cell[1] < col:
                                                 if structure_raster[temp_next_cell[0], temp_next_cell[1]] != structure_raster[
                                                     next_cell[0], next_cell[1]]:
-                                                    flow_dir_raster[next_cell[0], next_cell[1]] = 2 ** ((k + 4) % 8)
+                                                    flow_dir_raster[next_cell[0], next_cell[1]] = 2 ** ((k + 4) % 8)#指向上一个边界cell或出口
                                             wetland_extent[next_cell[0], next_cell[1]] = 2
                                             pop_cells.insert(0, next_cell)
 
@@ -425,14 +433,14 @@ class Structure(FolderBase):
 
         Vis = np.zeros((row, col))
         Result = np.zeros((row, col))
-        Result[:, :] = -9999
+        Result[:, :] = wetland_nodata
         Vis1 = np.zeros((row, col))
         Vis2 = np.zeros((row, col))
         id = 1
         wetland_extent = np.zeros((row, col))
-        wetland_extent[:, :] = -9999  #边界标记为1
+        wetland_extent[:, :] = wetland_nodata  #边界标记为1
         OUTLET = np.zeros((row, col))
-        OUTLET[:, :] = -9999
+        OUTLET[:, :] = wetland_nodata
 
         WETLAND = np.zeros((row, col)) #重新编码后的wetland
         for i in range(row):
@@ -440,7 +448,7 @@ class Structure(FolderBase):
                 WETLAND[i,j] = structure_raster[i,j]
 
         out = np.zeros((row, col))
-        out[:, :] = -9999
+        out[:, :] = wetland_nodata
 
         removed_wetland_ids = []
         removed_wetland_ids.append(wetland_nodata)
@@ -522,10 +530,10 @@ class Structure(FolderBase):
                                         temp_num += 1
                     #去掉面积太小的
                     if Wetland_Area <= area_threshold:
-                        removed_wetland_ids.append[now_wetland_id]
+                        removed_wetland_ids.append(now_wetland_id)
                         for cell in outlets[1:]:
                             outlets.remove(cell)
-                            OUTLET[cell[0], cell[1]] = -9999
+                            OUTLET[cell[0], cell[1]] = wetland_nodata
 
                         #if the wetland is removed, there is no need to process it further
                         continue
@@ -606,7 +614,7 @@ class Structure(FolderBase):
         second = {}
         for i in range(row):
             for j in range(col):
-                if structure_raster[i, j] != wetland_nodata and structure_raster[i, j] not in removed_wetland_ids and Result[i, j] == -9999:
+                if structure_raster[i, j] != wetland_nodata and structure_raster[i, j] not in removed_wetland_ids and Result[i, j] == wetland_nodata:
                     # 分割湿地后，有些湿地没有出口，需要再追溯上游
                     second.setdefault(structure_raster[i, j], []).append((i, j))
 
@@ -629,11 +637,11 @@ class Structure(FolderBase):
         us = {}
         for i in range(row):
             for j in range(col):
-                if Result[i, j] != -9999:
+                if Result[i, j] != wetland_nodata:
                     us.setdefault(Result[i, j], []).append((i, j))
         
         #再一次重新编码，确保从1开始
-        Result[:, :] = -9999
+        Result[:, :] = wetland_nodata
         id = 1
         for wet_ in us:
             wetland_cells = us[wet_]
@@ -646,13 +654,12 @@ class Structure(FolderBase):
             for j in range(col):
                 if WETLAND[i, j] != wetland_nodata:
                     WETLAND[i, j] = Result[i, j]
-                if OUTLET[i,j] != -9999:
+                if OUTLET[i,j] != wetland_nodata:
                     OUTLET[i,j] = Result[i, j]
 
         #create rasters
         out_configs = structure_raster.configs
         out_configs.data_type = RasterDataType.F32
-        out_configs.nodata = -9999
 
         wetland_extent_raster = self.wbe.new_raster(out_configs)
         wetland_upstream_raster = self.wbe.new_raster(out_configs)
@@ -764,7 +771,7 @@ class Structure(FolderBase):
         indexes = []
 
         for i in range(len(area)):
-            if self.isEdgePoint(area[i], area):
+            if self.__isEdgePoint(area[i], area):
                 d = (area[i][0] - checkPoint[0]) ** 2 + (area[i][1] - checkPoint[1]) ** 2
                 if d < distance:
                     distance = d

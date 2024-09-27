@@ -42,7 +42,7 @@ class Names:
     streamNetworkRasName = "stream_network" + raster_extension
     streamNetworkShpName = "stream_network" + shapefile_extension
     streamOutletsOriginalShpName = "stream_outlets_original" + shapefile_extension
-    streamOutletsOriginalRasName = "stream_outletsoriginal" + raster_extension
+    streamOutletsOriginalRasName = "stream_outlets_original" + raster_extension
     streamOutletsPourPointShpName = "stream_outlets_pour_point" + shapefile_extension
     streamOutletsPourPointRasName = "stream_outlets_pour_point" + raster_extension
     # streamLinkName = "stream_link" + raster_extension
@@ -193,6 +193,8 @@ class Names:
     # Cattle Feedlot
     feedlotShpName = "feedlot" + shapefile_extension
     feedlotRasName = feedlotShpName.replace(shapefile_extension, raster_extension)
+    feedlotOutletShpName = "feedlot_outlet" + shapefile_extension
+    feedlotOutletRasName = feedlotOutletShpName.replace(shapefile_extension, raster_extension)
 
     # offsite wintering - OFSW
     offsiteWinteringShpName = "offsiteWintering" + shapefile_extension
@@ -332,7 +334,8 @@ class Names:
         "wascob_boundary_shapefile":wascobShpName,
 
         #areal non-structure bmp
-        "manure_feedlot_boundary_shapefile": feedlotShpName
+        "manure_feedlot_boundary_shapefile": feedlotShpName,
+        "manure_feedlot_outlet_shapefile": feedlotOutletShpName
     }
 
     def get_standard_file_name(item_name:str)->str:

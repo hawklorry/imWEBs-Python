@@ -21,11 +21,18 @@ class DatabaseBase:
     def save_table(self, table_name:str, table_df:pd.DataFrame):
         table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=False)
 
+    def check_table_exist(self, table_name:str)->bool:
+        return len(pd.read_sql(f"SELECT tbl_name FROM sqlite_master where type='table' and tbl_name ='{table_name}'",self.engine)) > 0 
+
     def populate_defaults(self, table_name:str):
         """
         populate table from csv file, used to load the default tables, assuming the table name is same as the csv file name
         """
         
+        if self.check_table_exist(table_name):
+            logger.info(f"Table {table_name} already exist, skip")
+            return
+
         #try to find the corresponding csv file in the default folder
         csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defaults", f"{table_name}.csv")
 
@@ -37,7 +44,6 @@ class DatabaseBase:
         try:
             df = pd.read_csv(csv_file)
             df.to_sql(table_name, con = self.engine, if_exists='replace', index = False)
-            logger.debug(f"Import {csv_file} to table {table_name} in database: {self.database_file}")
         except:
             raise ValueError(f"{csv_file} couldn't be imported to table {table_name} in database: {self.database_file}")
         

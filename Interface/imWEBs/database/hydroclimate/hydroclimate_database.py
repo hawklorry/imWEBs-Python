@@ -16,8 +16,8 @@ class HydroClimateDatabase(DatabaseBase):
         self.__data_type_station_ids_dictionary = {}
 
     @property
-    def station_coordinates(self):
-        """Coordinates of all stations"""
+    def station_coordinates(self)->list:
+        """Coordinates of all stations. Used for interpolation"""
         if len(self.__station_coordinates) <= 0:
             Session = sessionmaker(bind=self.engine)
             with Session() as session:
@@ -40,7 +40,7 @@ class HydroClimateDatabase(DatabaseBase):
         return self.__data_type_station_ids_dictionary
     
     @property
-    def data_start_date(self):
+    def data_start_date(self)->pd.Timestamp:
         """The start date considering all data type"""
         start_date = pd.Timestamp('1900-01-01')
         for _, table_appendix in HydroClimateDatabase.station_types.items():
@@ -54,7 +54,7 @@ class HydroClimateDatabase(DatabaseBase):
         return start_date
 
     @property
-    def data_end_date(self):
+    def data_end_date(self)->pd.Timestamp:
         """The end date considering all data type"""
         end_date = pd.Timestamp('2100-01-01')
         for _, table_appendix in HydroClimateDatabase.station_types.items():

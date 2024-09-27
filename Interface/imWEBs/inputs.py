@@ -3,6 +3,9 @@ from .names import Names
 from .raster_extension import RasterExtension
 from whitebox_workflows import Raster, Vector
 from .lookup import Lookup
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Inputs(FolderBase):
     """
@@ -22,7 +25,7 @@ class Inputs(FolderBase):
         self.columns = self.dem_raster.configs.columns
 
     def create_new_raster(self)->Raster:
-        self.wbe.new_raster(self.dem_raster.configs)
+        return self.wbe.new_raster(self.dem_raster.configs)
 
 #region Watershed
 
@@ -35,7 +38,7 @@ class Inputs(FolderBase):
 
     @property
     def landuse_raster(self)->Raster:
-        return self.get_raster(Names.get_standard_file_name("landus_raster"))
+        return self.get_raster(Names.get_standard_file_name("landuse_raster"))
     
     @property
     def soil_raster(self)->Raster:
@@ -153,7 +156,7 @@ class Inputs(FolderBase):
     
     @property
     def feedlot_outlet_vector(self)->Vector:
-        return None
+        return self.get_vector(Names.feedlotOutletShpName)
 
 
 #endregion
@@ -164,6 +167,8 @@ class Inputs(FolderBase):
         Validate all grid inputs so they have same dimension. DEM is used as the standard. 
         Only soil and landuse are used here assuming all other inputs are gnereated from shapefile and would correct dimension as the dem.      
         """
+
+        logger.info("Validating inputs ...")
 
         #check mandatary files
         if self.dem_raster is None:
@@ -178,16 +183,16 @@ class Inputs(FolderBase):
         if self.landuse_raster is None:
             raise ValueError("Can't find landuse raster")       
         
-        if self.farm_raster is None:
-            raise ValueError("Can't find farm raster")       
+        if self.farm_vector is None:
+            raise ValueError("Can't find farm shapefile")       
         
-        if self.field_raster is None:
-            raise ValueError("Can't find field raster")   
+        if self.field_vector is None:
+            raise ValueError("Can't find field shapefile")   
         
-        if self.soil_lookup is None:
+        if self.soil_lookup_csv is None:
             raise ValueError("Can't find soil lookup")
         
-        if self.landuse_lookup is None:
+        if self.landuse_lookup_csv is None:
             raise ValueError("Can't find landuse lookup")
 
         #Check if dem, soil and landuse has the same dimension
@@ -199,6 +204,7 @@ class Inputs(FolderBase):
             raise ValueError("The landuse raster doesn't have same dimension as dem.")
         
         #check if the soil/lookup raster ids are included in corresponding lookup csv files
+        logger.info("Loading lookup tables ...")
         self.lookup_soil =  Lookup(self.soil_lookup_csv, self.soil_raster)
         self.lookup_landuse  = Lookup(self.landuse_lookup_csv, self.landuse_raster)
 

@@ -8,6 +8,7 @@ from ..outputs import Outputs
 import shutil
 import logging
 from .config import Config
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -34,18 +35,19 @@ class ModelConfig(Config):
         if self.config_file is not None and os.path.exists(self.config_file):
             rasters = {}
             vectors = {}
+            unique_id_vectors = {}
             databases = {}
             lookups = {}
 
             file_exist_valid = True
             wbe = WbEnvironment()
             
-            logger.debug(f"Loading model configuration file {self.config_file} ...")
+            logger.info(f"Loading model configuration file {self.config_file} ...")
             cf = ConfigParser()
             cf.read(self.config_file)
             for section, variables in self.config_variables.items():
                 for var in variables:
-                    logger.debug(f"Reading Section: {section}, Variable: {var} ...")
+                    #logger.info(f"Reading Section: {section}, Variable: {var} ...")
                     if section == "delineation":
                         value = Config.get_option_value_exactly(cf, section, var, valtyp=float)
                         setattr(self, var, value)
@@ -79,6 +81,8 @@ class ModelConfig(Config):
                                 rasters[var] = wbe.read_raster(file_path)
                             if "shapefile" in var:
                                 vectors[var] = wbe.read_vector(file_path)
+                                if "bmp" in section:
+                                    unique_id_vectors[var] = vectors[var]
                             if section == "database":
                                 databases[var] = value
                             if section == "lookup":
@@ -89,22 +93,38 @@ class ModelConfig(Config):
 
             #check rasters and vectors
             raster_valid = RasterExtension.check_rasters(rasters)
-            vector_valid = VectorExtension.check_vectors(vectors)
+            vector_valid = VectorExtension.check_vectors(unique_id_vectors)
             self.is_valid = file_exist_valid and raster_valid and vector_valid
 
             #copy all the input files to the model folder with standard name
             if self.is_valid:
                 self.__create_model_folder()
 
-                logger.debug(f"Copying input files to {self.input_folder} ...")
+                logger.info(f"Copying input files to {self.input_folder} ...")
+
+                logger.info("Rasters ...")
                 for option, raster in rasters.items():
+                    logger.info(raster.file_name)
                     wbe.write_raster(raster, os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option]))
+                
+                logger.info("Vectors ...")
                 for option, vector in vectors.items():
+                    logger.info(vector.file_name)
                     VectorExtension.save_vector(vector, os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option]))
+                
+                logger.info("Databases ...")
                 for option, databae_file in databases.items():
+                    logger.info(databae_file)
                     shutil.copyfile(os.path.join(self.input_folder, databae_file), os.path.join(self.model_database_folder, Names.config_item_standard_name_lookup[option]))
+                
+                logger.info("Lookup files ...")
                 for option, lookup_file in lookups.items():
-                    shutil.copyfile(os.path.join(self.input_folder, lookup_file), os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option]))
+                    logger.info(lookup_file)
+                    source_file = os.path.join(self.input_folder, lookup_file)
+                    target_file = os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option])
+
+                    #we need to write the lookup file to utf8 so it could be loaded correctly in pandas later.
+                    Path(target_file).write_text(Path(source_file).read_text(), encoding="utf8")
 
             #create model outputs object
             self.outputs = Outputs(self.model_output_folder, self.model_input_folder, self.model_database_folder)
@@ -127,6 +147,10 @@ class ModelConfig(Config):
     def delineate_watershed(self):
         """watershed delineation"""
         self.outputs.delineate_watershed()
+
+    def generate_parameters(self):
+        """generate parameters"""
+        pass
 
     @property
     def config_variables(self)->str:
@@ -169,7 +193,7 @@ class ModelConfig(Config):
                              "wascob_boundary_shapefile"],
 
             #feedlot will be delineated in a single subbasin, the catch basin will function as the outlet.
-            "non_structure_bmp":["manure_feedlot_boundary_shapefile"],
+            "non_structure_bmp":["manure_feedlot_boundary_shapefile","manure_feedlot_outlet_shapefile"],
 
             #delineation parameters
             "delineation":["stream_threshold_area_ha",

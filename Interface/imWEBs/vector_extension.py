@@ -25,7 +25,7 @@ class VectorExtension:
                 return False
             ids.append(id)
 
-        return True
+        return True, field_name, ids
 
     @staticmethod
     def compare_vector_projection(vector1:Vector, vector2:Vector):
@@ -42,8 +42,9 @@ class VectorExtension:
         is_same = True
         standard_vector = None
         for key, value in vectors.items():
-            logger.debug(f"Checking ID column in {{value.file_name}} ...")
-            if not VectorExtension.check_unique_id(value):
+            logger.info(f"Checking ID column in {value.file_name} ...")
+            exist,_,_ = VectorExtension.check_unique_id(value)
+            if not exist:
                 raise ValueError(f"ID column was not found in {value.file_name}.")
 
             if standard_vector is None:
@@ -58,15 +59,24 @@ class VectorExtension:
     
     @staticmethod
     def save_vector(vector:Vector, destination_file:str):
-        #wbe = WbEnvironment()
-        #wbe.write_vector(vector, destination_file)
+        wbe = WbEnvironment()
+        out_vector = wbe.new_vector(vector.header.shape_type, vector.get_attribute_fields(), proj=vector.projection)
 
-        gpd.read_file(vector.file_name).to_file(destination_file)
+        # Now fill it with the input data
+        for i in range(vector.num_records):
+            geom = vector[i]
+            out_vector.add_record(geom) # Add the record to the output Vector
+            out_vector.add_attribute_record(vector.get_attribute_record(i), deleted=False)
+        # Finally, save the output file
+        wbe.write_vector(out_vector, destination_file)
+
+        #gpd.read_file(vector.file_name).to_file(destination_file)
 
     @staticmethod
     def check_field_in_vector(vector:Vector, field_name:str):
         """
         check if vector has attribute with given name
         """
-        return len([field for field in vector.get_attribute_fields() if field.name == field_name]) > 0
+        return len([field for field in vector.get_attribute_fields() if field.name.lower() == field_name.lower()]) > 0
+        
 

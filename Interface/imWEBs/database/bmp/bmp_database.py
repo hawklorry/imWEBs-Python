@@ -67,24 +67,10 @@ class BMPDatabase(DatabaseBase):
 
     def __init__(self, database_file):
         super().__init__(database_file)
-        self.__load()
-        self.wbe = WbEnvironment()
+        self.wbe = WbEnvironment()             
 
-    def __load(self):    
-        self.reach_parameter = {}
-        self.__create_initial_structure()        
-
-    def get_reach_parameter(self, reach_id, parameter_name):
-        return getattr(self.reach_parameter[reach_id], parameter_name)
-    
-    def __create_initial_structure(self):
-        #remove the tables we want to update and then create them again
-        BMPTable.metadata.drop_all(self.engine)
-        BMPTable.metadata.create_all(self.engine)
-
-        #default tables
-        for table in BMPDatabase.default_tables:
-            self.populate_defaults(table)
+    # def get_reach_parameter(self, reach_id, parameter_name):
+    #     return getattr(self.reach_parameter[reach_id], parameter_name)   
 
     def populate_database(self, subbasin_raster:Raster, 
                           field_raster:Raster, 
@@ -97,29 +83,40 @@ class BMPDatabase(DatabaseBase):
         create all the parameter tables in bmp database
         """        
 
-        logger.debug("creating field_info ...")
+        #remove the tables we want to update and then create them again
+        logger.info("Creating table structure in bmp database ...")
+        BMPTable.metadata.drop_all(self.engine)
+        BMPTable.metadata.create_all(self.engine)
+
+        #default tables
+        logger.info("Loading default tables to bmp database ...")
+        for table in BMPDatabase.default_tables:
+            logger.info(table)
+            self.populate_defaults(table) 
+
+        logger.info("creating field_info ...")
         field_area_df = RasterExtension.get_category_area_ha_dataframe(field_raster, BMPDatabase.COL_NAME_AREA_HA)
         field_area_df.to_sql(FieldInfo.__tablename__, con = self.engine, if_exists='append',index=True)
         field_area_df.columns = ["FieldArea"]
 
-        logger.debug("creating farm_info ...")
+        logger.info("creating farm_info ...")
         farm_area_df = RasterExtension.get_category_area_ha_dataframe(farm_raster, BMPDatabase.COL_NAME_AREA_HA)
         farm_area_df.to_sql(FarmInfo.__tablename__, con = self.engine, if_exists='append',index=True)
         farm_area_df.columns = ["FarmArea"]
 
-        logger.debug("creating subbasin_info ...")
+        logger.info("creating subbasin_info ...")
         subbasin_area_df = self.__create_subbasin_info(subbasin_raster, flow_acc_raster, potential_runoff_coefficient_raster, depression_storage_capacity_raster, cn2_raster)
         subbasin_area_df.to_sql(SubbasinInfo.__tablename__, con = self.engine, if_exists='append',index=True)
         subbasin_area_df = subbasin_area_df[BMPDatabase.COL_NAME_AREA_HA].to_frame()
         subbasin_area_df.columns = ["SubbasinArea"]
 
-        logger.debug("creating field_subbasin ...")
+        logger.info("creating field_subbasin ...")
         self.__create_overlay(field_raster, subbasin_raster, "Field", "Subbasin", field_area_df, subbasin_area_df, FieldSubbasin.__tablename__)
 
-        logger.debug("creating farm_subbasin ...")
+        logger.info("creating farm_subbasin ...")
         self.__create_overlay(farm_raster, subbasin_raster, "Farm", "Subbasin", farm_area_df, subbasin_area_df, FarmSubbasin.__tablename__)
 
-        logger.debug("creating field_farm ...")
+        logger.info("creating field_farm ...")
         self.__create_overlay(field_raster, farm_raster, "Field", "Farm", field_area_df, farm_area_df, FieldFarm.__tablename__)
  
     def __create_subbasin_info(self, 

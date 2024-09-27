@@ -342,9 +342,10 @@ class Delineation:
 
         replace buildStreamNetworkLink2Outlets
         """
-        dX = [1, 1, 1, 0, -1, -1, -1, 0]
-        dY = [-1, 0, 1, 1, 1, 0, -1, -1]
-        LnOf2 = 0.693147180559945
+        #dX = [1, 1, 1, 0, -1, -1, -1, 0]
+        #dY = [-1, 0, 1, 1, 1, 0, -1, -1]
+        #dmove = [(-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0)]
+        dmove_dic = {1: (-1, 1), 2: (0, 1), 4: (1, 1), 8: (1, 0), 16: (1, -1), 32: (0, -1), 64: (-1, -1), 128: (-1, 0)}  
 
         wbe = WbEnvironment()
         rows = stream_network_raster.configs.rows
@@ -352,11 +353,17 @@ class Delineation:
         no_data = stream_network_raster.configs.nodata
 
         stream_network_modified_raster = wbe.new_raster(stream_network_raster.configs)
+        flag_raster = wbe.new_raster(stream_network_raster.configs)
 
         for row in range(rows):
             for col in range(cols):
+                #skip if the cell is already handled
+                if flag_raster[row, col] > 0:
+                    continue
+
                 if stream_network_raster[row, col] > 0:
                     stream_network_modified_raster[row, col] = stream_network_raster[row, col]
+                    flag_raster[row, col] = 1
                 elif outlets_raster[row, col] > 0:
                     if flow_dir_raster[row, col] < 0:
                         break
@@ -365,34 +372,26 @@ class Delineation:
                     y = row
                     value = no_data
 
+                    path = []
+                    path.append((x,y))
                     while value < 0:
                         flow_dir = flow_dir_raster[y, x]
                         if flow_dir > 0:
-                            c = int(math.log(flow_dir) / LnOf2)
-                            if c > 7:
-                                break
-                            x += dX[c]
-                            y += dY[c]
+                            mv = dmove_dic[flow_dir]
+
+                            x += mv[1]
+                            y += mv[0]
                             value = stream_network_raster[y, x]
+                            path.append((x,y))
                         else:
                             break
 
                     if value < 0:
                         value = 1
-                    x = col
-                    y = row
-                    while stream_network_raster[y, x] < 0:
-                        stream_network_modified_raster[y, x] = value
 
-                        flow_dir = flow_dir_raster[y, x]
-                        if flow_dir > 0:
-                            c = int(math.log(flow_dir) / LnOf2)
-                            if c > 7:
-                                break
-                            x += dX[c]
-                            y += dY[c]
-                        else:
-                            break
+                    for point in path:
+                        stream_network_modified_raster[point[1],point[0]] = value
+                        flag_raster[point[1],point[0]] = 1
 
         return stream_network_modified_raster
 

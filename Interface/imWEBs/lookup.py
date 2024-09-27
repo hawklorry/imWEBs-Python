@@ -2,6 +2,9 @@ from whitebox_workflows import Raster, WbEnvironment
 import pandas as pd
 from io import StringIO
 from .raster_extension import RasterExtension
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Lookup():
     """
@@ -13,17 +16,20 @@ class Lookup():
         self.original_raster = original_raster
         
         #load lookup relationship from csv file assuming it has header and the original id and imwebs id is in first and second column
+        logger.info(f"Reading {self.csv_file} ...")
         df = pd.read_csv(self.csv_file, usecols=[0, 1], index_col=0)
         self.lookup_dict = df[df.columns[0]].to_dict()
         self.lookup_list = []
 
         #get unique values in original raster
+        logger.info(f"Reading {self.original_raster.file_name} ...")
         wbe = WbEnvironment()
         values = wbe.list_unique_values_raster(original_raster)
         df = pd.read_csv(StringIO(values), sep =",", usecols = [0], dtype = "int")
         self.raster_ids = df[df.columns[0]].to_list()
 
         #make sure the raster ids is included in the lookup table
+        logger.info(f"Checking ids in lookup table ...")
         non_exist_ids = [id for id in self.raster_ids if id not in self.lookup_dict]
         if len(non_exist_ids) > 0:
             raise ValueError(f"Raster contains ids that are not in the lookup table: {non_exist_ids}.")
@@ -31,6 +37,7 @@ class Lookup():
         #could also test that the imwebs ids are available in the soil/landuse parameter table
         
         #create the mapped raster using the lookup list
+        logger.info(f"Create reclassified raster ...")
         self.mapped_raster = RasterExtension.reclassify(self.original_raster, self.lookup_dict)
 
 if __name__ == '__main__':

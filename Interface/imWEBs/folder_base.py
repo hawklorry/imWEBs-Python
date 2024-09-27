@@ -4,14 +4,14 @@ from .vector_extension import VectorExtension
 
 class FolderBase:
     def __init__(self, folder:str) -> None:
-        self.foler = folder
-        self.folder_exists = os.path.exists(self.foler)
+        self.folder = folder
+        self.folder_exists = os.path.exists(self.folder)
         self.wbe = WbEnvironment()
         self.rasters = {}
         self.vectors = {}
 
     def get_file_path(self, filename:str)->str:
-        return os.path.join(self.foler,filename)
+        return os.path.join(self.folder,filename)
 
     def save_raster(self, raster:Raster, file_name:str, overwrite = True):
         file_path = self.get_file_path(file_name)
@@ -31,12 +31,11 @@ class FolderBase:
         VectorExtension.save_vector(vector, self.get_file_path(file_name))      
         self.vectors[file_name] = vector
 
-
     def find_file(self, filename:str)->str:
         if not self.folder_exists:
             return None
         
-        file_path = os.path.join(self.foler,filename)
+        file_path = os.path.join(self.folder,filename)
         if os.path.exists(file_path):
             return file_path
         

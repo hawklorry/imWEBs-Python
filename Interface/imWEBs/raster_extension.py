@@ -10,6 +10,17 @@ class RasterExtension:
 
     flow_dir_xy_delta_dic = {1: (1, -1), 2: (1, 0), 4: (1, 1), 8: (0, 1), 16: (-1, 1), 32: (-1, 0), 64: (-1, -1), 128: (0, -1)}    
 
+    @staticmethod 
+    def get_number_of_valid_cell(raster:Raster):
+        rows = raster.configs.rows
+        cols = raster.configs.columns
+        rowCount = 0
+        for row in range(rows):
+            for col in range(cols):
+                if raster[row, col] > 0:
+                    rowCount += 1 #number of valid cell
+        return rowCount    
+
     @staticmethod
     def flow_dir_to_index_delta(flow_dir):
         if  int(flow_dir) not in RasterExtension.flow_dir_to_index_delta:

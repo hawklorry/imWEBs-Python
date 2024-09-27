@@ -33,8 +33,8 @@ class parameters(FolderBase):
         
         return reach_width_depth_parameter(design_storm, 0.04, 0.45)
 
-    def get_reach_parameter(self, reach_id, parameter_name):
-        return self.bmp_database.get_reach_parameter(reach_id, parameter_name)
+    # def get_reach_parameter(self, reach_id, parameter_name):
+    #     return self.bmp_database.get_reach_parameter(reach_id, parameter_name)
 
     def get_parameter_lookup(self,parameter_name,parameter_type):
         return self.parameter_database.get_parameter_lookup(parameter_name,parameter_type)

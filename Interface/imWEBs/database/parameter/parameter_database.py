@@ -4,7 +4,8 @@ from sqlalchemy import create_engine, select
 from ..database_base import DatabaseBase
 from .landuse_lookup import LanduseLookup
 from .soil_lookup import SoilLookup
-
+import logging
+logger = logging.getLogger(__name__)
 
 class ParameterDatabase(DatabaseBase):
     """Access to parameter database."""
@@ -14,33 +15,49 @@ class ParameterDatabase(DatabaseBase):
                       "Lapse_rate", "LS_parameter"]
 
     def __init__(self, database_file):
-        super().__init__(database_file)     
-
-        #populate default tables
-        for table in ParameterDatabase.default_tables:
-            self.populate_defaults(table)
+        super().__init__(database_file) 
 
         self._lookup_tables = {}
-        self.__load_landuse_soil_lookup()
+        self._soil_lookup = {}
+        self._landuse_lookup = {}
+        self._algricultural_landuses = []
 
-    def __load_landuse_soil_lookup(self):    
-        """Load soil and land use lookup table"""
+    def __populate_default_tables(self):
+        """populate default parameter tables from csv files"""
 
-        self.soil_lookup = {}
-        self.landuse_lookup = {}
-        self.algricultural_landuses = []
+        #populate default tables
+        logger.info("Trying to load default tables to parameter database ...")
+        for table in ParameterDatabase.default_tables:
+            logger.info(table)
+            self.populate_defaults(table)
 
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            select_stmt = select(SoilLookup)
-            for row in session.scalars(select_stmt):
-                self.soil_lookup[row.SOILCODE] = row
+    @property
+    def soil_lookup(self)->dict:
+        if len(self._soil_lookup) == 0:
+            self.__populate_default_tables()
 
-            select_stmt = select(LanduseLookup)
-            for row in session.scalars(select_stmt):
-                self.landuse_lookup[row.LANDUSE_ID] = row
-                if row.is_agricultrual:
-                    self.algricultural_landuses.append(row.LANDUSE_ID)
+            Session = sessionmaker(bind=self.engine)
+            with Session() as session:
+                select_stmt = select(SoilLookup)
+                for row in session.scalars(select_stmt):
+                    self._soil_lookup[row.SOILCODE] = row
+
+        return self._soil_lookup
+    
+    @property
+    def landuse_lookup(self)->dict:
+        if len(self._landuse_lookup) == 0:
+            self.__populate_default_tables()
+
+            Session = sessionmaker(bind=self.engine)
+            with Session() as session:
+                select_stmt = select(LanduseLookup)
+                for row in session.scalars(select_stmt):
+                    self._landuse_lookup[row.LANDUSE_ID] = row
+                    if row.is_agricultrual:
+                        self._algricultural_landuses.append(row.LANDUSE_ID)
+
+        return self._landuse_lookup
 
     def get_parameter_lookup(self, parameter_name, parameter_type):
         """return lookup array to be used in reclass funciton"""

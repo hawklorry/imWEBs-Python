@@ -1,9 +1,14 @@
 from whitebox_workflows import Raster
 import numpy as np
 import math
+from .interpolation import Interpolation
+from ..raster_extension import RasterExtension
 
-class InverseDistance:
-    def interpolate(self, mask_raster:Raster, station_coordinates:list, weight_file:str):
+class InverseDistance(Interpolation):
+    def __init__(self, weight_file: str) -> None:
+        super().__init__(weight_file)
+    
+    def write_weight_file(self, mask_raster:Raster, station_coordinates:list):
         rows = mask_raster.configs.rows
         cols = mask_raster.configs.columns
         numShapes = len(station_coordinates)
@@ -11,12 +16,7 @@ class InverseDistance:
         dist = np.zeros(numShapes)
         aValues = np.zeros(numShapes)
         aValuesInt = np.zeros(numShapes)
-        rowCount = 0
-
-        for row in range(rows):
-            for col in range(cols):
-                if mask_raster[row, col] > 0:
-                    rowCount += 1
+        rowCount = RasterExtension.get_number_of_valid_cell(mask_raster)
 
         sb = []
         sb.append(str(rowCount))
@@ -31,10 +31,12 @@ class InverseDistance:
                 if mask_raster[row, col] > 0:
                     tempDenom = 0
                     aValuesIntSum = 0
+                    raster_x = mask_raster.get_x_from_column(col)
+                    raster_y = mask_raster.get_y_from_row(row)
 
                     for i in range(numShapes):
-                        dist[i] = math.sqrt(math.pow(station_coordinates[i][0] - mask_raster.get_x_from_column(col), 2) +
-                                            math.pow(station_coordinates[i][1] - mask_raster.get_y_from_row(row), 2))
+                        dist[i] = math.sqrt(math.pow(station_coordinates[i][0] - raster_x, 2) +
+                                            math.pow(station_coordinates[i][1] - raster_y, 2))
                         tempDenom += 1 / math.pow(dist[i], 2)
 
                     for i in range(numShapes):
@@ -102,5 +104,5 @@ class InverseDistance:
                     sb.append(finalValue)
                     sb.append("\n")
 
-        with open(weight_file, 'w') as out:
+        with open(self.weight_file, 'w') as out:
             out.write(''.join(sb))
