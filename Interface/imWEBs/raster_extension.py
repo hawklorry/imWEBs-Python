@@ -3,6 +3,7 @@ from io import StringIO
 import pandas as pd
 import logging
 import math
+from .vector_extension import VectorExtension
 logger = logging.getLogger(__name__)
 
 
@@ -73,28 +74,28 @@ class RasterExtension:
 
         return filtered_raster
 
-    @staticmethod
-    def combine_structure_rasters(rasters:list, shape_type:str)->Raster:
-        """
-        combine raster and make sure uinique ids are assigned
-        """
-        wbe = WbEnvironment()
+    # @staticmethod
+    # def combine_structure_rasters(rasters:list, shape_type:str)->Raster:
+    #     """
+    #     combine raster and make sure uinique ids are assigned
+    #     """
+    #     wbe = WbEnvironment()
 
-        vectors = []
-        for r in rasters:
-            if shape_type == "polygon":
-                vectors.append(wbe.raster_to_vector_polygons(r))
-            elif shape_type == "point":
-                vectors.append(wbe.raster_to_vector_points(r))
+    #     vectors = []
+    #     for r in rasters:
+    #         if shape_type == "polygon":
+    #             vectors.append(wbe.raster_to_vector_polygons(r))
+    #         elif shape_type == "point":
+    #             vectors.append(wbe.raster_to_vector_points(r))
         
-        merged_vector = wbe.merge_vectors(vectors)
+    #     merged_vector = VectorExtension.merge_vectors(vectors)
         
-        if shape_type == "polygon":
-            return wbe.vector_polygons_to_raster(merged_vector,base_raster = rasters[-1])
-        elif shape_type == "point":
-            return wbe.vector_points_to_raster(merged_vector,base_raster = rasters[-1])
+    #     if shape_type == "polygon":
+    #         return wbe.vector_polygons_to_raster(merged_vector,base_raster = rasters[-1])
+    #     elif shape_type == "point":
+    #         return wbe.vector_points_to_raster(merged_vector,base_raster = rasters[-1])
         
-        return None
+    #     return None
             
 
     @staticmethod
@@ -158,3 +159,5 @@ class RasterExtension:
             return df[name].to_frame()
         
         return df[stat_type]
+    
+    

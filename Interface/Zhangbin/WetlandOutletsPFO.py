@@ -33,7 +33,13 @@ class GridCell:
 
 LnOf2 = 0.693147180559945
 
-def WetlandOutletsPFO(demFile:str, wetlandRasFile:str, outputFile: str, isAllowMultiOutlet: bool = False, isUsingPFO: bool = True, pntrFile: str = ""):
+def WetlandOutletsPFO(
+        demFile:str, 
+        wetlandRasFile:str, 
+        outputFile: str, 
+        isAllowMultiOutlet: bool = False, 
+        isUsingPFO: bool = True, 
+        pntrFile: str = ""):
     """
     Find Wetland Outlets with PFO
 

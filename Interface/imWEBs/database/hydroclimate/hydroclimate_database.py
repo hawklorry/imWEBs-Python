@@ -12,18 +12,18 @@ class HydroClimateDatabase(DatabaseBase):
     def __init__(self, database_file):
         super().__init__(database_file)    
 
-        self.__station_coordinates = []
+        self.__station_coordinates = {}
         self.__data_type_station_ids_dictionary = {}
 
     @property
-    def station_coordinates(self)->list:
+    def station_coordinates(self)->dict:
         """Coordinates of all stations. Used for interpolation"""
         if len(self.__station_coordinates) <= 0:
             Session = sessionmaker(bind=self.engine)
             with Session() as session:
                 select_stmt = select(Stations)
                 for row in session.scalars(select_stmt):
-                    self.__station_coordinates.append((row.XPR, row.YPR))
+                    self.__station_coordinates[row.ID] = (row.XPR, row.YPR)
 
         return self.__station_coordinates
     

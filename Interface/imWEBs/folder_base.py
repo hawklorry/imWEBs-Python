@@ -5,7 +5,9 @@ from .vector_extension import VectorExtension
 class FolderBase:
     def __init__(self, folder:str) -> None:
         self.folder = folder
-        self.folder_exists = os.path.exists(self.folder)
+        if not os.path.exists(self.folder):
+            raise ValueError(f"Folder {folder} doesn't exist.")
+
         self.wbe = WbEnvironment()
         self.rasters = {}
         self.vectors = {}
@@ -31,10 +33,7 @@ class FolderBase:
         VectorExtension.save_vector(vector, self.get_file_path(file_name))      
         self.vectors[file_name] = vector
 
-    def find_file(self, filename:str)->str:
-        if not self.folder_exists:
-            return None
-        
+    def find_file(self, filename:str)->str:        
         file_path = os.path.join(self.folder,filename)
         if os.path.exists(file_path):
             return file_path

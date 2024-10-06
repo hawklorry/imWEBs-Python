@@ -10,6 +10,12 @@ from ..database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 from ..names import Names
 from datetime import date
 import pandas as pd
+from ..model.parameter_h5 import ParameterH5
+from ..interpolation.weight_file import WriteWeightFile
+from ..outputs import Outputs
+from ..model.model import Model
+import numpy as np
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +44,15 @@ class ScanrioConfig(Config):
                     setattr(self, var, None)                  
                     if section == "climate_station" and value is not None and len(value.strip()) > 0:
                         ids = [int(x) for x in value.split(",")]
-                        setattr(self, var, ids)
-                        self.data_type_station_ids[var] = ids
+                        if var.upper() == "T":
+                            setattr(self, "TMAX", ids)
+                            setattr(self, "TMIN", ids)
+                            self.data_type_station_ids["TMAX"] = ids
+                            self.data_type_station_ids["TMIN"] = ids
+                        else:
+                            setattr(self, var, ids)
+                            self.data_type_station_ids[var] = ids
+
                     elif (var == "start_date" or var == "end_date") and value is not None and len(value.strip()) > 0:
                         setattr(self, var, pd.Timestamp(value))
                     elif value is not None and len(value.strip()):
@@ -48,6 +61,7 @@ class ScanrioConfig(Config):
                     if var == "model_folder":
                         if not os.path.exists(value):
                             raise ValueError(f"Model Folder {value} doesn't exist. Please delineate watershed first.")
+                        self.model = Model(value)
                         
                     if var == "name":
                         if value is None or len(value) <=0:
@@ -58,12 +72,15 @@ class ScanrioConfig(Config):
             self.__validate()
 
     def __validate(self):
-        """make sure all station ids are included in the hdyroclimate database"""
-        hydroclimate = HydroClimateDatabase(os.path.join(self.model_folder, "database",Names.hydroclimateDatabasename))
+        #set default value for model type and interval
+        if self.model_type is None:
+            self.model_type = "cell"
+        if self.interval is None:
+            self.interval = "daily"
 
         #if user provide ids, we check if the ids are available.
         #if all is empty, we will use all the available ids
-        available_stations_dict = hydroclimate.data_type_station_ids_dictionary
+        available_stations_dict = self.model.hydroclimate.data_type_station_ids_dictionary
         if len(self.data_type_station_ids) > 0:            
             for datatype, user_ids in self.data_type_station_ids.items():
                 station_ids = available_stations_dict[datatype]
@@ -72,10 +89,11 @@ class ScanrioConfig(Config):
                         raise ValueError(f"Climate Station {id} for Type {datatype} is not available in hydroclimate database.")
         else:
             self.data_type_station_ids = available_stations_dict
-                    
+
         #check start and end date
-        database_start_date = hydroclimate.data_start_date
-        database_end_date = hydroclimate.data_end_date
+        #if the start date and end date is not set, use the start and end date from the database
+        database_start_date = self.model.hydroclimate.data_start_date
+        database_end_date = self.model.hydroclimate.data_end_date
         if self.start_date is not None and self.start_date < database_start_date:
             raise ValueError(f"The earliest date in hydroclimate database is {database_start_date}, earlier than the user specified start date {self.start_date}")
         if self.end_date is not None and self.end_date > database_end_date:
@@ -84,27 +102,6 @@ class ScanrioConfig(Config):
             self.start_date = database_start_date
         if self.end_date is None:
             self.end_date = database_end_date
-
-
-    # @property
-    # def model_folder(self):
-    #     return getattr(self,"model_folder")
-    
-    # @property
-    # def model_type(self):
-    #     return getattr(self,"model_type")   
-    
-    # @property
-    # def start_date(self):
-    #     return getattr(self,"start_date")   
-    
-    # @property
-    # def end_date(self):
-    #     return getattr(self,"end_date")   
-    
-    # @property
-    # def interval(self):
-    #     return getattr(self,"interval")   
 
     @property
     def config_variables(self)->str:
@@ -126,26 +123,45 @@ class ScanrioConfig(Config):
             #The ids should match the ids in hydroclimate database which will be enforced
             #Exmaple:1,2,3,4
             #Empty means use all the stations for that type. 
+            #T is for TMIN and TMAX
             "climate_station":
             [
                 "P",
-                "TMAX",
-                "TMIN",
+                "T",
                 "RM",
                 "SR",
                 "WS",
                 "WD"
+            ],
+
+            "climate_interpolation":
+            [
+                #average_uniform
+                #grid_interpolation
+                #inverse_distance
+                #linear_triangle
+                #thiessen_polygon
+                "method"
             ]
             }    
     
-    def generate_model_structure(self):
-        """generate model structure"""
+    def __generate_file_in(self):
+        logger.info("Creating file.in ...")
+        #get cell size and number of valid cells for cell-based model
+        cell_size = -1
+        cell_number = -1
+        if self.model_type == "cell":
+            cell_size = self.model.outputs.inputs.cell_size
+            cell_number = self.model.outputs.number_of_valid_cell
+        else:
+            #read subarea info some where
+            pass
 
         #create file.in
         file_in = FileIn(folder = self.scenario_folder, 
                          model_type=self.model_type, 
-                         cell_size=30,
-                         cell_num=30,
+                         cell_size=cell_size,
+                         cell_num=cell_number,
                          subarea_num=30,
                          subbasin_num=40,
                          start_date=self.start_date,
@@ -155,11 +171,65 @@ class ScanrioConfig(Config):
         
         file_in.write_file()
 
+    def __generate_file_out(self):
         #create file.out
+        logger.info("Creating file.out ...")
         file_out = FileOut(self.scenario_folder)
         file_out.write_file()
 
+    def __generate_config_fig(self):
         #create config.fig
+        logger.info("Creating config.fig ...")
         config = ConfigFile(self.scenario_folder)
         config.write_file()
+
+    def __generate_weight_file(self):
+        logger.info(f"Creating weight file with method {self.method} ...")
+        #create weight files use the climate stations selected by users
+        coordinates = self.model.hydroclimate.station_coordinates
+        previous_ids = []
+        previous_weight_file = ""
+        for datatype, ids in self.data_type_station_ids.items():             
+            #we only need one for temperature so skip for TIMIN        
+            if datatype.upper() == "TMIN":
+                continue
+            
+            #get weight file name
+            weight_file = f"weight_{datatype}.txt"
+            if datatype.upper() == "TMAX":
+                weight_file = "weight_T.txt"
+
+            logger.info(f"Writing {weight_file}")
+
+            #just copy previous weight file if the stations are the same
+            if len(previous_ids) > 0 and np.array_equal(np.sort(previous_ids), np.sort(ids)):
+                shutil.copyfile(os.path.join(self.scenario_folder, previous_weight_file),os.path.join(self.scenario_folder, weight_file))
+            else:
+                #write the weight file
+                WriteWeightFile(self.method, 
+                                os.path.join(self.scenario_folder, weight_file),
+                                self.model.outputs.mask_raster,
+                                [coordinates[id] for id in ids])
+            #save it
+            previous_ids = ids
+            previous_weight_file = weight_file
+
+    def generate_model_structure(self):
+        """generate model structure"""
+        #self.__generate_file_in()
+        #self.__generate_file_out()
+        #self.__generate_config_fig()
+        self.__generate_weight_file()
+
+
+
+
+
+
+
+
+
+            
+
+
 

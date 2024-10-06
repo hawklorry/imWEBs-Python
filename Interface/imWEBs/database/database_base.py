@@ -7,6 +7,9 @@ logger = logging.getLogger(__name__)
 
 class DatabaseBase:
     def __init__(self, database_file):
+        if not os.path.exists(database_file):
+            raise ValueError(f"{database_file} doesn't exist.")
+        
         self.database_file = database_file        
         self.engine = create_engine(f'sqlite:///{self.database_file}')  
 

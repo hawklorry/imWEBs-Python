@@ -4,7 +4,7 @@ from .database.bmp.bmp_database import BMPDatabase, reach_width_depth_parameter
 from .folder_base import FolderBase 
 from .names import Names    
 
-class parameters(FolderBase):
+class Parameters(FolderBase):
     """all the parameters from parameter database and bmp database. It exposes necessary """
     GRASS_ID = 38
 

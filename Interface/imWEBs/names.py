@@ -9,6 +9,9 @@ class Names:
     sqlite_extension = ".db3"
     lookup_extension = ".csv"
 
+    #parameter h5
+    parameteH5Name = "parameter.h5"
+
     #database
     hydroclimateDatabasename = "hydroclimate" + sqlite_extension
     bmpDatabaseName = "bmp" + sqlite_extension
@@ -30,6 +33,7 @@ class Names:
     maskRefindedWithSubbasinRasName = "maskRefinedWithSubbasin" + raster_extension
 
     # Flow Direction and Accumulation
+    flowDirD8NoChangeName = "flow_dir_no_change" + raster_extension
     flowDirD8Name = "flow_dir" + raster_extension
     flowAccName = "flow_acc" + raster_extension
 
@@ -38,13 +42,15 @@ class Names:
     streamNetworUserRasName = streamNetworUserShpName.replace(shapefile_extension, raster_extension)
     
     # streamname = "stream" + shapefile_extension
-    # mainStreamRasName = "mainStream" + raster_extension    
+    # mainStreamRasName = "mainStream" + raster_extension   
+    streamMainRasName = "stream_main" + raster_extension
+    streamMainShpName = "stream_main" + shapefile_extension 
     streamNetworkRasName = "stream_network" + raster_extension
     streamNetworkShpName = "stream_network" + shapefile_extension
     streamOutletsOriginalShpName = "stream_outlets_original" + shapefile_extension
     streamOutletsOriginalRasName = "stream_outlets_original" + raster_extension
-    streamOutletsPourPointShpName = "stream_outlets_pour_point" + shapefile_extension
-    streamOutletsPourPointRasName = "stream_outlets_pour_point" + raster_extension
+    streamPourPointShpName = "stream_pour_point" + shapefile_extension
+    streamPourPointRasName = "stream_pour_point" + raster_extension
     # streamLinkName = "stream_link" + raster_extension
     streamOrderRasName = "stream_order" + raster_extension
     # streamOrderShpName = "stream_order" + shapefile_extension
@@ -146,7 +152,6 @@ class Names:
     streamOutletsWithInsertsName = "streamOutletsWithInserts" + raster_extension
     insertOutletsName = "insertOutlets"
     combinedOutletsName = "combinedOutlets"
-    flowDirD8FinalName = "flow_dir"
    
     #point source
     pointSourceShpName = "point_source" + shapefile_extension
@@ -198,6 +203,10 @@ class Names:
 
     # offsite wintering - OFSW
     offsiteWinteringShpName = "offsiteWintering" + shapefile_extension
+
+    #structures
+    structureCombinedBoundaryShpName = "structureCombinedBoundary" + shapefile_extension
+    structureCombinedOutputShpName = "structureCombinedOutlet" + shapefile_extension
 
     # Wetland
     wetlandShpName = "wetland" + shapefile_extension

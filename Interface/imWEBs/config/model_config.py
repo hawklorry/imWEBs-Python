@@ -4,11 +4,11 @@ from whitebox_workflows import WbEnvironment
 from ..raster_extension import RasterExtension
 from ..vector_extension import VectorExtension
 from ..names import Names
-from ..outputs import Outputs
 import shutil
 import logging
 from .config import Config
 from pathlib import Path
+from ..model.model import Model
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ class ModelConfig(Config):
 
     def __init__(self, config_file:str = None):
         super().__init__(config_file)
-        self.is_valid = False 
         self.input_folder = ""
+        self.model = None
         
         self.__load()
 
@@ -39,7 +39,6 @@ class ModelConfig(Config):
             databases = {}
             lookups = {}
 
-            file_exist_valid = True
             wbe = WbEnvironment()
             
             logger.info(f"Loading model configuration file {self.config_file} ...")
@@ -64,14 +63,13 @@ class ModelConfig(Config):
                         if os.path.exists(value):
                             self.input_folder = value
                         else:
-                            file_exist_valid = False
                             raise ValueError(f"{var} = {value} doesn't exist!")
                     
                     #create model folder
                     if var == "model_folder":
-                        self.model_folder = value
                         if not os.path.exists(value):
                             os.makedirs(value)
+                        self.model = Model(value)
                         continue
 
                     if section in ModelConfig.file_sections:
@@ -88,69 +86,39 @@ class ModelConfig(Config):
                             if section == "lookup":
                                 lookups[var] = value
                         else:
-                            file_exist_valid = False
-                            logger.warning(f"{var} = {value} doesn't exist!")
+                            raise ValueError(f"{var} = {value} doesn't exist!")
 
             #check rasters and vectors
-            raster_valid = RasterExtension.check_rasters(rasters)
-            vector_valid = VectorExtension.check_vectors(unique_id_vectors)
-            self.is_valid = file_exist_valid and raster_valid and vector_valid
+            RasterExtension.check_rasters(rasters)
+            VectorExtension.check_vectors(unique_id_vectors)
 
             #copy all the input files to the model folder with standard name
-            if self.is_valid:
-                self.__create_model_folder()
+            self.model.create_model_folder()
+            logger.info(f"Copying input files to {self.input_folder} ...")
 
-                logger.info(f"Copying input files to {self.input_folder} ...")
+            logger.info("Rasters ...")
+            for option, raster in rasters.items():
+                logger.info(raster.file_name)
+                wbe.write_raster(raster, os.path.join(self.model.model_input_folder, Names.config_item_standard_name_lookup[option]))
+            
+            logger.info("Vectors ...")
+            for option, vector in vectors.items():
+                logger.info(vector.file_name)
+                VectorExtension.save_vector(vector, os.path.join(self.model.model_input_folder, Names.config_item_standard_name_lookup[option]))
+            
+            logger.info("Databases ...")
+            for option, databae_file in databases.items():
+                logger.info(databae_file)
+                shutil.copyfile(os.path.join(self.input_folder, databae_file), os.path.join(self.model.model_database_folder, Names.config_item_standard_name_lookup[option]))
+            
+            logger.info("Lookup files ...")
+            for option, lookup_file in lookups.items():
+                logger.info(lookup_file)
+                source_file = os.path.join(self.input_folder, lookup_file)
+                target_file = os.path.join(self.model.model_input_folder, Names.config_item_standard_name_lookup[option])
 
-                logger.info("Rasters ...")
-                for option, raster in rasters.items():
-                    logger.info(raster.file_name)
-                    wbe.write_raster(raster, os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option]))
-                
-                logger.info("Vectors ...")
-                for option, vector in vectors.items():
-                    logger.info(vector.file_name)
-                    VectorExtension.save_vector(vector, os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option]))
-                
-                logger.info("Databases ...")
-                for option, databae_file in databases.items():
-                    logger.info(databae_file)
-                    shutil.copyfile(os.path.join(self.input_folder, databae_file), os.path.join(self.model_database_folder, Names.config_item_standard_name_lookup[option]))
-                
-                logger.info("Lookup files ...")
-                for option, lookup_file in lookups.items():
-                    logger.info(lookup_file)
-                    source_file = os.path.join(self.input_folder, lookup_file)
-                    target_file = os.path.join(self.model_input_folder, Names.config_item_standard_name_lookup[option])
-
-                    #we need to write the lookup file to utf8 so it could be loaded correctly in pandas later.
-                    Path(target_file).write_text(Path(source_file).read_text(), encoding="utf8")
-
-            #create model outputs object
-            self.outputs = Outputs(self.model_output_folder, self.model_input_folder, self.model_database_folder)
-
-    def __create_model_folder(self):
-        """
-        create model folder structure
-        """
-        self.model_input_folder = os.path.join(self.model_folder, "watershed", "input")
-        self.model_output_folder = os.path.join(self.model_folder, "watershed", "output")
-        self.model_database_folder = os.path.join(self.model_folder, "database")
-
-        if not os.path.exists(self.model_input_folder):
-            os.makedirs(self.model_input_folder)
-        if not os.path.exists(self.model_output_folder):
-            os.makedirs(self.model_output_folder)
-        if not os.path.exists(self.model_database_folder):
-            os.makedirs(self.model_database_folder)
-    
-    def delineate_watershed(self):
-        """watershed delineation"""
-        self.outputs.delineate_watershed()
-
-    def generate_parameters(self):
-        """generate parameters"""
-        pass
+                #we need to write the lookup file to utf8 so it could be loaded correctly in pandas later.
+                Path(target_file).write_text(Path(source_file).read_text(), encoding="utf8") 
 
     @property
     def config_variables(self)->str:
@@ -207,3 +175,7 @@ class ModelConfig(Config):
             #model folder
             "model":["model_folder"]
         }
+    
+    def delineate_watershed(self):
+        """watershed delineation""" 
+        self.model.delineate_watershed()
