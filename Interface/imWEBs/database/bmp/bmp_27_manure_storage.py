@@ -2,12 +2,13 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class ManureStorageParameter(BMPTable):
     """Parameter Table for BMP: Manure storage capacity and design (27)"""
-    __tablename__ = 'manure_storage_parameter'
+    __tablename__ = Names.bmp_table_name_manure_storage_parameter
     """Manure storage ID"""    
-    ManStorageID = Column(Integer,primary_key=True)
+    ID = Column(Integer,primary_key=True)
     """Name"""
     Name = Column(TEXT)
     """Description"""
@@ -45,16 +46,31 @@ class ManureStorageParameter(BMPTable):
     """Manure event mean concentration (mg/l)"""
     Manure_EMC = Column(REAL)
 
-    def __init__(self):
+    def __init__(self, 
+                 id:int, 
+                 subbasin:int, 
+                 feedlot:int, 
+                 contribution_area_ha:float, 
+                 drainage_fraction:float, 
+                 distance_to_reach:float, 
+                 height_to_reach:float):
+        
+        self.ID = id
+        self.ProducerID = id
+        self.Subbasin = subbasin
+        self.FeedlotID = feedlot
+        self.DraArea_ha = contribution_area_ha
+        self.DraFraction = drainage_fraction
+        self.DisReach_m = distance_to_reach
+        self.HigReach_m = height_to_reach
+
         self.ManLength_m = 20
         self.ManWidth_m = 20
         self.ManArea_m2 = 400
-        self.DraArea_ha = 0
-        self.DraFraction = 1
-        self.HigReach_m = 0
-        self.DisReach_m = 0
+
         self.ThDisReach = 0
         self.ThHigReach = 0
+
         self.ManInitial = 0
         self.CN_change = 0.3
         self.PRC_change = 0.3
@@ -63,7 +79,7 @@ class ManureStorageParameter(BMPTable):
 
 class ManureStorageManagement(BMPTable):
     """Distribution Table for BMP: Manure storage capacity and design (27)"""
-    __tablename__ = 'manure_storage_management'
+    __tablename__ = Names.bmp_table_name_manure_storage_management
 
     """Scenario ID"""
     Scenario = Column(Integer)

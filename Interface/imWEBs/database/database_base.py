@@ -7,11 +7,20 @@ logger = logging.getLogger(__name__)
 
 class DatabaseBase:
     def __init__(self, database_file):
-        if not os.path.exists(database_file):
-            raise ValueError(f"{database_file} doesn't exist.")
+        # if not os.path.exists(database_file):
+        #     raise ValueError(f"{database_file} doesn't exist.")
         
         self.database_file = database_file        
         self.engine = create_engine(f'sqlite:///{self.database_file}')  
+
+    def read_single_value(self, table_name:str, filter_column_name:str, filter_value:str, value_column_name:str):
+        """read a single value from a table with filter by another column"""
+        if not self.check_table_exist(table_name):
+            raise ValueError(f"Table: {table_name} doesn't exist in {self.database_file}.")
+
+        df = pd.read_sql(f'select {value_column_name} from {table_name} where {filter_column_name} = "{filter_value}"', self.engine)
+        if len(df) > 0:
+            return df[df.columns[-1]].to_list()[0]
 
     def read_distinct_list(self, table_name:str, column_name:str)->pd.DataFrame:
         """read distinct list of given column in given table"""
@@ -19,6 +28,8 @@ class DatabaseBase:
 
     def read_table(self, table_name:str)->pd.DataFrame:
         """read the whole table and return dataframe"""
+        if not self.check_table_exist(table_name):
+            return None
         return pd.read_sql(f"select * from {table_name}", self.engine)
 
     def save_table(self, table_name:str, table_df:pd.DataFrame):

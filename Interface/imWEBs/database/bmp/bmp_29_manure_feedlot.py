@@ -1,10 +1,12 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from ...delineation.structure_attribute import StructureAttribute
+from ...names import Names
 
-class ManureFeedlotParameter(BMPTable):
+class ManureFeedlot(BMPTable):
     """Parameter Table for BMP: Manure feedlot (29)"""
-    __tablename__ = 'manure_feed_lot_parameter'
+    __tablename__ = Names.bmp_table_name_manure_feed_lot_parameter
     """ID"""
     ID = Column(Integer, primary_key = True)
     """Name"""
@@ -28,7 +30,15 @@ class ManureFeedlotParameter(BMPTable):
     """Manure event mean concentration"""
     Manure_EMC = Column(REAL)
 
-    def __init__(self):
+    def __init__(self, attribute:StructureAttribute = None):
+        if attribute is not None:
+            self.ID = attribute.id
+            self.ProducerID = self.ID
+            self.Subbasin = attribute.subbasin
+
+        self.CatBasID = 0
+
+        self.AniID = 1
         self.ManInitial = 0
         self.CN_change = 0.2
         self.PRC_change = 0.2
@@ -36,7 +46,7 @@ class ManureFeedlotParameter(BMPTable):
 
 class ManureFeedlotManagement(BMPTable):
     """Distribution Table for BMP: Manure feedlot (29)"""
-    __tablename__ = 'manure_feed_lot_management'
+    __tablename__ = Names.bmp_table_name_manure_feed_lot_management
     Scenario = Column(Integer)
     Location = Column(Integer)
     Year = Column(Integer)
@@ -58,11 +68,13 @@ class ManureFeedlotManagement(BMPTable):
         self.FDLMon = 1
         self.FDLDay = 1
         self.Days = 120
-        #user should provide the nunbre of adult and non-adult
+        #user should provide the number of adult and non-adult
         self.AniAdult = 0
         self.AniNonAdult = 0
-        
+
+        self.ManStoID = 0
         self.ManStoDis = 1
+
         self.ManRemMon = 10
         self.ManRemDay = 31
         self.ManRemFra = 1

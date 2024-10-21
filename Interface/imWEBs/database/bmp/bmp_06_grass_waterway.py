@@ -2,10 +2,11 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class GrassWaterWay(BMPTable):
     """Parameter Table for BMP: Grass waterway (6)"""
-    __tablename__ = 'grass_waterway'
+    __tablename__ = Names.bmp_table_name_grass_waterway
     """Riparian buffer drainage part id used for IMWEBs model calculation, one RIBUF may contain several drainage parts"""
     ID = Column(Integer, primary_key=True)
     """Year of operation"""

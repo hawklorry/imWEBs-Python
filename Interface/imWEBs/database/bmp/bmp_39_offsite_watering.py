@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer
 from .bmp_table import BMPTable
-
+from ...names import Names
 
 class OffsiteWateringParameter(BMPTable):
     """Parameter Table for BMP: Off site watering (39)"""
-    __tablename__ = 'offsite_watering_parameter'
+    __tablename__ = Names.bmp_table_name_offsite_watering
     """Off-site watering ID"""
     ID = Column(Integer, primary_key = True)
     """Operation starting year (designed for setting up dugout scenarios)"""

@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 import os
-from whitebox_workflows import WbEnvironment
+from whitebox_workflows import WbEnvironment, Vector
 from ..raster_extension import RasterExtension
 from ..vector_extension import VectorExtension
 from ..names import Names
@@ -158,10 +158,13 @@ class ModelConfig(Config):
 
             #wasco will be the outlet of the subbasin
             "structure_bmp":["dugout_boundary_shapefile",
-                             "wascob_boundary_shapefile"],
+                             "wascob_boundary_shapefile",
+                             "riparian_buffer_shapefile",
+                             "tile_drain_shapefile"],
 
             #feedlot will be delineated in a single subbasin, the catch basin will function as the outlet.
-            "non_structure_bmp":["manure_feedlot_boundary_shapefile","manure_feedlot_outlet_shapefile"],
+            "non_structure_bmp":["manure_feedlot_boundary_shapefile","manure_feedlot_outlet_shapefile",
+                                 "manure_storage_boundary_shapefile","manure_storage_outlet_shapefile"],
 
             #delineation parameters
             "delineation":["stream_threshold_area_ha",
@@ -179,3 +182,7 @@ class ModelConfig(Config):
     def delineate_watershed(self):
         """watershed delineation""" 
         self.model.delineate_watershed()
+
+    def generate_parameters(self):
+        """watershed delineation""" 
+        self.model.generate_parameters()

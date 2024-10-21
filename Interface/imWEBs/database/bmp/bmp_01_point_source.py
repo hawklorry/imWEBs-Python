@@ -2,10 +2,11 @@
 from typing import Any
 from sqlalchemy import Column, TEXT, REAL, INTEGER
 from .bmp_table import BMPTable
+from ...names import Names
 
 
 class PointSource(BMPTable):
-    __tablename__ = 'point_source'
+    __tablename__ = Names.bmp_talbe_name_point_source
     ID = Column(INTEGER, primary_key=True)
     XLL = Column(REAL)
     YLL = Column(REAL)

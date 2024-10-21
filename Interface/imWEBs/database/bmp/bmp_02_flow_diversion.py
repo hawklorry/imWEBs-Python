@@ -2,9 +2,10 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL, TEXT
 from .bmp_table import BMPTable
+from ...names import Names
 
 class FlowDiversion(BMPTable):
-    __tablename__ = 'flow_diversion'
+    __tablename__ = Names.bmp_talbe_name_flow_diversion
     """Flow diversion ID"""
     ID = Column(Integer, primary_key=True)
     """X coordinates"""

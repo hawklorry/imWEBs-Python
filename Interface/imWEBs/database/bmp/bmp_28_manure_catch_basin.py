@@ -1,10 +1,11 @@
 from typing import Any
-from sqlalchemy import Column, Integer, REAL
+from sqlalchemy import Column, Integer, REAL, TEXT
 from .bmp_table import BMPTable
+from ...names import Names
 
-class ManureCatchBasin(BMPTable):
+class ManureCatchBasinParameter(BMPTable):
     """Parameter Table for BMP: Manure catch basin/impondment (28)"""
-    __tablename__ = 'manure_catch_basin'
+    __tablename__ = Names.bmp_table_name_manure_catch_basin
     ID = Column(Integer, primary_key = True)
     OperationYear = Column(Integer)
     Subbasin = Column(Integer)
@@ -31,7 +32,12 @@ class ManureCatchBasin(BMPTable):
     InitialOrgN_mgL = Column(REAL)
     InitialOrgP_mgL = Column(REAL)
 
-    def __init__(self):
+    def __init__(self, id, subbasin, receive_reach):
+        
+        self.ID = id
+        self.Subbasin = subbasin
+        self.receive_reach_id = receive_reach
+        
         self.OperationYear = 0
         self.MaxL_m = 100
         self.MaxW_m = 50

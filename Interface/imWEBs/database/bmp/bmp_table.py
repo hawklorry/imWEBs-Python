@@ -7,4 +7,4 @@ class BMPTable(DeclarativeBase):
             if hasattr(self, col.name):
                 dict[col.name] = getattr(self,col.name)
 
-        return dict   
+        return dict  

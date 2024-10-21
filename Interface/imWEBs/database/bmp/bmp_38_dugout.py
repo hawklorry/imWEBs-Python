@@ -1,10 +1,12 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
+from ...names import Names
+from ...delineation.structure_attribute import StructureAttribute
 
-class DugoutParameter(BMPTable):
+class Dugout(BMPTable):
     """Parameter Table for BMP: Dugout (38)"""
-    __tablename__ = 'dugout_parameter'
+    __tablename__ = Names.bmp_table_name_dugout
 
     """Scenario ID"""
     Scenario = Column(Integer)
@@ -66,7 +68,12 @@ class DugoutParameter(BMPTable):
     InitialOrgP_mgL = Column(REAL)
 
 
-    def __init__(self):
+    def __init__(self, attribute:StructureAttribute = None):
+        self.Scenario = -1
+        self.ID = attribute.id
+        self.Subbasin = attribute.subbasin
+        self.Drainage_Area = attribute.contribution_area
+
         self.Type = 0
         self.Year = 0
         self.MaxL_m = 100

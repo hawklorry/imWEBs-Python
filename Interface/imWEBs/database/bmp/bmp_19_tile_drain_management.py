@@ -1,10 +1,11 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class TileDrainParameter(BMPTable):
     """Parameter Table for BMP: till drainge management (19)"""
-    __tablename__ = 'tile_drain_parameter'
+    __tablename__ = Names.bmp_table_name_tile_drain_parameter
     Scenario = Column(Integer)
     Id = Column(Integer)
     StartYear = Column(Integer)

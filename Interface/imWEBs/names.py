@@ -3,9 +3,65 @@ class Names:
     Default name for input, temp, and output files
     """
 
+    bmp_table_name_reach_bmp = "Reach_BMP"
+    bmp_table_name_scenarios = "BMP_scenarios"
+    bmp_talbe_name_reach_parameter = "Reach_Parameter"
+    bmp_talbe_name_point_source = "point_source"
+    bmp_talbe_name_flow_diversion = "flow_diversion"
+    bmp_table_name_reservoir = 'reservoir'
+    bmp_table_name_riparian_buffer = "riparian_buffer"
+    bmp_table_name_grass_waterway = 'grass_waterway'
+    bmp_table_name_wetland = "wetland"
+    bmp_table_name_crop_management = "crop_management"
+    bmp_table_name_crop_parameter = "crop_parameter"
+    bmp_table_name_tillage_management = "tillage_management"
+    bmp_table_name_tillage_parameter = "tillage_parameter"
+    bmp_table_name_fertilizer_management = "fertilizer_management"
+    bmp_table_name_fertilizer_parameter = "fertilizer_parameter"
+    bmp_table_name_grazing_parameter = "GRAMG_management"
+    bmp_table_name_irrigation_management = "irrigation_management"
+    bmp_table_name_irrigation_parameter = "irrigation_parameter"
+    bmp_table_name_tile_drain_parameter = "tile_drain_parameter"
+    bmp_table_name_manure_incorporation_within_48h_management = "manure_incorporation_within_48h_management"
+    bmp_table_name_manure_application_setback_management = "manure_application_setback_management"
+    bmp_table_name_manure_no_application_on_snow_management = "manure_no_application_on_snow_management"
+    bmp_table_name_manure_spring_application_rather_than_fall_application_management = "manure_spring_application_rather_than_fall_application_management"
+    bmp_table_name_manure_application_based_on_soil_nitrogen_limit_management = "manure_application_based_on_soil_nitrogen_limit_management"
+    bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management = "manure_application_based_on_soil_phosphorous_limit_management"
+    bmp_table_name_manure_storage_parameter = "manure_storage_parameter"
+    bmp_table_name_manure_storage_management = "manure_storage_management"
+    bmp_table_name_manure_catch_basin = "manure_catch_basin"
+    bmp_table_name_manure_feed_lot_parameter = "manure_feed_lot_parameter"
+    bmp_table_name_manure_feed_lot_management = "manure_feed_lot_management"
+    bmp_table_name_wintering_site_parameter = "wintering_site_parameter"
+    bmp_table_name_wintering_site_management = "wintering_site_management"
+    bmp_table_name_pasture_crop_management = "pasture_crop_management"
+    bmp_table_name_pasture_fertilizer_management = "pasture_fertilizer_management"
+    bmp_table_name_pasture_tillage_management = "pasture_tillage_management"    
+    bmp_table_name_pasture_grazing_management = "pasture_grazing_management"
+    bmp_table_name_dugout = "dugout"
+    bmp_table_name_offsite_watering = "offsite_watering"
+    bmp_table_name_managed_access_including_fencing = "access_management"
+    bmp_table_name_wascob = "wascob"
+    bmp_table_name_water_use = "water_use"
+
+
+    field_name_id = "id"
+    field_name_subbasin = "subbasin"
+    field_name_contibution_area_ha = "con_area"
+    field_name_raster_value = "VALUE"
+    field_name_area = "AREA"
+
+    #the feedlot column in manure storage layer
+    field_name_feedlot = "feedlot"
+
+    #the catch basin column in feedlot
+    field_name_catch_basin = "cb"
+
     #default raster extension
     raster_extension = ".tif"
     shapefile_extension = ".shp"
+    csv_extension = ".csv"
     sqlite_extension = ".db3"
     lookup_extension = ".csv"
 
@@ -67,8 +123,8 @@ class Names:
     slopeRadiusName = "slopeRadius" + raster_extension
 
     # parameters
-    PRCName = "PRC" + raster_extension
-    DSCName = "DSC" + raster_extension
+    PRCName = "potentialRunoffCoefficient" + raster_extension
+    DSCName = "depressionStorageCapacity" + raster_extension
     cn2Name = "cn2" + raster_extension
     PRCAccAvgName = "PRC_Acc_Avg" + raster_extension
     DSCAccAvgName = "DSC_Acc_Avg" + raster_extension
@@ -166,11 +222,6 @@ class Names:
     reservoirShpName = "reservoir" + shapefile_extension
     reservoirRasterName = reservoirShpName.replace(shapefile_extension, raster_extension)
 
-    # Manure Storage - MSCD
-    manureStorageShpName = "manureStorage" + shapefile_extension
-    manureStorageName = manureStorageShpName.replace(shapefile_extension, raster_extension)
-    manureStorageOutletUserShpName = "manureStorageOutletUser" + shapefile_extension
-
     # Catch basin
     catchbasinShpName = "catchbasin" + shapefile_extension
     catchbasinRasName = catchbasinShpName.replace(shapefile_extension, raster_extension)
@@ -195,11 +246,26 @@ class Names:
     wascobShpName = "wascob" + shapefile_extension
     wascobRasName = wascobShpName.replace(shapefile_extension, raster_extension)
 
+    #Riparian Buffer Strip
+    riparianBufferStripShpName = "riparianBufferStrip" + shapefile_extension
+    riparianBufferStripRasterName = riparianBufferStripShpName.replace(shapefile_extension, raster_extension)
+    riparianBufferStripPartRasterName = "riparianBufferStripPart" + raster_extension
+    riparianBufferStripDrainageRasterName = "riparianBufferStripDrainage" + raster_extension
+    riparianBufferParameterCSVName = "riparianBufferStrip" + csv_extension
+
+    #tile drain
+    tileDrainShpName = "tile_drain" + shapefile_extension
+    tileDrainRasName = tileDrainShpName.replace(shapefile_extension, raster_extension)
+
     # Cattle Feedlot
     feedlotShpName = "feedlot" + shapefile_extension
     feedlotRasName = feedlotShpName.replace(shapefile_extension, raster_extension)
     feedlotOutletShpName = "feedlot_outlet" + shapefile_extension
     feedlotOutletRasName = feedlotOutletShpName.replace(shapefile_extension, raster_extension)
+
+    # Manure Storage - MSCD
+    manureStorageShpName = "manure_storage" + shapefile_extension
+    manureStorageRasName = manureStorageShpName.replace(shapefile_extension, raster_extension)
 
     # offsite wintering - OFSW
     offsiteWinteringShpName = "offsiteWintering" + shapefile_extension
@@ -271,14 +337,9 @@ class Names:
     # vegetationFilterStripDrainageRasterName = "vegetationFilterStripDrainage" + raster_extension
     # vegetationFilterStripDrainageShpName = "vegetationFilterStripDrainage" + shapefile_extension
 
-    #Riparian Buffer Strip
-    riparianBufferStripShpName = "riparianBufferStrip" + shapefile_extension
-    riparianBufferStripRasterName = riparianBufferStripShpName.replace(shapefile_extension, raster_extension)
+
     
-    # riparianBufferStripPartRasterName = "riparianBufferStripPart" + raster_extension
-    # riparianBufferStripPartShpName = "riparianBufferStripPart" + shapefile_extension
-    # riparianBufferStripDrainageRasterName = "riparianBufferStripDrainage" + raster_extension
-    # riparianBufferStripDrainageShpName = "riparianBufferStripDrainage" + shapefile_extension
+
 
     #Pasture
     pastureLandRasName = "PasCropland" + raster_extension
@@ -341,10 +402,13 @@ class Names:
         #structure_bmp
         "dugout_boundary_shapefile":dugoutShpName,
         "wascob_boundary_shapefile":wascobShpName,
+        "riparian_buffer_shapefile":riparianBufferStripShpName,
+        "tile_drain_shapefile":tileDrainShpName,
 
         #areal non-structure bmp
         "manure_feedlot_boundary_shapefile": feedlotShpName,
-        "manure_feedlot_outlet_shapefile": feedlotOutletShpName
+        "manure_feedlot_outlet_shapefile": feedlotOutletShpName,
+        "manure_storage_boundary_shapefile": manureStorageShpName
     }
 
     def get_standard_file_name(item_name:str)->str:

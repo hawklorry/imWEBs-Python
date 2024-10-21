@@ -3,6 +3,7 @@ from ..outputs import Outputs
 from ..database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 from ..names import Names
 from .parameter_h5 import ParameterH5
+from ..database.bmp.bmp_database import BMPDatabase
 
 class Model:
     """
@@ -14,6 +15,7 @@ class Model:
         self.model_output_folder = os.path.join(self.model_folder, "watershed", "output")
         self.model_database_folder = os.path.join(self.model_folder, "database")
         self.__outputs = None
+        self.__bmp_database = None
         self.__hydroclimate = None
         self.__parameter_h5 = None
 
@@ -30,6 +32,12 @@ class Model:
         if self.__outputs is None:
             self.__outputs = Outputs(self.model_output_folder, self.model_input_folder, self.model_database_folder)
         return self.__outputs
+    
+    @property
+    def bmp_databaes(self)->BMPDatabase:
+        if self.__bmp_database is None:
+            self.__bmp_database = BMPDatabase(os.path.join(self.model_database_folder,Names.bmpDatabaseName))
+        return self.__bmp_database
     
     @property
     def hydroclimate(self)->HydroClimateDatabase:
@@ -49,4 +57,4 @@ class Model:
 
     def generate_parameters(self):
         """generate parameters"""
-        pass
+        self.bmp_databaes.populate_database(self.outputs)

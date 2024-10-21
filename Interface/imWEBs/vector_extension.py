@@ -1,42 +1,94 @@
-from whitebox_workflows import WbEnvironment, Vector, AttributeField, FieldDataType, FieldData, Raster
+from whitebox_workflows import WbEnvironment, Vector, AttributeField, FieldDataType, FieldData, Raster, VectorGeometryType
 from io import StringIO
 import pandas as pd
 import geopandas as gpd
+from .names import Names
 import logging
 logger = logging.getLogger(__name__)
 
 class VectorExtension:
 
-    ID_FIELD_NAME = "id"
+    @staticmethod
+    def vector_to_raster(vector:Vector, base_raster:Raster)->Raster:
+        wbe = WbEnvironment()
+        exist, id_field_name = VectorExtension.check_id(vector)
+        if not exist:
+            raise ValueError(f"Couldn't find id field in {vector.file_name}.")
+
+        if vector.header.shape_type == VectorGeometryType.Polygon or vector.header.shape_type == VectorGeometryType.PolygonM or vector.header.shape_type == VectorGeometryType.PolygonZ:
+            return wbe.vector_polygons_to_raster(input = vector, field_name = id_field_name, base_raster = base_raster)
+        elif vector.header.shape_type == VectorGeometryType.Point or vector.header.shape_type == VectorGeometryType.PointM or vector.header.shape_type == VectorGeometryType.PointZ:
+            return wbe.vector_points_to_raster(input = vector, field_name = id_field_name, base_raster = base_raster)
+        else:
+            raise ValueError(f"Wrong shape type with {vector.file_name}.")
 
     @staticmethod
     def add_id_for_raster_value(vector:Vector)->Vector:
-        if len([field.name for field in vector.get_attribute_fields() if field.name == "VALUE"]) <= 0:
+        if len([field.name for field in vector.get_attribute_fields() if field.name == Names.field_name_raster_value]) <= 0:
             return vector
 
-        id_field = AttributeField(VectorExtension.ID_FIELD_NAME, FieldDataType.Int, 6, 0)
+        id_field = AttributeField(Names.field_name_id, FieldDataType.Int, 6, 0)
         vector.add_attribute_field(id_field)
 
         for i in range(vector.num_records):
-            value = vector.get_attribute_value(i, "VALUE").get_value_as_f64()
-            vector.set_attribute_value(i,VectorExtension.ID_FIELD_NAME,FieldData.new_int(int(value)))
+            value = vector.get_attribute_value(i, Names.field_name_raster_value).get_value_as_f64()
+            vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(int(value)))
         return vector
 
+    @staticmethod
+    def get_unique_ids(vector:Vector)->list:
+        if vector is None:
+            return []
+        
+        exist, _, ids = VectorExtension.check_unique_id(vector)
+        if exist:
+            return ids
+        return []
+    
+    @staticmethod
+    def get_unique_field_value(vector:Vector, field_name:str)->dict:
+        exist, name = VectorExtension.check_field_in_vector(vector, field_name)
+
+        if not exist:
+            raise ValueError(f"Can't find field {field_name} in {vector.file_name}.")
+        
+        exist_id,field_name_id = VectorExtension.check_id(vector)
+        
+        field_values = {}
+        for i in range(vector.num_records):
+            id = int(vector.get_attribute_value(i, field_name_id).get_value_as_f64())
+            field_value = vector.get_attribute_value(i, name)
+            if not field_value.is_null():
+                field_values[id] = int(field_value.get_value_as_f64())
+
+        return field_values
 
     @staticmethod
-    def check_unique_id(vector:Vector)->bool:
-        """check if the the vector has the ID column and values are unique"""
+    def check_id(vector:Vector):
+        """check if the vector has ID column"""
+        if vector is None:
+            return False, ""
+
         field_names = [field.name.lower() for field in vector.get_attribute_fields()]
-        if VectorExtension.ID_FIELD_NAME not in field_names:
-            return False
+        if Names.field_name_id not in field_names:
+            return False, ""
         
-        field_index = field_names.index(VectorExtension.ID_FIELD_NAME)
+        field_index = field_names.index(Names.field_name_id)
         field_name = vector.get_attribute_fields()[field_index].name
+        return True, field_name
+
+    @staticmethod
+    def check_unique_id(vector:Vector):
+        """check if the the vector has the ID column and values are unique"""        
+        exist,field_name = VectorExtension.check_id(vector)
+        if not exist:
+            return False, "", []
+        
         ids = []
         for i in range(vector.num_records):
             id = int(vector.get_attribute_value(i, field_name).get_value_as_f64())
             if id in ids:
-                return False
+                return False, "", []
             ids.append(id)
 
         return True, field_name, ids
@@ -59,7 +111,7 @@ class VectorExtension:
             logger.info(f"Checking ID column in {value.file_name} ...")
             exist,_,_ = VectorExtension.check_unique_id(value)
             if not exist:
-                raise ValueError(f"ID column was not found in {value.file_name}.")
+                raise ValueError(f"ID column was not found in {value.file_name} or the ids are not unique.")
 
             if standard_vector is None:
                 standard_vector = value

@@ -1,4 +1,3 @@
-from sqlalchemy import Column, Integer, Float, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, select
 from ..database_base import DatabaseBase
@@ -10,7 +9,8 @@ logger = logging.getLogger(__name__)
 class ParameterDatabase(DatabaseBase):
     """Access to parameter database."""
 
-    default_tables = ["Climate", "Discharge", "Interception", "NutrientCycling","PlantGrowth","Sediment","Snow","SubArea","WaterBalance","Wetland",
+    default_tables = ["Climate", "Discharge", "Interception", "NutrientCycling","PlantGrowth",
+                      "Sediment","Snow","SubArea","WaterBalance","Wetland",
                       "LanduseLookup", "SoilLookup", "LanduseSoilLoopUpCalibration",
                       "Lapse_rate", "LS_parameter"]
 
@@ -30,6 +30,9 @@ class ParameterDatabase(DatabaseBase):
         for table in ParameterDatabase.default_tables:
             logger.info(table)
             self.populate_defaults(table)
+
+#region Soil and Landuse Parameters
+
 
     @property
     def soil_lookup(self)->dict:
@@ -70,6 +73,8 @@ class ParameterDatabase(DatabaseBase):
             values = self.soil_lookup.items()
         elif parameter_type == "landuse":
             values = self.landuse_lookup.items()
+        else:
+            raise ValueError(f"Invalide parameter type {parameter_type}. Please use either soil or landuse.")
         for key, value in values:
             lookups.append([key, getattr(value, parameter_name)])
         
@@ -98,6 +103,33 @@ class ParameterDatabase(DatabaseBase):
         """Get CN2 for given landuse and soil"""
         return self.landuse_lookup[landuse].getCN2(self.soil_lookup[soil].HG)
 
-    def get_impervious_ratio(self, landuse)->float:
+    def get_impervious_ratio(self, landuse)->float:        
         """Get impervious ration for given landuse"""
         return self.landuse_lookup[landuse].FIMP
+    
+#endregion
+
+    
+#region Single Parameter
+
+    def __get_single_parameter(self, parameter_table_name:str, parameter_name:str)->float:
+        """get parameter value with given name and table"""
+        return float(self.read_single_value(parameter_table_name, "Parameter", parameter_name, "Value"))
+
+    @property
+    def wetland_co1(self)->float:
+        return self.__get_single_parameter("Wetland","Wet_Co1")
+    
+    @property
+    def wetland_ex1(self)->float:
+        return self.__get_single_parameter("Wetland","Wet_Ex1")   
+    
+    @property
+    def wetland_co2(self)->float:
+        return self.__get_single_parameter("Wetland","Wet_Co2")
+    
+    @property
+    def wetland_cons(self)->float:
+        return self.__get_single_parameter("Wetland","Wet_Cons")  
+    
+#endregion

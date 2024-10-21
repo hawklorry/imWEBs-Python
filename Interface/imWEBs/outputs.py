@@ -11,6 +11,7 @@ from .raster_extension import RasterExtension
 from .delineation.delineation import Delineation
 from .vector_extension import VectorExtension
 from .database.parameter.parameter_database import ParameterDatabase
+import pandas as pd
 
 import logging
 logger = logging.getLogger(__name__)
@@ -20,7 +21,10 @@ class Outputs(FolderBase):
     Output folder where all intermediate and final processed files are saved
     """
     def __init__(self, output_folder:str, input_folder:str, database_folder:str, 
-                 stream_threshold_area_ha:float = 10, wetland_min_area_ha:float = 0.1) -> None:
+                 stream_threshold_area_ha:float = 10,   #stream thrshold area
+                 wetland_min_area_ha:float = 0.1,       #min wetland area
+                 design_storm_return_period = 2         #design storm return period for reach width and depth
+                 ) -> None:
         super().__init__(output_folder)
 
         self.inputs = Inputs(input_folder)       
@@ -28,6 +32,7 @@ class Outputs(FolderBase):
 
         self.stream_threshold_area_ha = stream_threshold_area_ha
         self.main_stream_threshold_area_ha = 200            #threshold for main stream in ha
+        self.design_storm_return_period = design_storm_return_period
 
         self.wetland_min_area_ha = wetland_min_area_ha
         self.__structures = None
@@ -107,7 +112,6 @@ class Outputs(FolderBase):
         return self.__structure_combined
 
 #endregion
-  
                 
 #region DEM processing
 
@@ -140,13 +144,14 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.maskRefindedWithSubbasinRasName)
 
         if raster is None:
+            logger.info("Refining mask with subbain ...")
             raster = self.subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, 1)
             raster = self.inputs.soil_raster.con(f"value == {self.inputs.soil_raster.configs.nodata}", self.inputs.nodata, raster)
             raster = self.inputs.landuse_raster.con(f"value == {self.inputs.landuse_raster.configs.nodata}", self.inputs.nodata, raster)
 
             self.save_raster(raster, Names.maskRefindedWithSubbasinRasName)
 
-        return
+        return raster
 
     @property 
     def dem_clipped_raster(self):
@@ -199,23 +204,23 @@ class Outputs(FolderBase):
     
 #region farm & field
 
-    def __remove_non_agriculture_cell(self, raster:Raster)->Raster:
-        """
-        remove non agriculture cells
+    # def __remove_non_agriculture_cell(self, raster:Raster)->Raster:
+    #     """
+    #     remove non agriculture cells
 
-        Replace filterAgriLanduse
-        """
-        raster_with_only_algriculture = raster.farm_raster.deep_copy()
-        algricultrual_landuses = self.parameter.bmp_database.algricultural_landuses
+    #     Replace filterAgriLanduse
+    #     """
+    #     raster_with_only_algriculture = raster.farm_raster.deep_copy()
+    #     algricultrual_landuses = self.parameter.bmp_database.algricultural_landuses
 
-        for row in raster.configs.rows:
-            for col in raster.configs.columns:
-                landuse = self.mapped_landuse_raster[row, col]
+    #     for row in raster.configs.rows:
+    #         for col in raster.configs.columns:
+    #             landuse = self.mapped_landuse_raster[row, col]
                 
-                if landuse > 0 and landuse not in algricultrual_landuses:
-                    raster_with_only_algriculture[row, col] = raster.configs.nodata
+    #             if landuse > 0 and landuse not in algricultrual_landuses:
+    #                 raster_with_only_algriculture[row, col] = raster.configs.nodata
 
-        return raster_with_only_algriculture
+    #     return raster_with_only_algriculture
 
     @property
     def farm_raster(self)->Raster:
@@ -223,22 +228,27 @@ class Outputs(FolderBase):
     
         if raster is None:
             if self.inputs.farm_vector is not None:
+                exist, id_field_name = VectorExtension.check_id(self.inputs.farm_vector)
+                if not exist:
+                    raise ValueError(f"Couldn't find ID column in {self.inputs.farm_vector.file_name} ...")
                 raster = self.wbe.vector_polygons_to_raster(input = self.inputs.farm_vector, 
+                                                            field_name = id_field_name,
                                                             base_raster = self.inputs.dem_raster)
+                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
                 self.save_raster(raster, Names.farmRasName)
 
         return raster
     
-    @property
-    def farm_without_agriculture_raster(self)->Raster:
-        raster = self.get_raster(Names.farmWithOnlyAgricultureRasName)
+    # @property
+    # def farm_without_agriculture_raster(self)->Raster:
+    #     raster = self.get_raster(Names.farmWithOnlyAgricultureRasName)
 
-        if raster is None:
-            raster = self.__remove_non_agriculture_cell(self.farm_raster)
-            raster = self.mask_refined_with_subbasin_raster.con("value == 1", raster, raster.configs.nodata)
-            self.save_raster(raster, Names.farmWithOnlyAgricultureRasName)
+    #     if raster is None:
+    #         raster = self.__remove_non_agriculture_cell(self.farm_raster)
+    #         raster = self.mask_refined_with_subbasin_raster.con("value == 1", raster, raster.configs.nodata)
+    #         self.save_raster(raster, Names.farmWithOnlyAgricultureRasName)
 
-        return raster
+    #     return raster
 
     
     @property
@@ -247,21 +257,28 @@ class Outputs(FolderBase):
     
         if raster is None:
             if self.inputs.field_vector is not None:
-                raster = self.wbe.vector_polygons_to_raster(input = self.inputs.field_vector, base_raster = self.inputs.dem_raster)
-                self.save_raster(raster, Names.farmRasName)
+                exist, id_field_name = VectorExtension.check_id(self.inputs.field_vector)
+                if not exist:
+                    raise ValueError(f"Couldn't find ID column in {self.inputs.field_vector.file_name} ...")
+                raster = self.wbe.vector_polygons_to_raster(
+                    input = self.inputs.field_vector, 
+                    field_name = id_field_name,
+                    base_raster = self.inputs.dem_raster)
+                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
+                self.save_raster(raster, Names.fieldRasName)
 
         return raster
     
-    @property
-    def field_without_agriculture_raster(self)->Raster:
-        raster = self.get_raster(Names.fieldWithOnlyAgricultureRasName)
+    # @property
+    # def field_without_agriculture_raster(self)->Raster:
+    #     raster = self.get_raster(Names.fieldWithOnlyAgricultureRasName)
 
-        if raster is None:
-            raster = self.__remove_non_agriculture_cell(self.field_raster)
-            raster = self.mask_refined_with_subbasin_raster.con("value == 1", raster, raster.configs.nodata)
-            self.save_raster(raster, Names.fieldWithOnlyAgricultureRasName)
+    #     if raster is None:
+    #         raster = self.__remove_non_agriculture_cell(self.field_raster)
+    #         raster = self.mask_refined_with_subbasin_raster.con("value == 1", raster, raster.configs.nodata)
+    #         self.save_raster(raster, Names.fieldWithOnlyAgricultureRasName)
 
-        return raster
+    #     return raster
 
 #endregion    
 
@@ -312,6 +329,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.uslePName)
         if raster is None:
+            logger.info("Creating USLE P raster ...")
             self.save_raster(self.mask_refined_with_subbasin_raster, Names.uslePName)
             raster = self.get_raster(Names.uslePName)
 
@@ -400,6 +418,7 @@ class Outputs(FolderBase):
         """
 
         raster = self.get_raster(Names.PRCName)
+        subbasin_nodata = self.subbasin_raster.configs.nodata
 
         if raster is None:
             slope_raster = self.slope_degree_raster
@@ -412,6 +431,8 @@ class Outputs(FolderBase):
 
             for row in range(self.inputs.rows):
                 for col in range(self.inputs.columns):
+                    if self.subbasin_raster[row, col] == subbasin_nodata:
+                        continue
                     slope = slope_raster[row, col]
                     landuse = landuse_raster[row, col]
                     soil = soil_raster[row,col]
@@ -447,6 +468,8 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.DSCName)
 
+        subbasin_nodata = self.subbasin_raster.configs.nodata
+
         if raster is None:
             slope_raster = self.slope_degree_raster
             soil_raster = self.mapped_soil_raster
@@ -458,6 +481,8 @@ class Outputs(FolderBase):
 
             for row in range(self.inputs.rows):
                 for col in range(self.inputs.columns):
+                    if self.subbasin_raster[row, col] == subbasin_nodata:
+                        continue
                     slope = slope_raster[row, col]
                     landuse = landuse_raster[row, col]
                     soil = soil_raster[row,col]
@@ -466,7 +491,8 @@ class Outputs(FolderBase):
                     flow_dir = flow_dir_raster[row,col]
 
                     reachWaterSurfaceFraction = self.__calculate_reach_water_surface_fraction(reach, reach_width,flow_dir)
-                    raster[row,col] = self.parameter.get_depression_storage_capacity(landuse, soil, slope, reachWaterSurfaceFraction)
+                    raster[row,col] = self.parameter.get_depression_storage_capacity(
+                        landuse, soil, slope, reachWaterSurfaceFraction)
            
             self.save_raster(raster, Names.DSCName)
 
@@ -493,7 +519,7 @@ class Outputs(FolderBase):
         """
 
         raster = self.get_raster(Names.cn2Name)
-
+        subbasin_nodata = self.subbasin_raster.configs.nodata
         if raster is None:
             slope_raster = self.slope_degree_raster
             soil_raster = self.mapped_soil_raster
@@ -511,6 +537,8 @@ class Outputs(FolderBase):
                     reach = reach_raster[row,col]
                     reach_width = reach_width_raster[row,col]
                     flow_dir = flow_dir_raster[row,col]
+                    if self.subbasin_raster[row, col] == subbasin_nodata:
+                        continue
 
                     reachWaterSurfaceFraction = self.__calculate_reach_water_surface_fraction(reach, reach_width,flow_dir)
                     cn2 = self.parameter.get_cn2(landuse, soil)
@@ -698,7 +726,9 @@ class Outputs(FolderBase):
         """stream network provided by user for burn-in"""
         raster = self.get_raster(Names.streamNetworUserRasName)        
         if raster is None:
-            raster = self.wbe.vector_lines_to_raster(input = self.inputs.stream_network_user_vector, base_raster = self.inputs.dem_raster)
+            raster = self.wbe.vector_lines_to_raster(
+                input = self.inputs.stream_network_user_vector, 
+                base_raster = self.inputs.dem_raster)
             #raster = self.wbe.buffer_raster(raster, self.inputs.cell_size)
             self.save_raster(raster, Names.streamNetworUserRasName)
         return raster
@@ -760,7 +790,9 @@ class Outputs(FolderBase):
 
         if raster is None:
             logger.info("Converting stream outlets orginal vector to raster ...")
-            raster = self.wbe.vector_points_to_raster(input = self.stream_outlets_original_vector,base_raster = self.inputs.dem_raster)
+            raster = self.wbe.vector_points_to_raster(
+                input = self.stream_outlets_original_vector,
+                base_raster = self.inputs.dem_raster)
             self.save_raster(raster, Names.streamOutletsOriginalRasName)
 
         return raster
@@ -863,7 +895,7 @@ class Outputs(FolderBase):
         vector = self.get_raster(Names.subbasinShpName)
 
         if vector is None:
-            vector = self.wbe.raster_to_vector_polygons(self.subbasin_raster)
+            vector = RasterExtension.raster_to_vector(self.subbasin_raster)
             self.save_vector(vector, Names.subbasinShpName)
 
         return vector
@@ -879,21 +911,15 @@ class Outputs(FolderBase):
                 d8_pointer=self.flow_direction_raster, 
                 pour_points=self.stream_pour_points_vector)
 
-            #fix the subbasins considering the structures
-            logger.info("Fixing subbasin so the structure is in a single subbasin ...")
-            for type,structure in self.structures.items():
-                #logger.info(type)
-                structure.repair_subbasin(raster)
-            
             #reorder the subbasin starting from 1
             logger.info("Reordering subbasin ...")
             Delineation.reorder_raster_id(raster)
 
-            #reorder the structure
-            logger.info("Reordering structure ...")
+            #fix the subbasins considering the structures
+            logger.info("Fixing subbasin for structure and assign subbasin id to sturcture ...")
             for type,structure in self.structures.items():
                 #logger.info(type)
-                structure.reorder_after_subbasin(raster)
+                structure.repair_subbasin_and_assign_subbasin_id_contribution_area_to_sturcture(raster, self.flow_acc_raster)  
 
             #save the subbasin raster
             self.save_raster(raster, Names.subbasinRasName)
@@ -906,7 +932,7 @@ class Outputs(FolderBase):
 
         if raster is None:
             raster = (self.slope_degree_raster * math.pi / 180).tan()
-            self.save_raster(Names.slopeRadiusName)
+            self.save_raster(raster, Names.slopeRadiusName)
 
         return raster
     
@@ -916,7 +942,7 @@ class Outputs(FolderBase):
 
         if raster is None:
             raster = self.wbe.slope(dem = self.dem_clipped_burned_filled_raster)
-            self.save_raster(Names.slopeDegName)
+            self.save_raster(raster, Names.slopeDegName)
 
         return raster
 
@@ -950,18 +976,20 @@ class Outputs(FolderBase):
         """
         calculate reach width for 2-year design storm, will use-defined parameter later
         """
-        return self._get_reach_width_depth_raster(2, False)
+        return self._get_reach_width_depth_raster(False)
     
     @property
     def reach_depth_raster(self)->Raster:
         """
         calculate reach depth for 2-year design storm, will use-defined parameter later
         """
-        return self._get_reach_width_depth_raster(2, True)
+        return self._get_reach_width_depth_raster(True)
     
-    def _get_reach_width_depth_raster(self, design_storm, isdepth:bool)->Raster:
+    def _get_reach_width_depth_raster(self, isdepth:bool)->Raster:
         """
         calculate reach width/depth raster using given design storm
+
+        replace StreamWidth and StreamDepth
         """
         file_name = Names.reachWidthName
         if isdepth:
@@ -969,9 +997,9 @@ class Outputs(FolderBase):
 
         raster = self.get_raster(file_name)
         if raster is None:
-            parameter = self.parameter.get_reach_width_parameter(design_storm)          
+            parameter = self.parameter.get_reach_width_parameter(self.design_storm_return_period)          
             if isdepth:
-                parameter = self.parameter.get_reach_depth_parameter(design_storm) 
+                parameter = self.parameter.get_reach_depth_parameter(self.design_storm_return_period) 
             raster = (self.flow_acc_raster * self.inputs.cellsize_m2 * parameter.A) ** parameter.B
             raster = self.stream_network_raster.con("value > 0", raster, raster.configs.nodata)
             self.save_raster(raster, file_name)
@@ -1026,6 +1054,211 @@ class Outputs(FolderBase):
                     
         return raster
 
+#region Riparian Buffer
+
+    @property
+    def riparian_buffer_raster(self)->Raster:
+        raster = self.get_raster(Names.riparianBufferStripRasterName)
+    
+        if raster is None:
+            if self.inputs.raparian_buffer_vector is not None:
+                exist, id_field_name = VectorExtension.check_id(self.inputs.raparian_buffer_vector)
+                if not exist:
+                    raise ValueError(f"Couldn't find ID column in {self.inputs.raparian_buffer_vector.file_name} ...")
+                raster = self.wbe.vector_polygons_to_raster(input = self.inputs.raparian_buffer_vector, 
+                                                            field_name = id_field_name,
+                                                            base_raster = self.inputs.dem_raster)
+                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
+                self.save_raster(raster, Names.riparianBufferStripRasterName)
+
+        return raster
+    
+    @property
+    def riparian_buffer_drainage_area_raster(self)->Raster:
+        raster = self.get_raster(Names.riparianBufferStripDrainageRasterName)
+
+        if raster is None:
+            self.__create_riparian_buffer_distribution_paramter()
+            raster = self.get_raster(Names.riparianBufferStripDrainageRasterName)
+
+        return raster
+
+    @property
+    def riparian_buffer_parts_raster(self)->Raster:
+        raster = self.get_raster(Names.riparianBufferStripPartRasterName)
+
+        if raster is None:
+            self.__create_riparian_buffer_distribution_paramter()
+            raster = self.get_raster(Names.riparianBufferStripPartRasterName)
+
+        return raster   
+    
+    @property
+    def riparian_buffer_parameter_df(self)->pd.DataFrame:
+        df = self.get_df(Names.riparianBufferParameterCSVName)
+
+        if df is None:
+            self.__create_riparian_buffer_distribution_paramter()
+            df = self.get_df(Names.riparianBufferParameterCSVName)
+
+        return df  
+
+    def __create_riparian_buffer_distribution_paramter(self, width = 10):
+        """
+        create distribution raster and parameter table for riparian buffer. 
+        
+        It finds all parts of the buffer in each subbasin and corresponding drainage area. And then summarize the paramters. 
+
+        Replace Plugin VFSandRBS
+        """
+
+        row, col, x, y = 0, 0, 0, 0
+        z = 0.0
+        i, c = 0, 0
+        flag = False
+        flowDir = 0.0
+
+        if self.riparian_buffer_raster is None:
+            return
+
+        logger.info("Creating riparian buffer distribution and parameters ... ")
+
+        rows = self.flow_direction_raster.configs.rows,
+        cols = self.flow_direction_raster.configs.columns
+        riparian_buffer_nodata = self.riparian_buffer_raster.configs.nodata
+        subbasin_nodata = self.subbasin_raster.configs.nodata
+
+        riparian_buffer_drainage_area_raster = self.wbe.new_raster(self.subbasin_raster.configs)
+        riparian_buffer_parts_raster = self.wbe.new_raster(self.subbasin_raster.configs)
+
+        #flag if the cells has been traced
+        flag2D = np.zeros((rows, cols), dtype=bool)
+
+        path = []
+        pathInside = []
+        vfsOrRbsDrain = {}
+        vfsOrRbsInside = {}
+        vfsOrRbsLength = {}
+        celldist = (self.riparian_buffer_raster.configs.resolution_x + self.riparian_buffer_raster.configs.resolution_y) / 2.0
+
+        for row in range(rows):
+            for col in range(cols):
+                if self.subbasin_raster[row, col] != subbasin_nodata and not flag2D[row, col]:
+                    path = []
+                    pathInside = []
+
+                    x = col
+                    y = row
+
+                    path.append((y, x))
+
+                    flag = True
+                    length = 0.0
+
+                    while flag:
+                        flowDir = self.flow_direction_raster[y, x]
+                        if flowDir > 0:
+                            dx, dy = RasterExtension.flow_dir_xy_delta_dic(flowDir)
+
+                            lastVFSorRBSID = self.riparian_buffer_raster[y, x]
+                            isVisited = flag2D[y, x]
+
+                            if lastVFSorRBSID != riparian_buffer_nodata and not isVisited:
+                                pathInside.append((y, x))
+                                length += celldist * (1.41421356 if c in [1, 4, 16, 64] else 1)
+
+                            #get x,y for downstream cell
+                            x += dx
+                            y += dy
+
+                            #check to see if the next cell is edge, different riparian buffer. If yes, add it to the list
+                            if (self.riparian_buffer_raster[y, x] == riparian_buffer_nodata 
+                                or self.riparian_buffer_raster[y, x] != lastVFSorRBSID 
+                                or self.flow_direction_raster[y, x] == 0) and lastVFSorRBSID != riparian_buffer_nodata:
+                                #recalculate the current position
+                                loc = (y - dy, x - dx)
+
+                                if loc in vfsOrRbsDrain:
+                                    vfsOrRbsDrain[loc].extend(path)
+                                else:
+                                    vfsOrRbsDrain[loc] = path.copy()
+
+                                if loc in vfsOrRbsInside:
+                                    vfsOrRbsInside[loc].extend(pathInside)
+                                else:
+                                    vfsOrRbsInside[loc] = pathInside.copy()
+
+                                if loc in vfsOrRbsLength:
+                                    vfsOrRbsLength[loc] = max(length, vfsOrRbsLength[loc])
+                                else:
+                                    vfsOrRbsLength[loc] = length
+                                break
+
+                            if not isVisited:
+                                path.append((y, x))
+                        else:
+                            flag = False
+
+                    #update the flag
+                    for loc in path:
+                        flag2D[loc[0], loc[1]] = True
+
+        #create the resulting parameter dictionary
+        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID','RIBUF','Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
+        riparain_buffer_parameter_df.set_index('ID', inplace=True)        
+
+        cellArea = self.riparian_buffer_raster.configs.resolution_x * self.riparian_buffer_raster.configs.resolution_y
+        vfsOrRbsPartID = 0
+        for outLoc in vfsOrRbsDrain.keys():
+            vfsOrRbsPartID += 1
+
+            vfsOrRbsID = int(self.riparian_buffer_raster[outLoc[0], outLoc[1]])
+            subID = int(self.subbasin_raster[outLoc[0], outLoc[1]])
+            drainageArea = len(vfsOrRbsDrain[outLoc]) * cellArea / 10000
+            length = vfsOrRbsLength[outLoc]
+
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'RIBUF'] = vfsOrRbsID
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Subbasin'] = subID
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Drainage_Area'] = drainageArea
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Length'] = length
+
+            for loc in vfsOrRbsDrain[outLoc]:
+                riparian_buffer_drainage_area_raster[loc[0], loc[1]] = vfsOrRbsPartID
+
+            for loc in vfsOrRbsInside[outLoc]:
+                riparian_buffer_parts_raster[loc[0], loc[1]] = vfsOrRbsPartID
+
+        riparain_buffer_parameter_df["Width"] = width
+        riparain_buffer_parameter_df["Area_ha"] = width * riparain_buffer_parameter_df['Length'] * 0.0001
+        riparain_buffer_parameter_df["Area_Ratio"] = riparain_buffer_parameter_df["Drainage_Area"] / riparain_buffer_parameter_df["Area_ha"]
+        riparain_buffer_parameter_df["VegetationID"] = 6
+
+        #get slope, soil_k, soil_porosity and root_depth using the zone statistics
+        slope_df = RasterExtension.get_zonal_statistics(self.slope_degree_raster, riparian_buffer_parts_raster, "mean","Slope")
+        k_df = RasterExtension.get_zonal_statistics(self.soil_k_raster, riparian_buffer_parts_raster, "mean","Sol_K")
+        prosity_df = RasterExtension.get_zonal_statistics(self.soil_porosity_raster, riparian_buffer_parts_raster, "mean","Sol_porosity")
+        root_depth_df = RasterExtension.get_zonal_statistics(self.landuse_rootdepth_raster, riparian_buffer_parts_raster, "mean","Root_Depth")
+
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(slope_df, left_index=True, right_index=True, how="inner")
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(k_df, left_index=True, right_index=True, how="inner")
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(prosity_df, left_index=True, right_index=True, how="inner")
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(root_depth_df, left_index=True, right_index=True, how="inner")
+
+        #add other columns with default values
+        riparain_buffer_parameter_df["Scenario"] = 1
+        riparain_buffer_parameter_df["Year"] = 0
+
+        #adjust the sequence of the columns
+        riparain_buffer_parameter_df.reset_index(inplace=True)
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_k','Sol_porosity','Root_Depth']]
+
+        #save to bmp database
+        self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferStripDrainageRasterName)
+        self.save_raster(riparian_buffer_parts_raster, Names.riparianBufferStripPartRasterName)
+        self.save_df(riparain_buffer_parameter_df, Names.riparianBufferParameterCSVName)
+
+#endregion
+
 #endregion
 
 #region interpolation
@@ -1034,64 +1267,64 @@ class Outputs(FolderBase):
 
     def delineate_watershed(self):
         """watershed delineation which basically delineate stream and subbasins"""
-        subbasin = self.subbasin_vector
+        subbasin = self.mask_refined_with_subbasin_raster
 
-    def generate_bmp_database(self):
-        self.parameter.bmp_database.populate_database(
-            self.subbasin_raster, 
-            self.field_without_agriculture_raster, 
-            self.farm_without_agriculture_raster,
-            self.flow_acc_raster,
-            self.potential_ruoff_coefficient_raster,
-            self.depression_storage_capacity_raster,
-            self.cn2_raster)
+    # def generate_bmp_database(self):
+    #     self.parameter.bmp_database.populate_database(
+    #         self.subbasin_raster, 
+    #         self.field_without_agriculture_raster, 
+    #         self.farm_without_agriculture_raster,
+    #         self.flow_acc_raster,
+    #         self.potential_ruoff_coefficient_raster,
+    #         self.depression_storage_capacity_raster,
+    #         self.cn2_raster)
     
-    def generate_watershed_parameters(self):
-        mask = self.mask_raster
-        uslp = self.uslep_raster
-        reach_depth = self.reach_depth_raster
-        reach_width = self.reach_width_raster
-        field_capacity = self.field_capacity_raster
-        manning = self.manning_raster
-        velocity = self.velocity_raster
-        wetness_index = self.wetness_index_raster
-        initial_soil_moisture = self.initial_soil_moisture_raster
+    # def generate_watershed_parameters(self):
+    #     mask = self.mask_raster
+    #     uslp = self.uslep_raster
+    #     reach_depth = self.reach_depth_raster
+    #     reach_width = self.reach_width_raster
+    #     field_capacity = self.field_capacity_raster
+    #     manning = self.manning_raster
+    #     velocity = self.velocity_raster
+    #     wetness_index = self.wetness_index_raster
+    #     initial_soil_moisture = self.initial_soil_moisture_raster
 
-        #build the reach parameter table
-        #use the one from China
-        #reach = Reach(self)
-        #reach.build_reach_parameters()
+    #     #build the reach parameter table
+    #     #use the one from China
+    #     #reach = Reach(self)
+    #     #reach.build_reach_parameters()
 
-        #generate all the bmp database
-        self.generate_bmp_database()
+    #     #generate all the bmp database
+    #     self.generate_bmp_database()
 
-        #build structure bmp parameter table
-        #buildBMPParMgtTables
+    #     #build structure bmp parameter table
+    #     #buildBMPParMgtTables
   
-        # // Build livestock parameter table
-        # DataTable livestockPar = imwebs.getParameterDS().getTable(ParameterDatasetStructure.DefaultLivestockParameterTableName);
-        # livestockPar.setName(BMPDatasetStructure.LivestockParameterTableName);
-        # imwebs.getProject().getBMPDS().replaceTable(livestockPar);
+    #     # // Build livestock parameter table
+    #     # DataTable livestockPar = imwebs.getParameterDS().getTable(ParameterDatasetStructure.DefaultLivestockParameterTableName);
+    #     # livestockPar.setName(BMPDatasetStructure.LivestockParameterTableName);
+    #     # imwebs.getProject().getBMPDS().replaceTable(livestockPar);
 
-        # // Build manure_and_nutrient_parameter table
-        # DataTable manureParTable = imwebs.getParameterDS().getTable(ParameterDatasetStructure.manureAndNutrientParameterTableName);
-        # imwebs.getProject().getBMPDS().replaceTable(manureParTable);
+    #     # // Build manure_and_nutrient_parameter table
+    #     # DataTable manureParTable = imwebs.getParameterDS().getTable(ParameterDatasetStructure.manureAndNutrientParameterTableName);
+    #     # imwebs.getProject().getBMPDS().replaceTable(manureParTable);
 
-        # // Build LS_parameter table
-        # DataTable LSParTable = imwebs.getParameterDS().getTable(ParameterDatasetStructure.LSParameterTableName);
-        # imwebs.getProject().getBMPDS().replaceTable(LSParTable);
+    #     # // Build LS_parameter table
+    #     # DataTable LSParTable = imwebs.getParameterDS().getTable(ParameterDatasetStructure.LSParameterTableName);
+    #     # imwebs.getProject().getBMPDS().replaceTable(LSParTable);
 
-        # // Build BMP index table
-        # imwebs.getProject().getBMPDS().replaceTable(imwebs.buildBMPIndexTable());
+    #     # // Build BMP index table
+    #     # imwebs.getProject().getBMPDS().replaceTable(imwebs.buildBMPIndexTable());
 
-        # // Build subbasin multiplier table
-        # Tools.buildSubbasinMultiplierTable(imwebs.getProject().getBMPDS().getPath());
+    #     # // Build subbasin multiplier table
+    #     # Tools.buildSubbasinMultiplierTable(imwebs.getProject().getBMPDS().getPath());
 
-        # // Save BMP database
-        # imwebs.getProject().getBMPDS().save();
+    #     # // Save BMP database
+    #     # imwebs.getProject().getBMPDS().save();
         
-        # // Ensure all rasters in \Watershed\Output have same NoDataValue        
-        # Tools.VerifyAndFixAllRastersInFolder(imwebs.getWhiteboxToolsPath(), getWatershedOutputFolder());
+    #     # // Ensure all rasters in \Watershed\Output have same NoDataValue        
+    #     # Tools.VerifyAndFixAllRastersInFolder(imwebs.getWhiteboxToolsPath(), getWatershedOutputFolder());
     
 
 

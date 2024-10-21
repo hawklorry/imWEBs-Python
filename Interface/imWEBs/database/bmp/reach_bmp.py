@@ -1,11 +1,12 @@
 from typing import Any
 from sqlalchemy import Column, Integer, Float, String, Double
 from .bmp_table import BMPTable
+from ...names import Names
 
-class Reach_BMP(BMPTable):
+class ReachBMPDistribution(BMPTable):
 	"""Location of reach bmps. Note that dugout is not part of the reach bmps"""
 
-	__tablename__ = 'Reach_BMP'
+	__tablename__ = Names.table_name_reach_bmp
 	Scenario = Column(Integer)
 	Reach = Column(Integer)
 	PointSource = Column(Integer)
@@ -14,10 +15,13 @@ class Reach_BMP(BMPTable):
 	Wetland = Column(Integer)
 	CatchBasin = Column(Integer)
 	GrassWaterway = Column(Integer)
+	Dugout = Column(Integer)
 	AccessManagement = Column(Integer)
 	WaterUse = Column(Integer)
 
-	def __init__(self):
+	def __init__(self, reach):
+		self.Reach = reach
+		self.Scenario = -1
 		self.PointSource = 0
 		self.FlowDiversion = 0
 		self.Reservoir = 0
@@ -26,5 +30,4 @@ class Reach_BMP(BMPTable):
 		self.GrassWaterway = 0
 		self.AccessManagement = 0
 		self.WaterUse = 0
-
 

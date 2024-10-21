@@ -1,14 +1,16 @@
 import numpy as np
 from ..names import Names
-from whitebox_workflows import Raster, WbEnvironment, RasterDataType, Vector
+from whitebox_workflows import Raster, WbEnvironment, RasterDataType, Vector, AttributeField, FieldDataType, FieldData
 from ..folder_base import FolderBase
 from ..vector_extension import VectorExtension
+from ..raster_extension import RasterExtension
+from .structure_attribute import StructureAttribute
 import heapq
 from dataclasses import dataclass, field
 import math
 from collections import defaultdict
 import logging
-from functools import total_ordering
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +22,6 @@ class Structure(FolderBase):
     A structure will have a boundary polygon shapefile and an optional outlet point shapefile. 
     """
 
-    #structure_types = ["wetland","feedlot","dugout", "catchbasin", "manure_storage"]
     #catchbasin and manure storage is not included here as they don't impact the flow direction
     structure_types_affection_flow_direction = ["wetland","feedlot","wascob","dugout"]
 
@@ -28,9 +29,9 @@ class Structure(FolderBase):
                  output_folder:str, 
                  dem_raster:Raster, 
                  structure_polygon_vector:Vector, 
-                 structure_polygon_vector_id_field_name: str = "id",                 
+                 structure_polygon_vector_id_field_name: str = Names.field_name_id,                 
                  structure_outlet_point_vector:Vector = None, 
-                 structure_outlet_point_vector_id_field_name:str = "id",
+                 structure_outlet_point_vector_id_field_name:str = Names.field_name_id,
                  structure_area_threshold_ha = 0, 
                  structure_allow_multiple_outlets = False,
                  structure_using_PFO = True):
@@ -77,13 +78,17 @@ class Structure(FolderBase):
         #output file name
         self.__structure_boundary_original_raster_name = f"{self.structure_type}BoundaryOriginal{Names.raster_extension}"
         self.__structure_boundary_original_vector_name = f"{self.structure_type}BoundaryOriginal{Names.shapefile_extension}"
+
         self.__structure_boundary_processed_raster_name = f"{self.structure_type}BoundaryProcessed{Names.raster_extension}"
+        self.__structure_boundary_processed_vector_name = f"{self.structure_type}BoundaryProcessed{Names.shapefile_extension}"
+
         self.__structure_outlet_original_raster_name = f"{self.structure_type}OutletOriginal{Names.raster_extension}"
         self.__structure_outlet_processed_raster_name = f"{self.structure_type}OutletProcessed{Names.raster_extension}"        
         self.__structure_outlet_processed_vector_name = f"{self.structure_type}OutletProcessed{Names.shapefile_extension}"
 
 
-      
+        #individual structure list
+        self.__attributes = None
 #region properties
 
     @property
@@ -97,7 +102,6 @@ class Structure(FolderBase):
                     self.__structure_polygon_vector, self.__structure_area_threshold_ha * 10000)
             
             self.save_vector(vector, self.__structure_boundary_original_vector_name)
-
         return vector
 
 
@@ -117,9 +121,17 @@ class Structure(FolderBase):
         return raster
 
     @property
+    def boundary_processed_vector(self)->Vector:
+        """
+        Processed boundary vector. The only change is adding a subbasin column and removing the structure that are not in any of subbasins.
+        The original fields are still there
+        """
+        return self.get_vector(self.__structure_boundary_processed_vector_name)            
+
+    @property
     def boundary_processed_raster(self)->Raster:
-        """Process boundary raster"""
-        return None
+        """Process boundary raster where the structures that are not in any of subbasins are removed."""
+        return self.get_raster(self.__structure_boundary_processed_raster_name)
     
     @property
     def boundary_raster(self)->Raster:
@@ -127,8 +139,8 @@ class Structure(FolderBase):
         if self.boundary_processed_raster is None:
             return self.boundary_original_raster
         
-        return self.boundary_processed_raster
-    
+        return self.boundary_processed_raster    
+            
     @property
     def outlet_raster(self)->Raster:
         """Final outlet raster"""
@@ -141,7 +153,7 @@ class Structure(FolderBase):
 
         if vector is None:
             logger.info(f"Converting {self.structure_type} outlet from raster to vector ...")
-            vector = VectorExtension.add_id_for_raster_value(self.wbe.raster_to_vector_points(self.outlet_raster))
+            vector = VectorExtension.add_id_for_raster_value(RasterExtension.raster_to_vector(self.outlet_raster, "point"))
             self.save_vector(vector, self.__structure_outlet_processed_vector_name)
 
         return vector
@@ -172,11 +184,70 @@ class Structure(FolderBase):
             self.save_raster(raster,self.__structure_outlet_processed_raster_name)
 
         return raster
+    
+    @property 
+    def attributes(self)->dict:
+        """structure attribute dictionary including id, area, subbasin and contribution area"""
+        if self.__attributes is None:
+            if self.boundary_processed_vector is None:
+                raise ValueError(f"Processed vector for structure: {self.structure_type} doesn't exist. ")
+
+            self.__attributes = {}
+            for i in range(self.boundary_processed_vector.num_records):
+                id = int(self.boundary_processed_vector.get_attribute_value(i, Names.field_name_id).get_value_as_f64())
+                subbasin = int(self.boundary_processed_vector.get_attribute_value(i, Names.field_name_subbasin).get_value_as_f64())
+                area = self.boundary_processed_vector.get_attribute_value(i, Names.field_name_area).get_value_as_f64() / 10000.0
+                contibution_area = self.boundary_processed_vector.get_attribute_value(i, Names.field_name_contibution_area_ha).get_value_as_f64()
+                
+                self.__attributes[id] = StructureAttribute(id, area, subbasin, contibution_area)
+        
+        return self.__attributes 
 
 #endregion
 
+#region 
+    
+    def __creatd_processed_boundary_vector(self, id_subbasin_dict:dict, id_contribution_area_dict:dict)->Vector:
+        """Add subbasin column to vector with the given id subbasin dictionary"""
+       
+        #creat all necessary fields
+        #we will just use four columns: id, subbasin, contribution area and area. Area will be added by polygon_area function.
+        fields = [
+            AttributeField(Names.field_name_id, FieldDataType.Int, 6, 0),
+            AttributeField(Names.field_name_subbasin, FieldDataType.Int, 6, 0),
+            AttributeField(Names.field_name_contibution_area_ha, FieldDataType.Real, 12, 5)
+        ]
 
-    def repair_subbasin(self, subbasin_raster:Raster):
+        out_vector = self.wbe.new_vector(self.boundary_original_vector.header.shape_type, 
+                                         fields,
+                                         proj=self.boundary_original_vector.projection)
+
+        # Now fill it with the input data
+        for i in range(self.boundary_original_vector.num_records):
+            id = int(self.boundary_original_vector.get_attribute_value(i, self.__structure_polygon_vector_id_field_name).get_value_as_f64())
+            
+            #remove those that are not included in subbasin
+            if id not in id_subbasin_dict:
+                continue
+            
+            #add geometry
+            geom = self.boundary_original_vector[i]
+            out_vector.add_record(geom) # Add the record to the output Vector
+
+            #add fields
+            field_data = [
+                FieldData.new_int(id),
+                FieldData.new_int(int(id_subbasin_dict[id])),
+                FieldData.new_real(id_contribution_area_dict[id])
+            ]
+            out_vector.add_attribute_record(field_data, deleted=False)
+
+        #we also add the polygon area to the vector, the column name will be fixed as AREA
+        return self.wbe.polygon_area(out_vector)
+
+#endregion
+
+    def repair_subbasin_and_assign_subbasin_id_contribution_area_to_sturcture(self, subbasin_raster:Raster, flow_acc_raster:Raster):
         """
         it modifies both subbasin and structure raster. 
         this has been used on wetland, feedlot and dugout
@@ -189,15 +260,23 @@ class Structure(FolderBase):
         structure_raster_no_data = self.boundary_raster.configs.nodata
         subbasin_raster_no_data = subbasin_raster.configs.nodata
         mask_raster_no_data = self.__dem_raster.configs.nodata
+        outlet_raster_node_data = self.outlet_raster.configs.nodata
+        cell_size_ha = self.__dem_raster.configs.resolution_x * self.__dem_raster.configs.resolution_y / 10000.0
 
         #assuming 1:1 relationship from wetland to subbasin
         bmp2sub = {}
+        bmp_contribute_area = {}
         for row in range(rows):
             for col in range(cols):
                 wet_id = self.boundary_raster[row, col]
                 sub_id = subbasin_raster[row, col]
-                if wet_id != structure_raster_no_data and sub_id != subbasin_raster_no_data and int(wet_id) not in bmp2sub:
-                    bmp2sub[int(wet_id)] = int(sub_id)
+                if wet_id != structure_raster_no_data and sub_id != subbasin_raster_no_data:
+                    if int(wet_id) not in bmp2sub:
+                        bmp2sub[int(wet_id)] = int(sub_id)
+
+                    #get structure contribution area at the outlet    
+                    if self.outlet_raster[row, col] != outlet_raster_node_data:
+                        bmp_contribute_area[int(wet_id)] = flow_acc_raster[row, col] * cell_size_ha
 
         # Repair subbasin layer for the nodata cells within wetlands
         for row in range(rows):
@@ -219,32 +298,9 @@ class Structure(FolderBase):
         #save the change to file
         self.save_raster(self.boundary_raster, self.__structure_boundary_processed_raster_name)
 
-    def reorder_after_subbasin(self, subbasin_raster:Raster):
-        """
-        reorder the structure
-
-        replace reorderWetlandIDWithSubbasin
-        """
-
-        rows = self.boundary_raster.configs.rows
-        cols = self.boundary_raster.configs.columns
-
-        count = 0
-        map = {}
-        for row in range(rows):
-            for col in range(cols):
-                wet = int(self.boundary_raster[row, col])
-                sub = int(subbasin_raster[row, col])
-                if wet > 0 and sub > 0:
-                    if sub not in map:
-                        count += 1
-                        map[sub] = count
-                    self.boundary_raster[row, col] = map[sub]
-
-        #save the change to file
-        self.save_raster(self.boundary_raster, self.__structure_boundary_processed_raster_name)
-
- 
+        #assign subbasin id and contribution area to the shapefile also remove the structure that are not included in subbasin    
+        processed_boundary_vector = self.__creatd_processed_boundary_vector(bmp2sub,bmp_contribute_area)
+        self.save_vector(processed_boundary_vector, self.__structure_boundary_processed_vector_name)
 
 
 #region Zhangbin - Not used anymore

@@ -1,11 +1,11 @@
 
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
-
+from ...names import Names
 
 class TillageManagement(BMPTable):
     """Distribution Table for BMP: Tillage management (14)"""
-    __tablename__ = 'tillage_management'
+    __tablename__ = Names.bmp_table_name_tillage_management
     Scenario = Column(Integer)
     Location = Column(Integer)
     Year = Column(Integer)
@@ -164,7 +164,7 @@ class TillageManagement(BMPTable):
 
 class TillageParameter(BMPTable):
     """Parameter Table for BMP: Pasture tillage management (36)"""
-    __tablename__ = 'tillage_parameter'
+    __tablename__ = Names.bmp_table_name_tillage_parameter
     ITNUM = Column(Integer, primary_key=True)
     TILLNM = Column(TEXT)
     DESCRIPTION = Column(TEXT)

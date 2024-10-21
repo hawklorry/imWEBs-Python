@@ -1,6 +1,7 @@
 import os
 from whitebox_workflows import WbEnvironment, Raster, Vector
 from .vector_extension import VectorExtension
+import pandas as pd
 
 class FolderBase:
     def __init__(self, folder:str) -> None:
@@ -11,9 +12,19 @@ class FolderBase:
         self.wbe = WbEnvironment()
         self.rasters = {}
         self.vectors = {}
+        self.dfs = {}
 
     def get_file_path(self, filename:str)->str:
         return os.path.join(self.folder,filename)
+
+    def save_df(self, df: pd.DataFrame, file_name:str, overwrite = True):
+        file_path = self.get_file_path(file_name)
+
+        if os.path.exists(file_path) and not overwrite:
+            raise ValueError(f"File: {file_path} already exists and overwrite is set to false.")
+        
+        df.to_csv(file_path, index=False)
+        self.dfs[file_name] = df
 
     def save_raster(self, raster:Raster, file_name:str, overwrite = True):
         file_path = self.get_file_path(file_name)
@@ -62,4 +73,16 @@ class FolderBase:
                 self.rasters[shapefile_name] = self.wbe.read_vector(file_name)
                 return self.rasters[shapefile_name] 
         
-        return None           
+        return None      
+
+    def get_df(self, df_name:str)->pd.DataFrame:
+        """get data from the given name. if the data frame doesn't exist, return none."""
+        if df_name in self.dfs:
+            return self.dfs[df_name]
+        else:
+            file_name = self.find_file(df_name)
+            if file_name is not None:
+                self.dfs[df_name] = pd.read_csv(file_name)
+                return self.dfs[df_name] 
+        
+        return None      

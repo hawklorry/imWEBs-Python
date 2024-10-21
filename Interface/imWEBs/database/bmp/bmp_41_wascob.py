@@ -1,11 +1,15 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL, TEXT
 from .bmp_table import BMPTable
+from ...names import Names
+from ...delineation.structure_attribute import StructureAttribute
 
 class Wascob(BMPTable):
     """Parameter Table for BMP: WASCob (41)"""
-    __tablename__ = 'wascob'
-    ID = Column(Integer, primary_key=True)
+    __tablename__ = Names.bmp_table_name_wascob
+
+    Scenario = Column(Integer)
+    ID = Column(Integer)
 
     StartYear = Column(Integer)
     StartMon = Column(Integer)
@@ -54,7 +58,11 @@ class Wascob(BMPTable):
 
     BermType = Column(TEXT)
 
-    def __init__(self):
+    def __init__(self,attribute:StructureAttribute = None):
+        self.Scenario = -1
+        self.ID = attribute.id
+        self.ContributionArea = attribute.contribution_area
+
         self.StartYear = 1900
         self.StartMon = 1
         self.StartDay = 1

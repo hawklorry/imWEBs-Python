@@ -2,10 +2,11 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class irrigation_management(BMPTable):
     """Distribution Table for BMP: Irrigation management (18)"""
-    __tablename__ = 'irrigation_management'
+    __tablename__ = Names.bmp_table_name_irrigation_management
     Scenario = Column(Integer)
     Location = Column(Integer)
     Year = Column(Integer)
@@ -23,7 +24,7 @@ class irrigation_management(BMPTable):
 
 class irrigation_parameter(BMPTable):
     """Parameter Table for BMP: Irrigation management (18)"""
-    __tablename__ = 'irrigation_parameter'
+    __tablename__ = Names.bmp_table_name_irrigation_parameter
     IrrType = Column(Integer,primary_key=True)
     IRRNM = Column(TEXT)
     Year = Column(Integer)

@@ -1,11 +1,11 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
-
+from ...names import Names
 
 class PastureGrazingManagement(BMPTable):
     """Distribution Table for BMP: Pasture grazing management (37)"""
-    __tablename__ = 'pasture_grazing_management'
+    __tablename__ = Names.bmp_table_name_pasture_grazing_management
 
     """Scenario ID"""
     Scenario = Column(Integer)

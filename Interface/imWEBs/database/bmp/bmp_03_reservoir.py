@@ -1,10 +1,11 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class Reservoir(BMPTable):
     """Parameter Table for BMP: Reservoir (3)"""
-    __tablename__ = 'reservoir'
+    __tablename__ = Names.bmp_table_name_reservoir
     ID = Column(Integer, primary_key=True)
     XLL = Column(REAL)
     YLL = Column(REAL)
@@ -72,7 +73,8 @@ class Reservoir(BMPTable):
     STARG11 = Column(REAL)
     STARG12 = Column(REAL)
 
-    def __init__(self):
+    def __init__(self, id:int):
+        self.ID = id
         self.XLL = 0
         self.YLL = 0
         self.OPERATION = "1900-01-01"
@@ -139,5 +141,3 @@ class Reservoir(BMPTable):
         self.STARG11 = 0.5
         self.STARG12 = 0.5
         self.SELECTION = 0
-
-

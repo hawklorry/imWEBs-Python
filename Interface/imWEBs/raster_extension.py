@@ -1,18 +1,46 @@
-from whitebox_workflows import WbEnvironment, Raster
+from whitebox_workflows import WbEnvironment, Raster, Vector
 from io import StringIO
 import pandas as pd
 import logging
 import math
 from .vector_extension import VectorExtension
+from .names import Names
 logger = logging.getLogger(__name__)
 
 
-class RasterExtension:
 
-    flow_dir_xy_delta_dic = {1: (1, -1), 2: (1, 0), 4: (1, 1), 8: (0, 1), 16: (-1, 1), 32: (-1, 0), 64: (-1, -1), 128: (0, -1)}    
+class RasterExtension:
+    @staticmethod
+    def get_max_value(raster:Raster)->float:
+        """get max value in a raster"""
+        rows = raster.configs.rows
+        cols = raster.configs.columns
+        noddata = raster.configs.nodata
+        max_value = float("-inf")
+        for row in range(rows):
+            for col in range(cols):
+                if raster[row, col] != noddata:
+                    if max_value < raster[row, col]:
+                        max_value = raster[row, col]
+        return max_value         
+
+    @staticmethod
+    def raster_to_vector(raster:Raster, vector_type:str = "polygon")->Vector:
+        """Convert raster to vector and add an id column as the value"""
+        wbe = WbEnvironment()
+
+        #there is no need to consider lines
+        vector = None
+        if vector_type == "point":
+            vector = wbe.raster_to_vector_points(raster)
+        else:
+            vector = wbe.raster_to_vector_polygons(raster)
+
+        return VectorExtension.add_id_for_raster_value(vector)
 
     @staticmethod 
     def get_number_of_valid_cell(raster:Raster):
+        """Get number of valid cells"""
         rows = raster.configs.rows
         cols = raster.configs.columns
         rowCount = 0
@@ -74,30 +102,6 @@ class RasterExtension:
 
         return filtered_raster
 
-    # @staticmethod
-    # def combine_structure_rasters(rasters:list, shape_type:str)->Raster:
-    #     """
-    #     combine raster and make sure uinique ids are assigned
-    #     """
-    #     wbe = WbEnvironment()
-
-    #     vectors = []
-    #     for r in rasters:
-    #         if shape_type == "polygon":
-    #             vectors.append(wbe.raster_to_vector_polygons(r))
-    #         elif shape_type == "point":
-    #             vectors.append(wbe.raster_to_vector_points(r))
-        
-    #     merged_vector = VectorExtension.merge_vectors(vectors)
-        
-    #     if shape_type == "polygon":
-    #         return wbe.vector_polygons_to_raster(merged_vector,base_raster = rasters[-1])
-    #     elif shape_type == "point":
-    #         return wbe.vector_points_to_raster(merged_vector,base_raster = rasters[-1])
-        
-    #     return None
-            
-
     @staticmethod
     def compare_raster_extent(raster1:Raster, raster2:Raster):
         """Check if the raster have same size as the standard raster """
@@ -132,9 +136,10 @@ class RasterExtension:
 
     @staticmethod
     def get_category_area_ha_dataframe(raster:Raster, area_col_name:str)->pd.DataFrame:
+        """Get area of each raster value in ha"""
         wbe = WbEnvironment()
         class_area = wbe.raster_area(raster)
-        df = pd.read_csv(StringIO(class_area[1]),skiprows=1, index_col=0, names=["ID",area_col_name])
+        df = pd.read_csv(StringIO(class_area[1]),skiprows=1, index_col=0, names=[Names.field_name_id,area_col_name])
         df = df / 10000 #convert to ha
         return df
   
@@ -152,12 +157,12 @@ class RasterExtension:
         
         #need to conver the index to the real id
         #this is not necessary for next release
-        df.index = df.index + 1
+        #it seems this has been fixed
+        #df.index = df.index + 1
 
         if name is not None:
             df[name] = df[stat_type]
             return df[name].to_frame()
         
-        return df[stat_type]
-    
+        return df[stat_type]    
     

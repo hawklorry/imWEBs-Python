@@ -2,12 +2,13 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class GrazingManagement(BMPTable):
     """Distribution Table for BMP: Grazing management (16)"""
     
     #table name is fixed in the engine as GRAMG_management
-    __tablename__ = 'GRAMG_management'
+    __tablename__ = Names.bmp_table_name_grazing_parameter
     """Scenario ID"""
     Scenario = Column(Integer)
     """Location ID"""

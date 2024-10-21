@@ -1,8 +1,13 @@
 import math
 from .database.parameter.parameter_database import ParameterDatabase
-from .database.bmp.bmp_database import BMPDatabase, reach_width_depth_parameter
 from .folder_base import FolderBase 
 from .names import Names    
+
+class reach_width_depth_parameter:
+    def __init__(self, design_storm, parameter_A, parameter_B):
+        self.A = parameter_A
+        self.B = parameter_B
+        self.design_storm = design_storm
 
 class Parameters(FolderBase):
     """all the parameters from parameter database and bmp database. It exposes necessary """
@@ -12,7 +17,6 @@ class Parameters(FolderBase):
         super().__init__(database_folder)
 
         self.parameter_database = ParameterDatabase(self.get_file_path(Names.parameterDatabaseName))
-        self.bmp_database = BMPDatabase(self.get_file_path(Names.bmpDatabaseName))
         self.reach_width_parameters = {2: reach_width_depth_parameter(2, 1, 0.56),
                                        10: reach_width_depth_parameter(10, 1.2, 0.56),
                                        100: reach_width_depth_parameter(100, 1.4, 0.56)}
@@ -33,9 +37,6 @@ class Parameters(FolderBase):
         
         return reach_width_depth_parameter(design_storm, 0.04, 0.45)
 
-    # def get_reach_parameter(self, reach_id, parameter_name):
-    #     return self.bmp_database.get_reach_parameter(reach_id, parameter_name)
-
     def get_parameter_lookup(self,parameter_name,parameter_type):
         return self.parameter_database.get_parameter_lookup(parameter_name,parameter_type)
 
@@ -45,15 +46,16 @@ class Parameters(FolderBase):
         base_prc = self.parameter_database.get_potential_runoff_coefficient(landuse, soil)
         base_slope = self.parameter_database.get_slope(landuse, soil)
 
-        return parameters.calculate_potential_runoff_coefficient(impervious_ratio, grass_prc, base_prc, base_slope, slope, reach_fraction)
+        return self.calculate_potential_runoff_coefficient(
+            impervious_ratio, grass_prc, base_prc, base_slope, slope, reach_fraction)
     
     def get_depression_storage_capacity(self, landuse, soil, slope, reach_fraction):
         impervious_ratio = self.parameter_database.get_impervious_ratio(landuse)
         grass_dsc = self.parameter_database.get_depression_storage_capacity(self.GRASS_ID, soil)
         base_dsc = self.parameter_database.get_depression_storage_capacity(landuse, soil)
-        base_slope = self.parameter_database.get_slope(landuse, soil)
 
-        return parameters.calculate_depression_storage_capacity(impervious_ratio, grass_dsc, base_dsc, base_slope, slope, reach_fraction)
+        return self.calculate_depression_storage_capacity(
+            impervious_ratio, grass_dsc, base_dsc, slope, reach_fraction)
 
     def get_cn2(self, landuse, soil)->float:
         return self.parameter_database.get_cn2(landuse, soil)

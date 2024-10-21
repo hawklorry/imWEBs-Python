@@ -18,6 +18,12 @@ class imWEBs:
         """
         self.model_config.delineate_watershed()
 
+    def generate_parameters(self):
+        """
+        watershed delineation
+        """
+        self.model_config.generate_parameters()
+
     def create_model(self):
         pass
 

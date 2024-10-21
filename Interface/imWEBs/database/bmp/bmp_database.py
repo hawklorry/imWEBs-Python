@@ -1,5 +1,7 @@
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select,insert
+from whitebox_workflows import Vector
+from ...vector_extension import VectorExtension
 from .reach_parameter import ReachParameter
 from .field_info import FieldInfo
 from .farm_info import FarmInfo
@@ -7,13 +9,25 @@ from .subbasin_info import SubbasinInfo
 from .field_subbasin import FieldSubbasin
 from .field_farm import FieldFarm
 from .farm_subbasin import FarmSubbasin
-# from .bmp_01_point_source import PointSource
-# from .bmp_02_flow_diversion import FlowDiversion
-# from .bmp_03_reservoir import Reservoir
+from .subbasin_multiplier import SubbasinMultiplier
+from ...delineation.structure import Structure
+from ...names import Names
+from ...bmp.bmp_areal_manure_storage import ArealBMPManureStorage
+from ...bmp.bmp_reach_manure_catch_basin import ReachBMPManureCatchBasin
+from ...bmp.bmp_reach_reservoir import ReachBMPReservoir
+from ...bmp.bmp_type import BMPType
+from ...bmp.bmp_reach import ReachBMP
+from ...bmp.bmp import BMP
+from ...bmp.bmp_structure_dugout import StructureBMPDugout
+from ...bmp.bmp_structure_wascob import StructureBMPWascob
+
+from .bmp_01_point_source import PointSource
+from .bmp_02_flow_diversion import FlowDiversion
+from .bmp_03_reservoir import Reservoir
 # from .bmp_05_riparian_buffer import RiparianBuffer
 # from .bmp_06_grass_waterway import GrassWaterWay
 # from .bmp_07_vegetation_filter_strip import FilterStrip
-# from .bmp_09_isolated_wetland import Wetland
+from .bmp_09_isolated_wetland import Wetland
 # from .bmp_12_crop_management import CropManagement, CropParameter
 # from .bmp_14_tillage_management import TillageManagement, TillageParameter
 # from .bmp_15_fertilizer_management import FertlizerManagement, FertilizerParameter
@@ -25,9 +39,9 @@ from .farm_subbasin import FarmSubbasin
 # from .bmp_24_spring_application_rather_than_fall_application import ManureSpringApplicationRatherThanFallApplicationManagement
 # from .bmp_25_applicaiton_based_on_soil_nitrogen_limit import ManureApplicationBasedOnSoliNitrogenLimitManagement
 # from .bmp_26_applicaiton_based_on_soil_phosphorous_limit import ManureApplicationBasedOnPhosphorousLimitManagement
-# from .bmp_27_manure_storage import ManureStorageCapacityAndDesignManagement, ManureStorageCapacityAndDesignParameter
-# from .bmp_28_manure_catch_basin import ManureCatchBasinImpondmentParameter
-# from .bmp_29_manure_feedlot import ManureFeedlotManagement, ManureFeedlotParameter
+from .bmp_27_manure_storage import ManureStorageParameter
+from .bmp_28_manure_catch_basin import ManureCatchBasinParameter
+from .bmp_29_manure_feedlot import ManureFeedlot
 # from .bmp_30_marginal_crop_management import MarginalCropManagement
 # from .bmp_31_marginal_fertilizer_management import MarginalFertilizerManagement
 # from .bmp_32_marginal_tillage_management import MarginalTillageManagement
@@ -38,24 +52,21 @@ from .farm_subbasin import FarmSubbasin
 # from .bmp_37_pasture_grazing_management import PastureGrazingManagement, PastureGrazingParameter
 # from .bmp_38_dugout import DugoutParameter
 # from .bmp_39_offsite_watering import OffsiteWateringParameter
-# from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFencingParameter
+from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFencingParameter
+from .bmp_41_wascob import Wascob
+#from .bmp_42_water_use import 
 
 
 from ..database_base import DatabaseBase, logger
 from .bmp_table import BMPTable
 from ...raster_extension import RasterExtension
 from whitebox_workflows import WbEnvironment, Raster
-from io import StringIO
 import pandas as pd
 import math
 import numpy as np
+from ...outputs import Outputs
 
-class reach_width_depth_parameter:
-    def __init__(self, design_storm, parameter_A, parameter_B):
-        self.A = parameter_A
-        self.B = parameter_B
-        self.design_storm = design_storm
-        
+      
 
 class BMPDatabase(DatabaseBase):
     default_tables = ["bmp_index",
@@ -72,16 +83,13 @@ class BMPDatabase(DatabaseBase):
     # def get_reach_parameter(self, reach_id, parameter_name):
     #     return getattr(self.reach_parameter[reach_id], parameter_name)   
 
-    def populate_database(self, subbasin_raster:Raster, 
-                          field_raster:Raster, 
-                          farm_raster:Raster, 
-                          flow_acc_raster:Raster, 
-                          potential_runoff_coefficient_raster:Raster, 
-                          depression_storage_capacity_raster:Raster, 
-                          cn2_raster:Raster):
+    def populate_database(self, outputs:Outputs):
         """
         create all the parameter tables in bmp database
         """        
+        logger.info("*"*25)
+        logger.info("BMP Database")
+        logger.info("*"*25)
 
         #remove the tables we want to update and then create them again
         logger.info("Creating table structure in bmp database ...")
@@ -94,31 +102,66 @@ class BMPDatabase(DatabaseBase):
             logger.info(table)
             self.populate_defaults(table) 
 
-        logger.info("creating field_info ...")
-        field_area_df = RasterExtension.get_category_area_ha_dataframe(field_raster, BMPDatabase.COL_NAME_AREA_HA)
-        field_area_df.to_sql(FieldInfo.__tablename__, con = self.engine, if_exists='append',index=True)
+        logger.info("Creating field_info ...")
+        field_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.field_raster, BMPDatabase.COL_NAME_AREA_HA)
+        field_area_df.to_sql(FieldInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
         field_area_df.columns = ["FieldArea"]
 
-        logger.info("creating farm_info ...")
-        farm_area_df = RasterExtension.get_category_area_ha_dataframe(farm_raster, BMPDatabase.COL_NAME_AREA_HA)
-        farm_area_df.to_sql(FarmInfo.__tablename__, con = self.engine, if_exists='append',index=True)
+        logger.info("Creating farm_info ...")
+        farm_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.farm_raster, BMPDatabase.COL_NAME_AREA_HA)
+        farm_area_df.to_sql(FarmInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
         farm_area_df.columns = ["FarmArea"]
 
-        logger.info("creating subbasin_info ...")
-        subbasin_area_df = self.__create_subbasin_info(subbasin_raster, flow_acc_raster, potential_runoff_coefficient_raster, depression_storage_capacity_raster, cn2_raster)
-        subbasin_area_df.to_sql(SubbasinInfo.__tablename__, con = self.engine, if_exists='append',index=True)
+        logger.info("Creating subbasin_info ...")
+        subbasin_area_df = self.__create_subbasin_info(outputs.subbasin_raster, 
+                                                       outputs.flow_acc_raster, 
+                                                       outputs.potential_ruoff_coefficient_raster, 
+                                                       outputs.depression_storage_capacity_raster, 
+                                                       outputs.cn2_raster)
+        subbasin_area_df.to_sql(SubbasinInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
+        subbasin_ids = subbasin_area_df.index.to_list()
+
         subbasin_area_df = subbasin_area_df[BMPDatabase.COL_NAME_AREA_HA].to_frame()
         subbasin_area_df.columns = ["SubbasinArea"]
 
-        logger.info("creating field_subbasin ...")
-        self.__create_overlay(field_raster, subbasin_raster, "Field", "Subbasin", field_area_df, subbasin_area_df, FieldSubbasin.__tablename__)
+        logger.info("Creating field_subbasin ...")
+        self.__create_overlay(outputs.field_raster, outputs.subbasin_raster, 
+                              "Field", "Subbasin", field_area_df, subbasin_area_df, FieldSubbasin.__tablename__)
 
-        logger.info("creating farm_subbasin ...")
-        self.__create_overlay(farm_raster, subbasin_raster, "Farm", "Subbasin", farm_area_df, subbasin_area_df, FarmSubbasin.__tablename__)
+        logger.info("Creating farm_subbasin ...")
+        self.__create_overlay(outputs.farm_raster, outputs.subbasin_raster, 
+                              "Farm", "Subbasin", farm_area_df, subbasin_area_df, FarmSubbasin.__tablename__)
 
-        logger.info("creating field_farm ...")
-        self.__create_overlay(field_raster, farm_raster, "Field", "Farm", field_area_df, farm_area_df, FieldFarm.__tablename__)
- 
+        logger.info("Creating field_farm ...")
+        self.__create_overlay(outputs.field_raster, outputs.farm_raster, 
+                              "Field", "Farm", field_area_df, farm_area_df, FieldFarm.__tablename__) 
+        
+        self.__create_subbasin_multiplier(subbasin_ids)
+
+        #bmps
+        reach_bmps = {}
+        reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = self.__create_bmp_reservoir(outputs)
+        for type, struc in outputs.structures.items():            
+            id_subbasins = self.__create_bmp_structure(type, struc, outputs)
+            if type == "wetland":
+                reach_bmps[BMPType.BMP_TYPE_WETLAND] = id_subbasins
+        self.__create_bmp_manure_storage(outputs)   
+        reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = self.__create_bmp_manure_catchbasin(outputs) 
+        self.__create_bmp_riparian_buffer(outputs)
+
+
+        #create reach_bmp table
+        #all reach bmps should be added before this
+        self.__create_bmp_reach_bmp(subbasin_ids, reach_bmps)
+
+        #create bmp_scenarios table
+        self.__create_bmp_scenarios(outputs)
+
+        #create grazing reach deposit table
+        #the start year could be read from somewhere later
+        self.__create_grazing_reach_deposit(1991)
+
+
     def __create_subbasin_info(self, 
                                 subbasin_raster:Raster,
                                 flow_acc_raster:Raster, 
@@ -147,16 +190,19 @@ class BMPDatabase(DatabaseBase):
         merged_df = merged_df.merge(raster2_area_df, left_on= name2, right_index=True, how="left")
 
         #calculate the ratio
-        merged_df["ID"] = merged_df.index + 1
+        merged_df["ID"] = merged_df.index
         merged_df[f"To{name1}"] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name1}Area"]
         merged_df[f"To{name2}"] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name2}Area"]
 
-        merged_df = merged_df[["ID", name1, name2, BMPDatabase.COL_NAME_AREA_HA, f"To{name1}", f"To{name2}"]]        
-        merged_df.to_sql(table_name, con = self.engine, if_exists='append',index=False)
+        merged_df = merged_df[["ID", name1, name2, BMPDatabase.COL_NAME_AREA_HA, f"To{name1}", f"To{name2}"]]     
+        self.save_table(merged_df, table_name)   
     
     def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str)->pd.DataFrame:
-        #find max id from raster1        
-        raster1_max = int(math.pow(10, int(math.log10(spatial1_ras.configs.maximum)) + 2))
+        #find max id from raster1     
+        spatial1_ras_max = spatial1_ras.configs.maximum   
+        if spatial1_ras_max == float('-inf') or spatial1_ras_max == float('inf'):
+            spatial1_ras_max = RasterExtension.get_max_value(spatial1_ras)   
+        raster1_max = int(math.pow(10, int(math.log10(spatial1_ras_max)) + 2))
 
         #make a new raster with a unique id combining both raster 1 and raster 2
         merged_raster = spatial1_ras + spatial2_ras * raster1_max
@@ -179,6 +225,9 @@ class BMPDatabase(DatabaseBase):
         """
         
         grazing_management_df = self.read_table("GRAMG_management")
+        if grazing_management_df is None:
+            return 
+
         field_info_df = self.read_table("field_info")
         livestock_parameter = self.read_table("livestock_parameter")
         fertilizer_parameter = self.read_table("fertilizer_parameter")
@@ -249,156 +298,114 @@ class BMPDatabase(DatabaseBase):
         #save to database
         self.save_table("GRAMG_ReachDeposit",reach_deposit_df)
 
-    def __create_riparian_buffer_distribution_paramter(self,
-                                                       riparian_buffer_raster:Raster,
-                                                       flow_dir_raster:Raster,
-                                                       subbasin_raster:Raster,
-                                                       slope_radius_raster:Raster,
-                                                       soil_k_raster:Raster,
-                                                       soil_porosity_raster:Raster,
-                                                       landuse_rootdepth_raster:Raster,
-                                                       width = 10):
-        """
-        create distribution raster and parameter table for riparian buffer. 
+
+#region BMPs
+
+    def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
+        """populate default subbasin-muliplier"""
+        logger.info("Creating subbasin_multiplier ... ")
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all([SubbasinMultiplier(id) for id in subbasin_ids])
+            session.commit()
+
+    def __create_bmp_structure(self, structure_type:str, structure:Structure,outputs:Outputs)->dict:
+        """populate default structure parameter table""" 
+        logger.info(f"Creating {structure_type} parameter table ... ")      
+
+        if structure_type == "wetland" or structure_type == "feedlot":
+            Session = sessionmaker(bind=self.engine)
+            with Session() as session:
+                if structure_type == "wetland":
+                    session.add_all([Wetland(struc_attribute) for struc_attribute in structure.attributes.values()])
+                elif structure_type == "feedlot":
+                    session.add_all([ManureFeedlot(struc_attribute) for struc_attribute in structure.attributes.values()])
+                session.commit()
+        else:
+            #we couldn't create dugout and wascob parameter table with ORM as the primary key is not defined. Use pandas dataframe instead
+            if structure_type == "dugout":
+                self.__create_bmp_dugout(self,outputs,structure)
+            elif structure_type == "wascob":
+                self.__create_bmp_wascob(self,outputs,structure)
         
-        It finds all parts of the buffer in each subbasin and corresponding drainage area. And then summarize the paramters. 
 
-        Replace Plugin VFSandRBS
-        """
+        id_subbasins = {}
+        for id, attribute in structure.attributes.items():
+            id_subbasins[id] = attribute.subbasin
+        return id_subbasins
 
-        row, col, x, y = 0, 0, 0, 0
-        z = 0.0
-        i, c = 0, 0
-        flag = False
-        flowDir = 0.0
+    def __create_bmp_riparian_buffer(self, outputs:Outputs):
+        df = outputs.riparian_buffer_parameter_df
+        if df is not None:
+            self.save_table(df, Names.bmp_table_name_riparian_buffer)
 
-        rows = flow_dir_raster.configs.rows,
-        cols = flow_dir_raster.configs.columns
-        riparian_buffer_nodata = riparian_buffer_raster.configs.nodata
-        subbasin_nodata = subbasin_raster.configs.nodata
+    def __create_bmp_dugout(self, outputs:Outputs, dugout_structure:Structure):
+        dugout = StructureBMPDugout(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, dugout_structure)
+        self.save_table(dugout.dugout_df, Names.bmp_table_name_dugout)
 
-        riparian_buffer_drainage_area_raster = self.wbe.new_raster(flow_dir_raster.configs)
-        riparian_buffer_parts_raster = self.wbe.new_raster(flow_dir_raster.configs)
+    def __create_bmp_wascob(self, outputs:Outputs, wascob_structure:Structure):
+        wascob = StructureBMPWascob(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, wascob_structure)
+        self.save_table(wascob.wascob_df, Names.bmp_table_name_dugout)
 
-        #flag if the cells has been traced
-        flag2D = np.zeros((rows, cols), dtype=bool)
+    def __create_bmp_manure_storage(self,outputs:Outputs):
+        """populate default manure storage tables"""
+        if outputs.inputs.manure_storage_boundary_vector is None:
+            return
+        
+        logger.info("Creating manure storage parameter table ... ")
+        storage = ArealBMPManureStorage(outputs.inputs.manure_storage_boundary_vector,
+                                outputs.flow_direction_raster,
+                                outputs.subbasin_raster,
+                                outputs.reach_raster,
+                                outputs.dem_clipped_raster)
+        
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(storage.manure_storage_parameters)
+            session.commit()  
 
-        path = []
-        pathInside = []
-        vfsOrRbsDrain = {}
-        vfsOrRbsInside = {}
-        vfsOrRbsLength = {}
-        celldist = (riparian_buffer_raster.configs.resolution_x + riparian_buffer_raster.configs.resolution_y) / 2.0
+    def __create_bmp_reservoir(self, outputs:Outputs)->dict:
+        """populate default reservoir parameter table"""
+        if outputs.inputs.reservoir_vector is None:
+            return {}
+        
+        logger.info("Creating reservoir parameter table ... ")
+        reservoir = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster)
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(reservoir.reservoirs)
+            session.commit()  
 
-        for row in range(rows):
-            for col in range(cols):
-                if subbasin_raster[row, col] != subbasin_nodata and not flag2D[row, col]:
-                    path = []
-                    pathInside = []
+        return reservoir.subbasins
 
-                    x = col
-                    y = row
+    def __create_bmp_manure_catchbasin(self, outputs:Outputs)->dict:
+        if outputs.inputs.catchbasin_vector is None:
+            return {}
+        
+        logger.info("Creating manure catch basin parameter table ... ")
+        catchbasin = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
+                                outputs.subbasin_raster)
+        
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(catchbasin.manure_catch_basin_parameters)
+            session.commit()         
 
-                    path.append((y, x))
+        return catchbasin.subbasins
+    
+    def __create_bmp_reach_bmp(self, subbasin_ids:list, reach_bmps:dict):
+        """create reach_bmp table"""
 
-                    flag = True
-                    length = 0.0
+        logger.info("Creating reach_bmp table ... ")
+        df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
+        self.save_table(df, Names.bmp_table_name_reach_bmp)
 
-                    while flag:
-                        flowDir = flow_dir_raster[y, x]
-                        if flowDir > 0:
-                            dx, dy = RasterExtension.flow_dir_xy_delta_dic(flowDir)
+    def __create_bmp_scenarios(self, outputs:Outputs):
+        """create bmp scenarios table"""
+        
+        logger.info("Creating bmp_secenarios table ... ")
 
-                            lastVFSorRBSID = riparian_buffer_raster[y, x]
-                            isVisited = flag2D[y, x]
+        df = BMP.generate_bmp_scenarios_df(outputs.inputs.bmp_types)
+        self.save_table(df, Names.bmp_table_name_scenarios)
 
-                            if lastVFSorRBSID != riparian_buffer_nodata and not isVisited:
-                                pathInside.append((y, x))
-                                length += celldist * (1.41421356 if c in [1, 4, 16, 64] else 1)
-
-                            #get x,y for downstream cell
-                            x += dx
-                            y += dy
-
-                            #check to see if the next cell is edge, different riparian buffer. If yes, add it to the list
-                            if (riparian_buffer_raster[y, x] == riparian_buffer_nodata or riparian_buffer_raster[y, x] != lastVFSorRBSID or flow_dir_raster[y, x] == 0) and lastVFSorRBSID != riparian_buffer_nodata:
-                                #recalculate the current position
-                                loc = (y - dy, x - dx)
-
-                                if loc in vfsOrRbsDrain:
-                                    vfsOrRbsDrain[loc].extend(path)
-                                else:
-                                    vfsOrRbsDrain[loc] = path.copy()
-
-                                if loc in vfsOrRbsInside:
-                                    vfsOrRbsInside[loc].extend(pathInside)
-                                else:
-                                    vfsOrRbsInside[loc] = pathInside.copy()
-
-                                if loc in vfsOrRbsLength:
-                                    vfsOrRbsLength[loc] = max(length, vfsOrRbsLength[loc])
-                                else:
-                                    vfsOrRbsLength[loc] = length
-                                break
-
-                            if not isVisited:
-                                path.append((y, x))
-                        else:
-                            flag = False
-
-                    #update the flag
-                    for loc in path:
-                        flag2D[loc[0], loc[1]] = True
-
-        #create the resulting parameter dictionary
-        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID','RIBUF','Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
-        riparain_buffer_parameter_df.set_index('ID', inplace=True)        
-
-        cellArea = riparian_buffer_raster.configs.resolution_x * riparian_buffer_raster.configs.resolution_y
-        vfsOrRbsPartID = 0
-        for outLoc in vfsOrRbsDrain.keys():
-            vfsOrRbsPartID += 1
-
-            vfsOrRbsID = int(riparian_buffer_raster[outLoc[0], outLoc[1]])
-            subID = int(subbasin_raster[outLoc[0], outLoc[1]])
-            drainageArea = len(vfsOrRbsDrain[outLoc]) * cellArea / 10000
-            length = vfsOrRbsLength[outLoc]
-
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'RIBUF'] = vfsOrRbsID
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Subbasin'] = subID
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Drainage_Area'] = drainageArea
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Length'] = length
-
-            for loc in vfsOrRbsDrain[outLoc]:
-                riparian_buffer_drainage_area_raster[loc[0], loc[1]] = vfsOrRbsPartID
-
-            for loc in vfsOrRbsInside[outLoc]:
-                riparian_buffer_parts_raster[loc[0], loc[1]] = vfsOrRbsPartID
-
-        riparain_buffer_parameter_df["Width"] = width
-        riparain_buffer_parameter_df["Area_ha"] = width * riparain_buffer_parameter_df['Length'] * 0.0001
-        riparain_buffer_parameter_df["Area_Ratio"] = riparain_buffer_parameter_df["Drainage_Area"] / riparain_buffer_parameter_df["Area_ha"]
-        riparain_buffer_parameter_df["VegetationID"] = 6
-
-        #get slope, soil_k, soil_porosity and root_depth using the zone statistics
-        slope_df = RasterExtension.get_zonal_statistics(slope_radius_raster / 100, riparian_buffer_parts_raster, "mean","Slope")
-        k_df = RasterExtension.get_zonal_statistics(soil_k_raster, riparian_buffer_parts_raster, "mean","Sol_K")
-        prosity_df = RasterExtension.get_zonal_statistics(soil_porosity_raster, riparian_buffer_parts_raster, "mean","Sol_porosity")
-        root_depth_df = RasterExtension.get_zonal_statistics(landuse_rootdepth_raster, riparian_buffer_parts_raster, "mean","Root_Depth")
-
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(slope_df, left_index=True, right_index=True, how="inner")
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(k_df, left_index=True, right_index=True, how="inner")
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(prosity_df, left_index=True, right_index=True, how="inner")
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df.merge(root_depth_df, left_index=True, right_index=True, how="inner")
-
-        #add other columns with default values
-        riparain_buffer_parameter_df["Scenario"] = 1
-        riparain_buffer_parameter_df["Year"] = 0
-
-        #adjust the sequence of the columns
-        riparain_buffer_parameter_df.reset_index(inplace=True)
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_k','Sol_porosity','Root_Depth']]
-
-        #save to bmp database
-        self.save_table(RiparianBuffer.__tablename__, riparain_buffer_parameter_df)
-
+#endregion

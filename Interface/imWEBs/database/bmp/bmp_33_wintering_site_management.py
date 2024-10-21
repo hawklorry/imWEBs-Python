@@ -1,11 +1,12 @@
 from typing import Any
 from sqlalchemy import Column, Integer, Float, TEXT, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class WinteringSiteParameter(BMPTable):
     """Parameter Table for Wintering Site Management"""
 
-    __tablename__ = 'wintering_site_parameter'
+    __tablename__ = Names.bmp_table_name_wintering_site_parameter
 
     """Wintering site ID"""
     ID = Column(Integer, primary_key=True)
@@ -24,7 +25,7 @@ class WinteringSiteParameter(BMPTable):
 
 class WinteringSiteManagement(BMPTable):
     """Distribution Table for BMP: Wintering site management (33)"""
-    __tablename__ = 'wintering_site_management'
+    __tablename__ = Names.bmp_table_name_wintering_site_management
     """Scenario ID"""
     Scenario = Column(Integer)
     """Location ID"""

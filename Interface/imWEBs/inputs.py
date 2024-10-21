@@ -1,9 +1,12 @@
 from .folder_base import FolderBase
 from .names import Names
 from .raster_extension import RasterExtension
+from .vector_extension import VectorExtension
 from whitebox_workflows import Raster, Vector
 from .lookup import Lookup
 import logging
+import numpy as np
+from .bmp.bmp_type import BMPType
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +111,8 @@ class Inputs(FolderBase):
    
     @property
     def reservoir_vector(self)->Vector:
-        return self.get_vector(Names.get_standard_file_name("reservoir_shapefile"))  
-     
+        return self.get_vector(Names.get_standard_file_name("reservoir_shapefile"))      
+   
     @property
     def catchbasin_vector(self)->Vector:
         return self.get_vector(Names.get_standard_file_name("manure_catch_basin_shapefile"))
@@ -124,7 +127,7 @@ class Inputs(FolderBase):
     
     @property
     def water_use_vector(self)->Vector:
-        return self.get_vector(Names.get_standard_file_name("water_use_shapefile"))
+        return self.get_vector(Names.get_standard_file_name("water_use_shapefile"))   
 
 #endregion
 
@@ -145,6 +148,14 @@ class Inputs(FolderBase):
     @property
     def wascob_outlet_vector(self)->Vector:
         return None
+    
+    @property
+    def raparian_buffer_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("riparian_buffer_shapefile"))    
+    
+    @property
+    def tile_drain_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("tile_drain_shapefile"))    
 
 #endregion
 
@@ -157,10 +168,43 @@ class Inputs(FolderBase):
     @property
     def feedlot_outlet_vector(self)->Vector:
         return self.get_vector(Names.feedlotOutletShpName)
-
+    
+    @property
+    def manure_storage_boundary_vector(self)->Vector:
+        return self.get_vector(Names.manureStorageShpName)
 
 #endregion
-    
+
+    @property
+    def bmp_types(self):
+        bmps = []
+        if self.reservoir_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_RESERVOIR)
+        if self.flow_diversion_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_FLOWDIVERSION_STREAM)
+        if self.point_source_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_POINTSOURCE)
+        if self.wetland_boundary_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_WETLAND)
+        if self.catchbasin_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_MANURE_CATCHBASIN)
+        if self.grass_waterway_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_GRASSWATERWAY)
+        if self.access_management_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_ACCESSMGT)
+        if self.water_use_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_WATERUSE)
+        if self.dugout_boundary_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_DUGOUT)
+        if self.wascob_boundary_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_WASCOB)
+        if self.manure_storage_boundary_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_MANURE_STORAGE)
+        if self.feedlot_boundary_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_MANURE_FEEDLOT)
+
+        return bmps  
+
     def __validate(self):
         """
         Validate necessary files are present.
@@ -203,9 +247,54 @@ class Inputs(FolderBase):
         if not RasterExtension.compare_raster_extent(self.dem_raster, self.landuse_raster):
             raise ValueError("The landuse raster doesn't have same dimension as dem.")
         
+        #check manure feedlot, catch basin and storage
+        self.__check_manure_feedlot_catchbasin_storage()
+        
         #check if the soil/lookup raster ids are included in corresponding lookup csv files
         logger.info("Loading lookup tables ...")
         self.lookup_soil =  Lookup(self.soil_lookup_csv, self.soil_raster)
         self.lookup_landuse  = Lookup(self.landuse_lookup_csv, self.landuse_raster)
+
+    def __check_manure_feedlot_catchbasin_storage(self):
+        """
+        check manure feedlot catchbasin and storage
+        
+        1. feedlot should have a cb column for catch basin id
+        2. manure storage should have feedlot column for source feedlot
+        3. feedlot outlet id should match the id in feedlot boundary 
+        """
+
+        #feedlot boundary and feedlot outlet
+        if self.feedlot_boundary_vector is None:
+            return 
+        
+        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)
+
+        #check feedlot outlet id
+        if self.feedlot_outlet_vector is not None:
+            feedlot_outlet_ids = VectorExtension.get_unique_ids(self.feedlot_outlet_vector)
+
+            if not np.array_equal(feedlot_ids, feedlot_outlet_ids):
+                raise ValueError("The ids in feedlot and catch basin doesn't match. Please check. ")
+            
+        #check catch basin column in feedlot
+        if self.catchbasin_vector is not None:
+            catch_basin_ids = VectorExtension.get_unique_ids(self.catchbasin_vector)
+            feedlot_catchbasin_ids = VectorExtension.get_unique_field_value(self.feedlot_boundary_vector, Names.field_name_catch_basin)
+
+            for catch_basin in feedlot_catchbasin_ids.values():
+                if catch_basin not in catch_basin_ids:
+                    raise ValueError(f"Couldn't fine catch basin with id = {catch_basin}. Please check feedlot and catch basin shapefile.")
+                
+        #check feedlot column in manure storage 
+        if self.manure_storage_boundary_vector is not None:
+            manure_storage_feedlot_ids = VectorExtension.get_unique_field_value(self.manure_storage_boundary_vector, Names.field_name_feedlot)
+
+            for feedlot in manure_storage_feedlot_ids.values():
+                if feedlot not in feedlot_ids:
+                    raise ValueError(f"Couldn't fine feedlot with id = {catch_basin}. Please check feedlot and manure storage shapefile.")
+            
+
+
 
 
