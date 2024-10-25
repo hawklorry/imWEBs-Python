@@ -15,3 +15,11 @@ class OffsiteWateringParameter(BMPTable):
     Source = Column(Integer)
     """ID for the source"""
     SourceID = Column(Integer)
+
+    def __init__(self, id:int, subbasin:int):
+        self.ID = id
+        self.Year = 0
+        self.Subbasin = subbasin
+        self.SourceID = subbasin
+        self.Source = 0
+

@@ -2,6 +2,7 @@ from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
 from ...delineation.structure_attribute import StructureAttribute
+from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
 class ManureFeedlot(BMPTable):
@@ -44,32 +45,19 @@ class ManureFeedlot(BMPTable):
         self.PRC_change = 0.2
         self.Manure_EMC = 100000
 
-class ManureFeedlotManagement(BMPTable):
+class ManureFeedlotManagement(BMPManagementBaseWithYear):
     """Distribution Table for BMP: Manure feedlot (29)"""
-    __tablename__ = Names.bmp_table_name_manure_feed_lot_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    Year = Column(Integer)
-    FDLMon = Column(Integer)
-    FDLDay = Column(Integer)
-    Days = Column(Integer)
-    """Number of adult animals"""
-    AniAdult = Column(Integer)
-    """Number of non-adult animals"""
-    AniNonAdult = Column(Integer)
-    ManStoID = Column(TEXT)
-    ManStoDis = Column(TEXT)
-    ManRemMon = Column(Integer)
-    ManRemDay = Column(Integer)
-    ManRemFra = Column(REAL)
 
+    #FDLMon,FDLDay,Days,AniAdult,AniNonAdult,ManStoID,ManStoDis,ManRemMon,ManRemDay,ManRemFra"
     def __init__(self):
-        self.Year = 1
+        super().__init__()
         self.FDLMon = 1
         self.FDLDay = 1
         self.Days = 120
-        #user should provide the number of adult and non-adult
+
+        """Number of adult animals"""
         self.AniAdult = 0
+        """Number of non-adult animals"""
         self.AniNonAdult = 0
 
         self.ManStoID = 0

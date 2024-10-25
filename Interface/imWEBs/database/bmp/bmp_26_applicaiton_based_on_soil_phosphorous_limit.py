@@ -1,10 +1,7 @@
-from sqlalchemy import Column, Integer, REAL
-from .bmp_table import BMPTable
-from ...names import Names
+from .bmp_management_base import BMPManagementBase
 
-class ManureApplicationBasedOnPhosphorousLimitManagement(BMPTable):
+class ManureApplicationBasedOnPhosphorousLimitManagement(BMPManagementBase):
     """Distribution Table for BMP: Application based on soil Phosphorous limit (25)"""
-    __tablename__ = Names.bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    Soil_P_Limit_kg_ha = Column(REAL)
+    def __init__(self):
+        super().__init__()
+        self.Soil_P_Limit_kg_ha = 0

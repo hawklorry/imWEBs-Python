@@ -5,9 +5,9 @@ class Names:
 
     bmp_table_name_reach_bmp = "Reach_BMP"
     bmp_table_name_scenarios = "BMP_scenarios"
-    bmp_talbe_name_reach_parameter = "Reach_Parameter"
-    bmp_talbe_name_point_source = "point_source"
-    bmp_talbe_name_flow_diversion = "flow_diversion"
+    bmp_table_name_reach_parameter = "Reach_Parameter"
+    bmp_table_name_point_source = "point_source"
+    bmp_table_name_flow_diversion = "flow_diversion"
     bmp_table_name_reservoir = 'reservoir'
     bmp_table_name_riparian_buffer = "riparian_buffer"
     bmp_table_name_grass_waterway = 'grass_waterway'
@@ -39,6 +39,7 @@ class Names:
     bmp_table_name_pasture_fertilizer_management = "pasture_fertilizer_management"
     bmp_table_name_pasture_tillage_management = "pasture_tillage_management"    
     bmp_table_name_pasture_grazing_management = "pasture_grazing_management"
+    bmp_table_name_pasture_grazing_parameter = "pasture_grazing_parametert"
     bmp_table_name_dugout = "dugout"
     bmp_table_name_offsite_watering = "offsite_watering"
     bmp_table_name_managed_access_including_fencing = "access_management"
@@ -408,7 +409,8 @@ class Names:
         #areal non-structure bmp
         "manure_feedlot_boundary_shapefile": feedlotShpName,
         "manure_feedlot_outlet_shapefile": feedlotOutletShpName,
-        "manure_storage_boundary_shapefile": manureStorageShpName
+        "manure_storage_boundary_shapefile": manureStorageShpName,
+        "offsite_watering_shapefile": offsiteWinteringShpName
     }
 
     def get_standard_file_name(item_name:str)->str:

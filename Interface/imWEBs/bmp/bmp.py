@@ -34,7 +34,7 @@ class BMP:
     def subbasins(self)->dict:
         """Get id and subbasin dictionary"""
         if self.__subbasins is None:
-            self.__subbasins = RasterExtension.get_zonal_statistics(self.subbasin_raster, self.bmp_raster,"max","subbasin")["subbain"].to_dict()
+            self.__subbasins = RasterExtension.get_zonal_statistics(self.subbasin_raster, self.bmp_raster,"max","subbasin")["subbasin"].to_dict()
 
         return self.__subbasins
     

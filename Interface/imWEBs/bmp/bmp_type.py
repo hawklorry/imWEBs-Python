@@ -95,8 +95,8 @@ BMPDistributions = {
 }
 
 BMPParameters = {
-    BMPType.BMP_TYPE_POINTSOURCE: Names.bmp_talbe_name_point_source,
-    BMPType.BMP_TYPE_FLOWDIVERSION_STREAM: Names.bmp_talbe_name_flow_diversion,
+    BMPType.BMP_TYPE_POINTSOURCE: Names.bmp_table_name_point_source,
+    BMPType.BMP_TYPE_FLOWDIVERSION_STREAM: Names.bmp_table_name_flow_diversion,
     BMPType.BMP_TYPE_RESERVOIR: Names.bmp_table_name_reservoir,
     BMPType.BMP_TYPE_WETLAND:Names.bmp_table_name_wetland,
     BMPType.BMP_TYPE_MANURE_CATCHBASIN:Names.bmp_table_name_manure_catch_basin,

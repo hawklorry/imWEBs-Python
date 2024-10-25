@@ -1,17 +1,18 @@
 
-from sqlalchemy import Column, Integer, TEXT, REAL
+from .bmp_management_base import BMPManagementBaseWithYear
+from sqlalchemy import Column, Integer, REAL, TEXT
 from .bmp_table import BMPTable
 from ...names import Names
 
-class TillageManagement(BMPTable):
+class TillageManagement(BMPManagementBaseWithYear):
     """Distribution Table for BMP: Tillage management (14)"""
-    __tablename__ = Names.bmp_table_name_tillage_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    Year = Column(Integer)
-    TillMon = Column(Integer)
-    TillDay = Column(Integer)
-    TillCode = Column(Integer)
+
+    def __init__(self, TillMon:int,TillDay:int,TillCode:int):
+        super().__init__()
+        self.TillMon = TillMon
+        self.TillDay = TillDay
+        self.TillCode = TillCode  
+
 
     @staticmethod
     def default_tillage_management():

@@ -1,34 +1,19 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
+from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
-class CropManagement(BMPTable):    
+class CropManagement(BMPManagementBaseWithYear):    
     """Distribution Table for BMP: Crop management (12)"""
-    __tablename__ = Names.bmp_table_name_crop_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    ID = Column(Integer)
-    Year = Column(Integer)
-    ActualYear = Column(Integer)
-    CropCode = Column(Integer)
-    PlantingMon = Column(Integer)
-    PlantingDay = Column(Integer)
-    HarvestMon = Column(Integer)
-    HarvestDay = Column(Integer)
-    HarvestType = Column(Integer)
-    HarvestEfficiency = Column(REAL)
-    HarvestIndexOverride = Column(REAL)
-    StoverFraction = Column(REAL)
-    CNOP = Column(REAL)
-    IsGrain = Column(Integer)
-    PRCOP = Column(REAL)
         
-    def __init__(self):
-        """
-        some default values
-        """
-        self.Year = 1
+    def __init__(self, CropCode:int, PlantingMon:int,PlantingDay:int,HarvestMon:int, HarvestDay:int):
+        super().__init__()
+        self.CropCode = CropCode
+        self.PlantingMon = PlantingMon
+        self.PlantingDay = PlantingDay
+        self.HarvestMon = HarvestMon
+        self.HarvestDay = HarvestDay
         self.HarvestType = 2
         self.HarvestEfficiency = 1
         self.HarvestIndexOverride = 0

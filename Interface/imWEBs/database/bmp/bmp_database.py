@@ -20,6 +20,7 @@ from ...bmp.bmp_reach import ReachBMP
 from ...bmp.bmp import BMP
 from ...bmp.bmp_structure_dugout import StructureBMPDugout
 from ...bmp.bmp_structure_wascob import StructureBMPWascob
+from ...bmp.bmp_offsite_wintering import BMPOffsiteWintering
 
 from .bmp_01_point_source import PointSource
 from .bmp_02_flow_diversion import FlowDiversion
@@ -51,7 +52,7 @@ from .bmp_29_manure_feedlot import ManureFeedlot
 # from .bmp_36_pasture_tillage_management import Pasture_tillage_management
 # from .bmp_37_pasture_grazing_management import PastureGrazingManagement, PastureGrazingParameter
 # from .bmp_38_dugout import DugoutParameter
-# from .bmp_39_offsite_watering import OffsiteWateringParameter
+from .bmp_39_offsite_watering import OffsiteWateringParameter
 from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFencingParameter
 from .bmp_41_wascob import Wascob
 #from .bmp_42_water_use import 
@@ -148,6 +149,7 @@ class BMPDatabase(DatabaseBase):
         self.__create_bmp_manure_storage(outputs)   
         reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = self.__create_bmp_manure_catchbasin(outputs) 
         self.__create_bmp_riparian_buffer(outputs)
+        self.__create_bmp_offsite_wintering(outputs)
 
 
         #create reach_bmp table
@@ -195,7 +197,7 @@ class BMPDatabase(DatabaseBase):
         merged_df[f"To{name2}"] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name2}Area"]
 
         merged_df = merged_df[["ID", name1, name2, BMPDatabase.COL_NAME_AREA_HA, f"To{name1}", f"To{name2}"]]     
-        self.save_table(merged_df, table_name)   
+        self.save_table(table_name, merged_df)   
     
     def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str)->pd.DataFrame:
         #find max id from raster1     
@@ -337,15 +339,15 @@ class BMPDatabase(DatabaseBase):
     def __create_bmp_riparian_buffer(self, outputs:Outputs):
         df = outputs.riparian_buffer_parameter_df
         if df is not None:
-            self.save_table(df, Names.bmp_table_name_riparian_buffer)
+            self.save_table(Names.bmp_table_name_riparian_buffer, df)
 
     def __create_bmp_dugout(self, outputs:Outputs, dugout_structure:Structure):
         dugout = StructureBMPDugout(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, dugout_structure)
-        self.save_table(dugout.dugout_df, Names.bmp_table_name_dugout)
+        self.save_table(Names.bmp_table_name_dugout, dugout.dugout_df)
 
     def __create_bmp_wascob(self, outputs:Outputs, wascob_structure:Structure):
         wascob = StructureBMPWascob(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, wascob_structure)
-        self.save_table(wascob.wascob_df, Names.bmp_table_name_dugout)
+        self.save_table(Names.bmp_table_name_dugout, wascob.wascob_df)
 
     def __create_bmp_manure_storage(self,outputs:Outputs):
         """populate default manure storage tables"""
@@ -393,12 +395,24 @@ class BMPDatabase(DatabaseBase):
 
         return catchbasin.subbasins
     
+    def __create_bmp_offsite_wintering(self, outputs:Outputs):
+        if outputs.inputs.offsite_watering_vector is None:
+            return
+        
+        logger.info("Creating offsite wintering parameter table ... ")
+        bmp = BMPOffsiteWintering(outputs.inputs.offsite_watering_vector, outputs.subbasin_raster)
+
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(bmp.offsite_wintering_parameters)
+            session.commit()        
+    
     def __create_bmp_reach_bmp(self, subbasin_ids:list, reach_bmps:dict):
         """create reach_bmp table"""
 
         logger.info("Creating reach_bmp table ... ")
         df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
-        self.save_table(df, Names.bmp_table_name_reach_bmp)
+        self.save_table(Names.bmp_table_name_reach_bmp, df)
 
     def __create_bmp_scenarios(self, outputs:Outputs):
         """create bmp scenarios table"""
@@ -406,6 +420,6 @@ class BMPDatabase(DatabaseBase):
         logger.info("Creating bmp_secenarios table ... ")
 
         df = BMP.generate_bmp_scenarios_df(outputs.inputs.bmp_types)
-        self.save_table(df, Names.bmp_table_name_scenarios)
+        self.save_table(Names.bmp_table_name_scenarios, df)
 
 #endregion

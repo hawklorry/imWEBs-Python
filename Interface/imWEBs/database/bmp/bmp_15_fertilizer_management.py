@@ -1,22 +1,18 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
-class FertlizerManagement(BMPTable):
+class FertlizerManagement(BMPManagementBaseWithYear):
     """Distribution Table for BMP: Fertilizer management (15)"""
-    __tablename__ = Names.bmp_table_name_fertilizer_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    Year = Column(Integer)
-    FerMon = Column(Integer)
-    FerDay = Column(Integer)
-    FerType = Column(Integer)
-    FerRate = Column(REAL)
-    FerSurface = Column(REAL)
 
-    def __init__(self):
-        self.Year = 1
+    def __init__(self,FerMon:int,FerDay:int,FerType:int,FerRate:int):
+        super().__init__()
+        self.FerMon = FerMon
+        self.FerDay = FerDay
+        self.FerType = FerType
+        self.FerRate = FerRate
         self.FerSurface = 0.2
 
     @staticmethod

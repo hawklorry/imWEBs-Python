@@ -86,7 +86,10 @@ class VectorExtension:
         
         ids = []
         for i in range(vector.num_records):
-            id = int(vector.get_attribute_value(i, field_name).get_value_as_f64())
+            field_data = vector.get_attribute_value(i, field_name)
+            if field_data.is_null():
+                raise ValueError(f"The id in {vector.file_name} can't be null.")
+            id = int(field_data.get_value_as_f64())
             if id in ids:
                 return False, "", []
             ids.append(id)
@@ -119,7 +122,7 @@ class VectorExtension:
 
             if not VectorExtension.compare_vector_projection(standard_vector, value):
                 is_same = False
-                raise ValueError(f"The extend of {value.file_name} doesn't match {standard_vector.file_name}")
+                raise ValueError(f"The projection of {value.file_name} doesn't match {standard_vector.file_name}. Please check shapefile projection.")
 
         return is_same
     

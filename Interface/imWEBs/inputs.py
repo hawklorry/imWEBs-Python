@@ -172,6 +172,10 @@ class Inputs(FolderBase):
     @property
     def manure_storage_boundary_vector(self)->Vector:
         return self.get_vector(Names.manureStorageShpName)
+    
+    @property
+    def offsite_watering_vector(self)->Vector:
+        return self.get_vector(Names.offsiteWinteringShpName)
 
 #endregion
 
@@ -274,8 +278,8 @@ class Inputs(FolderBase):
         if self.feedlot_outlet_vector is not None:
             feedlot_outlet_ids = VectorExtension.get_unique_ids(self.feedlot_outlet_vector)
 
-            if not np.array_equal(feedlot_ids, feedlot_outlet_ids):
-                raise ValueError("The ids in feedlot and catch basin doesn't match. Please check. ")
+            if not np.array_equal(feedlot_ids.sort(), feedlot_outlet_ids.sort()):
+                raise ValueError("The ids in feedlot and catch basin doesn't match. Each feedlot should have only one feedlot outlet. Please check. ")
             
         #check catch basin column in feedlot
         if self.catchbasin_vector is not None:

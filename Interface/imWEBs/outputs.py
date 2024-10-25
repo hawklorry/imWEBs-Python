@@ -1123,7 +1123,7 @@ class Outputs(FolderBase):
 
         logger.info("Creating riparian buffer distribution and parameters ... ")
 
-        rows = self.flow_direction_raster.configs.rows,
+        rows = self.flow_direction_raster.configs.rows
         cols = self.flow_direction_raster.configs.columns
         riparian_buffer_nodata = self.riparian_buffer_raster.configs.nodata
         subbasin_nodata = self.subbasin_raster.configs.nodata
@@ -1134,6 +1134,10 @@ class Outputs(FolderBase):
         #flag if the cells has been traced
         flag2D = np.zeros((rows, cols), dtype=bool)
 
+
+        dX = [1, 1, 1, 0, -1, -1, -1, 0]
+        dY = [-1, 0, 1, 1, 1, 0, -1, -1]
+        LnOf2 = 0.693147180559945
         path = []
         pathInside = []
         vfsOrRbsDrain = {}
@@ -1158,7 +1162,7 @@ class Outputs(FolderBase):
                     while flag:
                         flowDir = self.flow_direction_raster[y, x]
                         if flowDir > 0:
-                            dx, dy = RasterExtension.flow_dir_xy_delta_dic(flowDir)
+                            c = int(math.log(flowDir) / LnOf2)
 
                             lastVFSorRBSID = self.riparian_buffer_raster[y, x]
                             isVisited = flag2D[y, x]
@@ -1168,15 +1172,15 @@ class Outputs(FolderBase):
                                 length += celldist * (1.41421356 if c in [1, 4, 16, 64] else 1)
 
                             #get x,y for downstream cell
-                            x += dx
-                            y += dy
+                            x += dX[c]
+                            y += dY[c]
 
                             #check to see if the next cell is edge, different riparian buffer. If yes, add it to the list
                             if (self.riparian_buffer_raster[y, x] == riparian_buffer_nodata 
                                 or self.riparian_buffer_raster[y, x] != lastVFSorRBSID 
                                 or self.flow_direction_raster[y, x] == 0) and lastVFSorRBSID != riparian_buffer_nodata:
                                 #recalculate the current position
-                                loc = (y - dy, x - dx)
+                                loc = (y - dY[c], x - dX[c])
 
                                 if loc in vfsOrRbsDrain:
                                     vfsOrRbsDrain[loc].extend(path)
@@ -1204,7 +1208,7 @@ class Outputs(FolderBase):
                         flag2D[loc[0], loc[1]] = True
 
         #create the resulting parameter dictionary
-        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID','RIBUF','Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
+        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID','RIBUF_ID','Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
         riparain_buffer_parameter_df.set_index('ID', inplace=True)        
 
         cellArea = self.riparian_buffer_raster.configs.resolution_x * self.riparian_buffer_raster.configs.resolution_y
@@ -1217,7 +1221,7 @@ class Outputs(FolderBase):
             drainageArea = len(vfsOrRbsDrain[outLoc]) * cellArea / 10000
             length = vfsOrRbsLength[outLoc]
 
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'RIBUF'] = vfsOrRbsID
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'RIBUF_ID'] = vfsOrRbsID
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Subbasin'] = subID
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Drainage_Area'] = drainageArea
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Length'] = length
@@ -1250,7 +1254,7 @@ class Outputs(FolderBase):
 
         #adjust the sequence of the columns
         riparain_buffer_parameter_df.reset_index(inplace=True)
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_k','Sol_porosity','Root_Depth']]
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_K','Sol_porosity','Root_Depth']]
 
         #save to bmp database
         self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferStripDrainageRasterName)

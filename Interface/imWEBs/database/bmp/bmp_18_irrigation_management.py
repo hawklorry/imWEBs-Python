@@ -2,25 +2,27 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
-class irrigation_management(BMPTable):
+class irrigation_management(BMPManagementBaseWithYear):
     """Distribution Table for BMP: Irrigation management (18)"""
-    __tablename__ = Names.bmp_table_name_irrigation_management
-    Scenario = Column(Integer)
-    Location = Column(Integer)
-    Year = Column(Integer)
-    IrrMon = Column(Integer)
-    IrrDay = Column(Integer)
-    Days = Column(Integer)
-    IrrType = Column(Integer)
-    IrrSource = Column(REAL)
-    IrrSourceID = Column(Integer)
-    IrrRate = Column(REAL)
-    IrrMax = Column(REAL)
-    IrrEffi = Column(REAL)
-    ReturnFlowCo = Column(REAL)
-    WstrMax = Column(REAL)
+
+    def __init__(self):
+        super().__init__()
+
+        self.IrrMon = 1
+        self.IrrDay = 1
+        self.Days = 2
+        self.IrrType = 0
+        self.IrrSource = 0
+        self.IrrSourceID = 0
+        self.IrrRate = 0
+        self.IrrMax = 0
+        self.IrrEffi = 0
+        self.ReturnFlowCo = 0
+        self.WstrMax = 0
+
 
 class irrigation_parameter(BMPTable):
     """Parameter Table for BMP: Irrigation management (18)"""

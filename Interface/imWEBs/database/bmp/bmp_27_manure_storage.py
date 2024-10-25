@@ -2,6 +2,7 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
+from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
 class ManureStorageParameter(BMPTable):
@@ -76,28 +77,14 @@ class ManureStorageParameter(BMPTable):
         self.PRC_change = 0.3
         self.Manure_EMC = 10000
 
-
-class ManureStorageManagement(BMPTable):
-    """Distribution Table for BMP: Manure storage capacity and design (27)"""
-    __tablename__ = Names.bmp_table_name_manure_storage_management
-
-    """Scenario ID"""
-    Scenario = Column(Integer)
-    """Manure Storage ID"""
-    Location = Column(Integer)
-    """nan"""
-    Year = Column(Integer)
-    """Month of manure application"""
-    ManAppMon = Column(Integer)
-    """Day of manure application"""
-    ManAppDay = Column(Integer)
-    """Fraction of manure amount applied to the field"""
-    ManAppFra = Column(Integer)
-
+class ManureStorageManagement(BMPManagementBaseWithYear):
     def __init__(self):
-        self.Year = 0
+        super().__init__()
+        """Month of manure application"""
         self.ManAppMon = 11
+        """Day of manure application"""
         self.ManAppDay = 15
+        """Fraction of manure amount applied to the field"""
         self.ManAppFra = 1
 
 

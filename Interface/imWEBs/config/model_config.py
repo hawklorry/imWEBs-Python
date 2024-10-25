@@ -133,11 +133,12 @@ class ModelConfig(Config):
                          "boundary_shapefile",
                          "farm_shapefile",
                          "field_shapefile",
-                         "outlet_shapefile"
+                         "outlet_shapefile" #not used right now
                         ],
 
             #lookup tables            
-            "lookup":["soil_lookup","landuse_lookup"],
+            "lookup":["soil_lookup",
+                      "landuse_lookup"],
 
             #db3 databases
             "database":["hydroclimate"],
@@ -149,7 +150,8 @@ class ModelConfig(Config):
             "reach_bmp":[ "point_source_shapefile",
                           "flow_diversion_shapefile",
                           "reservoir_shapefile",
-                          "wetland_boundary_shapefile","wetland_outlet_shapefile",
+                          "wetland_boundary_shapefile",
+                          "wetland_outlet_shapefile",
                           "manure_catch_basin_shapefile",
                           "grass_waterway_shapefile",
                           "access_management_shapefile",
@@ -163,8 +165,10 @@ class ModelConfig(Config):
                              "tile_drain_shapefile"],
 
             #feedlot will be delineated in a single subbasin, the catch basin will function as the outlet.
-            "non_structure_bmp":["manure_feedlot_boundary_shapefile","manure_feedlot_outlet_shapefile",
-                                 "manure_storage_boundary_shapefile","manure_storage_outlet_shapefile"],
+            "non_structure_bmp":["manure_feedlot_boundary_shapefile",
+                                 "manure_feedlot_outlet_shapefile",
+                                 "manure_storage_boundary_shapefile",
+                                 "offsite_watering_shapefile"],
 
             #delineation parameters
             "delineation":["stream_threshold_area_ha",

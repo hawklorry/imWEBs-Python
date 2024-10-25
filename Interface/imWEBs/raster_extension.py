@@ -73,7 +73,7 @@ class RasterExtension:
         no_data = raster.configs.nodata
 
         dict = lookup_dict
-        if lookup_dict is list:
+        if type(lookup_dict) is list:
             dict = {}
             for item in lookup_dict:
                 dict[item[0]] = item[1]
@@ -81,7 +81,7 @@ class RasterExtension:
         for row in range(raster.configs.rows):
             for col in range(raster.configs.columns):
                 if mask_raster is None or mask_raster[row, col] > 0:
-                    old_id = raster[row, col]
+                    old_id = int(raster[row, col])
                     if old_id != no_data:
                         mapped_raster[row,col] = dict[old_id]
 

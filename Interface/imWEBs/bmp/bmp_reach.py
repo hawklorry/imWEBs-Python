@@ -6,7 +6,7 @@ import pandas as pd
 
 class ReachBMP(BMP):
     def __init__(self, bmp_vector:Vector, subbasin_raster:Raster):
-        super.__init__(bmp_vector, subbasin_raster)
+        super().__init__(bmp_vector, subbasin_raster)
 
     @staticmethod
     def bmp_type_to_name(bmp_type:BMPType)->str:
@@ -16,22 +16,19 @@ class ReachBMP(BMP):
         return ReachBMPColumnNames[bmp_type]
     
     @staticmethod
-    def create_reach_bmp_df(self, subbasin_ids:list, reach_bmps:dict)->pd.DataFrame:
+    def create_reach_bmp_df(subbasin_ids:list, reach_bmp_type_id_subbasin_dict:dict)->pd.DataFrame:
         """create reach_bmp table"""
 
         #create empty object
         reach_bmps = {sub: ReachBMPDistribution(sub) for sub in subbasin_ids}
         
         #assign the id assuming the type is same as the column name
-        for type, id_subbasins in reach_bmps:
-            if len(id_subbasins) <= 0:
+        for type, bmp_id_subbasins in reach_bmp_type_id_subbasin_dict.items():
+            if len(bmp_id_subbasins) <= 0:
                 continue
 
-            #flip id and subbasin to subbasin and id
-            subbasin_ids = {value: key for key, value in id_subbasins.items()}
-
             #assign the id     
-            for sub, id in subbasin_ids:
+            for id, sub in bmp_id_subbasins.items():
                 setattr(reach_bmps[sub], ReachBMP.bmp_type_to_name(type), id)
             
-        return pd.DataFrame([vars(rb) for rb in reach_bmps])
+        return pd.DataFrame([vars(rb) for rb in reach_bmps.values()])
