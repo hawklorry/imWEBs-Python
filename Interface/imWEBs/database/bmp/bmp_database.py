@@ -85,16 +85,10 @@ class BMPDatabase(DatabaseBase):
         super().__init__(database_file)
         self.wbe = WbEnvironment()             
 
-    # def get_reach_parameter(self, reach_id, parameter_name):
-    #     return getattr(self.reach_parameter[reach_id], parameter_name)   
-
     def populate_database(self, outputs:Outputs):
         """
         create all the parameter tables in bmp database
         """        
-        logger.info("*"*25)
-        logger.info("BMP Database")
-        logger.info("*"*25)
 
         #remove the tables we want to update and then create them again
         logger.info("Creating table structure in bmp database ...")
@@ -170,7 +164,6 @@ class BMPDatabase(DatabaseBase):
 
         #just force to generate the reach vector, change it later
         reach = outputs.reach_vector
-
 
     def __create_subbasin_info(self, 
                                 subbasin_raster:Raster,
@@ -394,7 +387,8 @@ class BMPDatabase(DatabaseBase):
         
         logger.info("Creating manure catch basin parameter table ... ")
         catchbasin = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
-                                outputs.subbasin_raster)
+                                outputs.subbasin_raster,
+                                outputs.reach_parameter_df)
         
         Session = sessionmaker(bind=self.engine)
         with Session() as session:
