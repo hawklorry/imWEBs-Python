@@ -1,9 +1,9 @@
 
 import numpy as np
 import pandas as pd
-from ...outputs import Outputs
 from .reach_parameter import ReachParameter
 from ...raster_extension import RasterExtension
+from whitebox_workflows import Raster
 
 class Reach:
     """
@@ -14,28 +14,38 @@ class Reach:
 
     Replace buildReachParTable
     """
-    def __init__(self, outputs:Outputs):
+    def __init__(self, 
+                 dem_raster:Raster, 
+                 subbasin_raster:Raster, 
+                 stream_network_raster:Raster, 
+                 stream_order_raster:Raster, 
+                 flow_length_raster:Raster, 
+                 flow_direction_raster:Raster,
+                 flow_accumulation_raster:Raster,
+                 reach_width_raster:Raster, 
+                 reach_depth_raster:Raster,                 
+                 velocity_raster:Raster):
         self.LnOf2 = 0.693147180559945
         self.minimumSlope = 0.01
 
-        self.subbasin_raster = outputs.subbasin_raster  
-        self.stream_network_raster = outputs.stream_network_raster
-        self.reach_length_raster = outputs.flow_length_raster
-        self.flow_dir_raster = outputs.flow_direction_raster
-        self.stream_order_raster = outputs.stream_order_raster
-        self.reach_width_raster = outputs.reach_width_raster
-        self.reach_depth_raster = outputs.reach_depth_raster
-        self.dem_raster = outputs.dem_clipped_burned_filled_raster
-        self.velocity_raster = outputs.velocity_raster
-        self.flow_acc_raster = outputs.flow_acc_raster
-
-        self.subMax = int(self.subbasin_raster.configs.maximum)
+        self.subbasin_raster = subbasin_raster  
+        self.stream_network_raster = stream_network_raster
+        self.reach_length_raster = flow_length_raster
+        self.flow_dir_raster = flow_direction_raster
+        self.stream_order_raster = stream_order_raster
+        self.reach_width_raster = reach_width_raster
+        self.reach_depth_raster = reach_depth_raster
+        self.dem_raster = dem_raster
+        self.velocity_raster = velocity_raster
+        self.flow_acc_raster = flow_accumulation_raster
+        
+        self.subMax = int(RasterExtension.get_max_value(self.subbasin_raster))
         self.rowNum = int(self.stream_network_raster.configs.rows)
         self.colNum = int(self.stream_network_raster.configs.columns)
 
-        self.cellsize = outputs.inputs.cell_size
-        self.cellsize_ha = outputs.inputs.cellsize_m2 / 10000        
-        self.nodata = outputs.inputs.nodata
+        self.cellsize = dem_raster.configs.resolution_x
+        self.cellsize_ha = dem_raster.configs.resolution_x * dem_raster.configs.resolution_y / 10000        
+        self.nodata = dem_raster.configs.nodata
 
         self.dX = [1, 1, 1, 0, -1, -1, -1, 0]
         self.dY = [-1, 0, 1, 1, 1, 0, -1, -1]
@@ -121,7 +131,7 @@ class Reach:
 
     def __calculate_reach_mean(self, value_raster, name:str, min_value = None):
         #filter out the raster that are not on a stream       
-        raster = self.stream_network_raster.con("value > 0", value_raster, self.nodata)
+        raster = self.stream_network_raster.con(f"value == {self.stream_network_raster.configs.nodata}", self.nodata, value_raster)
 
         #get the mean width in each subbasin
         reach_width_df = RasterExtension.get_zonal_statistics(raster, self.subbasin_raster, "mean", name)
@@ -202,29 +212,17 @@ class Reach:
     
     def __calculate_reach_order(self):
         """
-        Just read from stream_order_raster
+        Just get max order for each subbasin
         """
-        
-        rchsum = np.zeros(self.subMax)
-        rchcount = np.zeros(self.subMax)
 
-        for row in range(self.rowNum):
-            for col in range(self.colNum):
-                currentValue = self.stream_order_raster[row, col]
-                currentSub = int(self.subbasin_raster[row, col])
-                if currentValue > 0 and currentSub > 0 and self.stream_network_raster[row, col] > 0:
-                    rchsum[currentSub - 1] = currentValue
+        reach_order_df = RasterExtension.get_zonal_statistics(self.stream_order_raster, self.subbasin_raster, ["max"], "order")
+        default_reach_order_df = pd.DataFrame(index=range(1, self.subMax + 1))
+        default_reach_order_df["order"] = 1
 
-        maxOrder = int(self.stream_order_raster.configs.maximum)
-        k = 1
+        reach_order_df = reach_order_df.combine_first(default_reach_order_df)
 
-        for i in range(1, maxOrder + 1):
-            for j in range(self.subMax):
-                if rchsum[j] == i:
-                    rchcount[j] = k
-                    k += 1
-
-        return rchcount
+        #return the np array
+        return reach_order_df["order"].to_numpy()
 
     def __calculate_reach_manning(self,rch_in_row, rch_in_col):
         """
@@ -349,10 +347,8 @@ class Reach:
         """
         Basically get the max flow_acc in each subbasin and multipy the cell area
         """
-        raster = self.flow_acc_raster.con("value > 0", self.flow_acc_raster, self.nodata)
-
         #get the mean depth in each subbasin
-        reach_contribution_area_df = RasterExtension.get_zonal_statistics(raster, self.subbasin_raster, "max", "contri")
+        reach_contribution_area_df = RasterExtension.get_zonal_statistics(self.flow_acc_raster, self.subbasin_raster, "max", "contri")
 
         #get the area
         reach_contribution_area_df = reach_contribution_area_df * self.cellsize_ha
@@ -362,7 +358,7 @@ class Reach:
 
     def __calculate_reach_elevation(self):
         #filter out the raster that are not on a stream       
-        raster = self.stream_network_raster.con("value > 0", self.dem_raster, self.nodata)
+        raster = self.stream_network_raster.con(f"value == {self.stream_network_raster.configs.nodata}", self.nodata, self.dem_raster)
 
         #get the mean width in each subbasin
         reach_elevation_df = RasterExtension.get_zonal_statistics(raster, self.subbasin_raster, ["max","min","mean"])
@@ -370,7 +366,8 @@ class Reach:
         #return the np array
         return reach_elevation_df["max"].to_numpy(), reach_elevation_df["min"].to_numpy(),reach_elevation_df["mean"].to_numpy()
 
-    def build_reach_parameters(self):
+    @property
+    def reach_parameter_df(self)->pd.DataFrame:
         reach_parameters = []
         for row in range(self.subMax):
             reach_parameters.append(ReachParameter())

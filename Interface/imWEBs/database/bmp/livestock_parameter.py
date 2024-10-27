@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, Float, String, Double
 from .bmp_table import BMPTable
+from ...names import Names
 
 class Livestock_Parameter(BMPTable):
-    __tablename__ = 'Livestock_Parameter'
+    __tablename__ = Names.bmp_table_name_livestock_parameter
     """Animal ID"""
-    ID = Column(Integer)
+    ID = Column(Integer, primary_key=True)
     """Animal name"""
     Name = Column(String)
     """Description"""

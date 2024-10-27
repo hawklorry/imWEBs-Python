@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, Float
 from sqlalchemy import create_engine, select
 from .bmp_table import BMPTable
+from ...names import Names
 
 class ReachParameter(BMPTable):
     """Reach parameter in BMP database"""
-    __tablename__ = 'Reach_Parameter'
+    __tablename__ = Names.bmp_table_name_reach_parameter
 
     # Define columns
     reach_id = Column(Integer, primary_key=True)
@@ -62,7 +63,7 @@ class ReachParameter(BMPTable):
         self.cover_factor = 0.2
         self.bc1 = 0.55
         self.bc2 = 1.1
-        self.bc3 = 0.31
+        self.bc3 = 0.21
         self.bc4 = 0.35
         self.rk1 = 1.71
         self.rk2 = 50

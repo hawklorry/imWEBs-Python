@@ -1,6 +1,7 @@
 import os
 from whitebox_workflows import Raster, Vector
 from .parameters import Parameters
+from .database.bmp.reach import Reach
 import numpy as np
 import math
 from .folder_base import FolderBase
@@ -71,7 +72,7 @@ class Outputs(FolderBase):
         return self.__structures
     
     @property
-    def structure_combined_boundary_vector(self):
+    def structure_combined_boundary_vector(self)->Vector:
         vector = self.get_vector(Names.structureCombinedBoundaryShpName)
 
         if vector is None and len(self.structures) > 0:
@@ -81,7 +82,7 @@ class Outputs(FolderBase):
         return vector
     
     @property
-    def structure_combined_outlet_vector(self):
+    def structure_combined_outlet_vector(self)->Vector:
         vector = self.get_vector(Names.structureCombinedOutputShpName)
 
         if vector is None and len(self.structures) > 0:
@@ -89,6 +90,18 @@ class Outputs(FolderBase):
             self.save_vector(vector, Names.structureCombinedOutputShpName)
 
         return vector
+    
+    @property
+    def structure_combined_outlet_raster(self):
+        raster = self.get_raster(Names.structureCombinedOutputRasName)
+
+        if raster is None and len(self.structures) > 0:
+            raster = self.wbe.vector_points_to_raster(input = self.structure_combined_outlet_vector, 
+                                                            field_name = Names.field_name_id,
+                                                            base_raster = self.inputs.dem_raster)
+            self.save_raster(raster, Names.structureCombinedOutputRasName)
+
+        return raster
 
     @property
     def structure_combined(self)->Structure:
@@ -716,6 +729,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.flowLengthName)
 
         if raster is None:
+            logger.info("Creating flow length raster ...")
             raster = Delineation.get_flow_path_length(flow_dir_raster=self.flow_direction_raster)
             self.save_raster(raster, Names.flowLengthName)
 
@@ -765,8 +779,8 @@ class Outputs(FolderBase):
                 threshold = self.stream_threshold_area_ha / self.inputs.cellsize_ha)
             
             #fix it as some of the structure streams may be below the threshold 
-            #logger.info("Fixing stream network so the structure stream segment that is below threashold will be added back ...")           
-            #raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.stream_outlets_original_raster)
+            logger.info("Fixing stream network so the structure stream segment that is below threashold will be added back ...")
+            raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.structure_combined_outlet_raster)
 
             #save it
             self.save_raster(raster, Names.streamNetworkRasName)
@@ -782,49 +796,6 @@ class Outputs(FolderBase):
             self.save_vector(vector, Names.streamNetworkRasName)
 
         return vector    
-    
-    @property
-    def stream_outlets_original_raster(self)->Raster:
-        """Single raster of all possible stream outlets"""
-        raster = self.get_raster(Names.streamOutletsOriginalRasName)
-
-        if raster is None:
-            logger.info("Converting stream outlets orginal vector to raster ...")
-            raster = self.wbe.vector_points_to_raster(
-                input = self.stream_outlets_original_vector,
-                base_raster = self.inputs.dem_raster)
-            self.save_raster(raster, Names.streamOutletsOriginalRasName)
-
-        return raster
-
-    @property
-    def stream_outlets_original_vector(self)->Vector:
-        """Single vector of all possible stream outlets"""
-        vector = self.get_vector(Names.streamOutletsOriginalShpName)
-
-        if vector is None:
-            logger.info("Merging all possible stream outlets to a single vector ...")
-
-            #merge the pour points and user-provided reservoir and outlets
-            outlet_vectors = []
-          
-            #add user-defined outlets
-            if self.inputs.outlet_vector is not None:
-                outlet_vectors.append(self.inputs.outlet_vector)
-
-            #add reach bmp points but exclude wetland
-            for reach_bmp in self.inputs.reach_bmp_vectors:
-                if reach_bmp is not None:
-                    outlet_vectors.append(reach_bmp)
-
-            #add structure outlets
-            if len(self.structures) > 0:
-                outlet_vectors.extend([structure.outlet_vector for structure in self.structures.values()])
-
-            vector = VectorExtension.merge_vectors(outlet_vectors)
-            self.save_vector(vector, Names.streamOutletsOriginalShpName)
-
-        return vector
     
     @property
     def stream_pour_point_raster(self)->Raster:
@@ -931,6 +902,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.slopeRadiusName)
 
         if raster is None:
+            logger.info("creating slope (radius) raster ...")
             raster = (self.slope_degree_raster * math.pi / 180).tan()
             self.save_raster(raster, Names.slopeRadiusName)
 
@@ -941,6 +913,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.slopeDegName)
 
         if raster is None:
+            logger.info("creating slope (degree) raster ...")
             raster = self.wbe.slope(dem = self.dem_clipped_burned_filled_raster)
             self.save_raster(raster, Names.slopeDegName)
 
@@ -951,7 +924,8 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.streamOrderRasName)  
 
         if raster is None:
-            rater = self.wbe.strahler_stream_order(d8_pntr = self.flow_direction_raster, streams_raster = self.stream_network_raster)
+            logger.info("creating stream order raster ...")
+            raster = self.wbe.strahler_stream_order(d8_pntr = self.flow_direction_raster, streams_raster = self.stream_network_raster)
             self.save_raster(raster, Names.streamOrderRasName)
 
         return raster
@@ -962,10 +936,22 @@ class Outputs(FolderBase):
 #region reach
 
     @property
+    def reach_vector(self)->Vector:
+        vector = self.get_vector(Names.reachShpName) 
+
+        if vector is None:
+            logger.info("creating reach vector ...")
+            vector = self.wbe.raster_streams_to_vector(streams = self.reach_raster, d8_pointer = self.flow_direction_raster)
+            self.save_vector(vector, Names.reachShpName)
+
+        return vector
+
+    @property
     def reach_raster(self)->Raster:
         raster = self.get_raster(Names.reachRasName) 
 
         if raster is None:
+            logger.info("creating reach raster ...")
             raster = self.stream_network_raster.con("value >= 0", self.subbasin_raster, self.subbasin_raster.configs.nodata)
             self.save_raster(raster, Names.reachRasName)
 
@@ -997,14 +983,36 @@ class Outputs(FolderBase):
 
         raster = self.get_raster(file_name)
         if raster is None:
+            
+            logger.info(f"creating reach {"depth" if isdepth else "width"} raster ...")
             parameter = self.parameter.get_reach_width_parameter(self.design_storm_return_period)          
             if isdepth:
                 parameter = self.parameter.get_reach_depth_parameter(self.design_storm_return_period) 
-            raster = (self.flow_acc_raster * self.inputs.cellsize_m2 * parameter.A) ** parameter.B
+            raster = (self.flow_acc_raster * self.inputs.cellsize_km2 * parameter.A) ** parameter.B
             raster = self.stream_network_raster.con("value > 0", raster, raster.configs.nodata)
             self.save_raster(raster, file_name)
 
         return raster
+    
+    @property
+    def reach_parameter_df(self)->pd.DataFrame:
+        df = self.get_df(Names.reachParameterCsvName)
+
+        if df is None:            
+            df = Reach(self.dem_clipped_raster, 
+                       self.subbasin_raster,
+                       self.stream_network_raster,
+                       self.stream_order_raster,
+                       self.flow_length_raster,
+                       self.flow_direction_raster,
+                       self.flow_acc_raster,
+                       self.reach_width_raster,
+                       self.reach_depth_raster,
+                       self.velocity_raster
+                       ).reach_parameter_df 
+            self.save_df(df, Names.reachParameterCsvName)
+
+        return df  
 
 #endregion
 

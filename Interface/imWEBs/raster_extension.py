@@ -33,8 +33,10 @@ class RasterExtension:
         vector = None
         if vector_type == "point":
             vector = wbe.raster_to_vector_points(raster)
-        else:
+        elif vector_type == "polygon":
             vector = wbe.raster_to_vector_polygons(raster)
+        else:
+            vector = wbe.raster_to_vector_lines(raster)
 
         return VectorExtension.add_id_for_raster_value(vector)
 

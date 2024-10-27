@@ -101,7 +101,8 @@ class Structure(FolderBase):
             vector = self.wbe.filter_vector_features_by_area(
                     self.__structure_polygon_vector, self.__structure_area_threshold_ha * 10000)
             
-            self.save_vector(vector, self.__structure_boundary_original_vector_name)
+            self.save_vector(vector, self.__structure_boundary_original_vector_name, True, True)
+            self.get_vector(self.__structure_boundary_original_vector_name)
         return vector
 
 

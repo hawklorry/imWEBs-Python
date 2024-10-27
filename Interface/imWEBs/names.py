@@ -2,49 +2,76 @@ class Names:
     """
     Default name for input, temp, and output files
     """
+    
+    bmp_table_name_bmp_index = "bmp_index"
+    bmp_table_name_scenarios = "bmp_scenarios"
 
-    bmp_table_name_reach_bmp = "Reach_BMP"
-    bmp_table_name_scenarios = "BMP_scenarios"
-    bmp_table_name_reach_parameter = "Reach_Parameter"
-    bmp_table_name_point_source = "point_source"
-    bmp_table_name_flow_diversion = "flow_diversion"
-    bmp_table_name_reservoir = 'reservoir'
-    bmp_table_name_riparian_buffer = "riparian_buffer"
-    bmp_table_name_grass_waterway = 'grass_waterway'
-    bmp_table_name_wetland = "wetland"
-    bmp_table_name_crop_management = "crop_management"
-    bmp_table_name_crop_parameter = "crop_parameter"
-    bmp_table_name_tillage_management = "tillage_management"
-    bmp_table_name_tillage_parameter = "tillage_parameter"
-    bmp_table_name_fertilizer_management = "fertilizer_management"
-    bmp_table_name_fertilizer_parameter = "fertilizer_parameter"
+    #reach bmps
+    bmp_table_name_reach_parameter = "reach_parameter"
+    bmp_table_name_reach_bmp = "reach_bmp"
+    bmp_table_name_point_source = "reach_bmp_point_source"
+    bmp_table_name_flow_diversion = "reach_bmp_flow_diversion"
+    bmp_table_name_reservoir = 'reach_bmp_reservoir'
+    bmp_table_name_wetland = "reach_bmp_wetland"
+    bmp_table_name_manure_catch_basin = "reach_bmp_manure_catch_basin"
+    bmp_table_name_grass_waterway = 'reach_bmp_grass_waterway'    
+    bmp_table_name_managed_access_including_fencing = "reach_bmp_access_management"
+    bmp_table_name_water_use = "reach_bmp_water_use"
+
+    #structure bmps
+    bmp_table_name_dugout = "structure_bmp_dugout"    
+    bmp_table_name_riparian_buffer = "structure_bmp_riparian_buffer"    
+    bmp_table_name_tile_drain = "structure_bmp_tile_drain"
+    bmp_table_name_wascob = "structure_bmp_wascob"
+
+    #areal non-structure
+    bmp_table_name_crop_management = "non_structure_bmp_crop_management"
+    bmp_table_name_crop_parameter = "non_structure_bmp_crop_parameter"
+    bmp_table_name_crop_remove_parameter = "non_structure_bmp_crop_remove_parameter"
+    bmp_table_name_tillage_management = "non_structure_bmp_tillage_management"
+    bmp_table_name_tillage_parameter = "non_structure_bmp_tillage_parameter"
+    bmp_table_name_fertilizer_management = "non_structure_bmp_fertilizer_management"
+    bmp_table_name_fertilizer_parameter = "non_structure_bmp_fertilizer_parameter"
     bmp_table_name_grazing_parameter = "GRAMG_management"
-    bmp_table_name_irrigation_management = "irrigation_management"
-    bmp_table_name_irrigation_parameter = "irrigation_parameter"
-    bmp_table_name_tile_drain_parameter = "tile_drain_parameter"
-    bmp_table_name_manure_incorporation_within_48h_management = "manure_incorporation_within_48h_management"
-    bmp_table_name_manure_application_setback_management = "manure_application_setback_management"
-    bmp_table_name_manure_no_application_on_snow_management = "manure_no_application_on_snow_management"
-    bmp_table_name_manure_spring_application_rather_than_fall_application_management = "manure_spring_application_rather_than_fall_application_management"
-    bmp_table_name_manure_application_based_on_soil_nitrogen_limit_management = "manure_application_based_on_soil_nitrogen_limit_management"
-    bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management = "manure_application_based_on_soil_phosphorous_limit_management"
-    bmp_table_name_manure_storage_parameter = "manure_storage_parameter"
-    bmp_table_name_manure_storage_management = "manure_storage_management"
-    bmp_table_name_manure_catch_basin = "manure_catch_basin"
-    bmp_table_name_manure_feed_lot_parameter = "manure_feed_lot_parameter"
-    bmp_table_name_manure_feed_lot_management = "manure_feed_lot_management"
-    bmp_table_name_wintering_site_parameter = "wintering_site_parameter"
-    bmp_table_name_wintering_site_management = "wintering_site_management"
-    bmp_table_name_pasture_crop_management = "pasture_crop_management"
-    bmp_table_name_pasture_fertilizer_management = "pasture_fertilizer_management"
-    bmp_table_name_pasture_tillage_management = "pasture_tillage_management"    
-    bmp_table_name_pasture_grazing_management = "pasture_grazing_management"
-    bmp_table_name_pasture_grazing_parameter = "pasture_grazing_parametert"
-    bmp_table_name_dugout = "dugout"
+    bmp_table_name_livestock_parameter = "non_structure_bmp_livestock_parameter"
+    bmp_table_name_irrigation_management = "non_structure_bmp_irrigation_management"
+    bmp_table_name_irrigation_parameter = "non_structure_bmp_irrigation_parameter"
+    bmp_table_name_manure_storage_parameter = "non_structure_bmp_manure_storage_parameter"
+    bmp_table_name_manure_storage_management = "non_structure_bmp_manure_storage_management"    
+    bmp_table_name_manure_feed_lot_parameter = "non_structure_bmp_manure_feed_lot_parameter"
+    bmp_table_name_manure_feed_lot_management = "non_structure_bmp_manure_feed_lot_management"
+    bmp_table_name_wintering_site_parameter = "non_structure_bmp_wintering_site_parameter"
+    bmp_table_name_wintering_site_management = "non_structure_bmp_wintering_site_management"
+    bmp_table_name_pasture_crop_management = "non_structure_bmp_pasture_crop_management"
+    bmp_table_name_pasture_fertilizer_management = "non_structure_bmp_pasture_fertilizer_management"
+    bmp_table_name_pasture_tillage_management = "non_structure_bmp_pasture_tillage_management"    
+    bmp_table_name_pasture_grazing_management = "non_structure_bmp_pasture_grazing_management"
+    bmp_table_name_pasture_grazing_parameter = "non_structure_bmp_pasture_grazing_parametert"
+    
+    #manure appication adjustment
+    bmp_table_name_manure_incorporation_within_48h_management = "manure_adjustment_incorporation_within_48h_management"
+    bmp_table_name_manure_application_setback_management = "manure_adjustment_application_setback_management"
+    bmp_table_name_manure_no_application_on_snow_management = "manure_adjustment_no_application_on_snow_management"
+    bmp_table_name_manure_spring_application_rather_than_fall_application_management = "manure_adjustment_spring_application_rather_than_fall_application_management"
+    bmp_table_name_manure_application_based_on_soil_nitrogen_limit_management = "manure_adjustment_application_based_on_soil_nitrogen_limit_management"
+    bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management = "manure_adjustment_application_based_on_soil_phosphorous_limit_management"
+
+    #other tables
+    bmp_table_name_ls_parameter = "LS_parameter"
+
+    bmp_table_name_farm_info = "farm_info"
+    bmp_table_name_field_info = "field_info"
+    bmp_table_name_field_farm = "field_farm"
+    bmp_table_name_farm_subbasin = "farm_subbasin"
+    bmp_table_name_field_subbasin = "field_subbasin"
+    bmp_table_name_subbasin_info = "subbasin_info"
+    bmp_table_name_subbasin_multiplier = "subbasin_multiplier"
+
+
+
+    #
     bmp_table_name_offsite_watering = "offsite_watering"
-    bmp_table_name_managed_access_including_fencing = "access_management"
-    bmp_table_name_wascob = "wascob"
-    bmp_table_name_water_use = "water_use"
+
 
 
     field_name_id = "id"
@@ -104,8 +131,6 @@ class Names:
     streamMainShpName = "stream_main" + shapefile_extension 
     streamNetworkRasName = "stream_network" + raster_extension
     streamNetworkShpName = "stream_network" + shapefile_extension
-    streamOutletsOriginalShpName = "stream_outlets_original" + shapefile_extension
-    streamOutletsOriginalRasName = "stream_outlets_original" + raster_extension
     streamPourPointShpName = "stream_pour_point" + shapefile_extension
     streamPourPointRasName = "stream_pour_point" + raster_extension
     # streamLinkName = "stream_link" + raster_extension
@@ -118,6 +143,9 @@ class Names:
     # Reach
     reachRasName = "reach" + raster_extension 
     reachShpName = "reach" + shapefile_extension 
+    reachParameterCsvName = bmp_table_name_reach_parameter + csv_extension
+    reachDepthName = "reach_depth" + raster_extension
+    reachWidthName = "reach_width" + raster_extension
 
     # Slope
     slopeDegName = "slopeDeg" + raster_extension
@@ -130,26 +158,25 @@ class Names:
     PRCAccAvgName = "PRC_Acc_Avg" + raster_extension
     DSCAccAvgName = "DSC_Acc_Avg" + raster_extension
     Cn2AccAvgName = "CN2_Acc_Avg" + raster_extension
-    flowLengthName = "flow_le" + raster_extension
+    flowLengthName = "flow_length" + raster_extension
     usleKName = "usleK" + raster_extension
     uslePName = "usleP" + raster_extension
     usleCName = "usleC" + raster_extension
     densityName = "density" + raster_extension
     sandName = "sand" + raster_extension
     clayName = "clay" + raster_extension    
-    wetnessIndexName = "WTI" + raster_extension
+    wetnessIndexName = "wetness_index" + raster_extension
     depressionName = "depression" + raster_extension
     residualName = "residual" + raster_extension
     residualIntMaxName = "residualIntMax" + raster_extension
     residualIntMinName = "residualIntMin" + raster_extension
     runoffCoeffName = "runoffCoeff" + raster_extension
     porosityName = "porosity" + raster_extension
-    fieldCapName = "fieldcap" + raster_extension
+    fieldCapName = "field)capacity" + raster_extension
     poreIndexName = "poreIndex" + raster_extension
     wiltingPointName = "wiltingPoint" + raster_extension
-    moistureInitialName = "Moist_in" + raster_extension
-    reachDepthName = "depth" + raster_extension
-    reachWidthName = "width" + raster_extension
+    moistureInitialName = "initial_moisture" + raster_extension
+
     manningName = "manning" + raster_extension
     velocityName = "velocity" + raster_extension
 
@@ -160,8 +187,7 @@ class Names:
     travelTimeHillT0Name = "travelTimeHillT0" + raster_extension
     travelTimeStreamT0Name = "travelTimeStreamT0" + raster_extension
     travelTimeHillDeltaName = "travelTimeHillDelta" + raster_extension
-    travelTimeStreamDeltaName = "travelTimeStreamDelta" + raster_extension
-    reachParameterFileName = "reachParameter" + ".txt"
+    travelTimeStreamDeltaName = "travelTimeStreamDelta" + raster_extension    
     slopeLengthName = "slopeLength" + raster_extension
     rootDepthName = "rootDepth" + raster_extension
     coverFractionName = "coverFraction" + raster_extension
@@ -274,6 +300,7 @@ class Names:
     #structures
     structureCombinedBoundaryShpName = "structureCombinedBoundary" + shapefile_extension
     structureCombinedOutputShpName = "structureCombinedOutlet" + shapefile_extension
+    structureCombinedOutputRasName = "structureCombinedOutlet" + raster_extension
 
     # Wetland
     wetlandShpName = "wetland" + shapefile_extension

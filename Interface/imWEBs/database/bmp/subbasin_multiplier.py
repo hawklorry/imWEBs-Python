@@ -1,9 +1,10 @@
 from typing import Any
 from sqlalchemy import Column, Integer, REAL
 from .bmp_table import BMPTable
+from ...names import Names
 
 class SubbasinMultiplier(BMPTable):
-    __tablename__ = 'subbasin_multiplier'
+    __tablename__ = Names.bmp_table_name_subbasin_multiplier
 
     ID = Column(Integer, primary_key=True)
     SHC = Column(REAL)

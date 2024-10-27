@@ -196,6 +196,7 @@ class Delineation:
         dX = [1, 1, 1, 0, -1, -1, -1, 0]
         dY = [-1, 0, 1, 1, 1, 0, -1, -1]
         inflowingVals = [16, 32, 64, 128, 1, 2, 4, 8]
+        LnOf2 = 0.693147180559945
         numInNeighbours = 0.0
         flag = False
         flowDir = 0.0
@@ -243,7 +244,7 @@ class Delineation:
                         flowLength = flow_length_raster[y, x]
                         flowDir = flow_dir_raster[y, x]
                         if flowDir > 0:
-                            i = int(np.log(flowDir) / self.LnOf2)
+                            i = int(np.log(flowDir) / LnOf2)
                             flowLength += gridLengths[i]
                             x += dX[i]
                             y += dY[i]
@@ -283,6 +284,7 @@ class Delineation:
         outletID = 0
 
         wbe = WbEnvironment()
+        LnOf2 = 0.693147180559945
         rows = flow_dir_raster.configs.rows
         cols = flow_dir_raster.configs.columns
         flow_dir_nodata = flow_dir_raster.configs.nodata
@@ -307,7 +309,7 @@ class Delineation:
                     while not flag:
                         flowDir = flow_dir_raster[y, x]
                         if flowDir > 0:
-                            c = int(np.log(flowDir) / self.LnOf2)
+                            c = int(np.log(flowDir) / LnOf2)
                             x += dX[c]
                             y += dY[c]
                             z = subbasin_raster[y, x]
@@ -325,7 +327,7 @@ class Delineation:
                     while not flag:
                         flowDir = flow_dir_nodata[y, x]
                         if flowDir > 0:
-                            c = int(np.log(flowDir) / self.LnOf2)
+                            c = int(np.log(flowDir) / LnOf2)
                             x += dX[c]
                             y += dY[c]
                             z = subbasin_raster[y, x]

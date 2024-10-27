@@ -35,13 +35,15 @@ class FolderBase:
         self.wbe.write_raster(raster, file_path)        
         self.rasters[file_name] = raster
 
-    def save_vector(self, vector:Vector, file_name:str, overwrite = True):
+    def save_vector(self, vector:Vector, file_name:str, overwrite = True, reload_from_file = False):
         file_path = self.get_file_path(file_name)
 
         if os.path.exists(file_path) and not overwrite:
             raise ValueError(f"File: {file_path} already exists and overwrite is set to false.")
         
-        VectorExtension.save_vector(vector, self.get_file_path(file_name))      
+        VectorExtension.save_vector(vector, file_path)  
+        if reload_from_file:
+            vector = self.wbe.read_vector(file_path)    
         self.vectors[file_name] = vector
 
     def find_file(self, filename:str)->str:        

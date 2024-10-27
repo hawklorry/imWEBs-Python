@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, Float, String
 from .bmp_table import BMPTable
+from ...names import Names
 
 class FarmInfo(BMPTable):
-    __tablename__ = 'farm_info'
+    __tablename__ = Names.bmp_table_name_farm_info
     ID = Column(Integer, primary_key=True)
     Area_Ha = Column(Float)
 

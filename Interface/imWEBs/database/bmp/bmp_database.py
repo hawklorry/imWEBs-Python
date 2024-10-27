@@ -2,6 +2,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, select,insert
 from whitebox_workflows import Vector
 from ...vector_extension import VectorExtension
+from .reach import Reach
 from .reach_parameter import ReachParameter
 from .field_info import FieldInfo
 from .farm_info import FarmInfo
@@ -70,10 +71,13 @@ from ...outputs import Outputs
       
 
 class BMPDatabase(DatabaseBase):
-    default_tables = ["bmp_index",
-                      "crop_parameter","fertilizer_parameter","tillage_parameter",
-                      "manure_and_nutrient_parameter","livestock_parameter",
-                      "crop_remove_parameter","LS_parameter"]
+    default_tables = [Names.bmp_table_name_bmp_index,
+                      Names.bmp_table_name_crop_parameter,
+                      Names.bmp_table_name_crop_remove_parameter,
+                      Names.bmp_table_name_fertilizer_parameter,
+                      Names.bmp_table_name_tillage_parameter,
+                      Names.bmp_table_name_livestock_parameter,                      
+                      Names.bmp_table_name_ls_parameter]
 
     COL_NAME_AREA_HA = "Area_Ha"
 
@@ -154,6 +158,7 @@ class BMPDatabase(DatabaseBase):
 
         #create reach_bmp table
         #all reach bmps should be added before this
+        self.__create_reach_parameter(outputs)
         self.__create_bmp_reach_bmp(subbasin_ids, reach_bmps)
 
         #create bmp_scenarios table
@@ -162,6 +167,9 @@ class BMPDatabase(DatabaseBase):
         #create grazing reach deposit table
         #the start year could be read from somewhere later
         self.__create_grazing_reach_deposit(1991)
+
+        #just force to generate the reach vector, change it later
+        reach = outputs.reach_vector
 
 
     def __create_subbasin_info(self, 
@@ -405,7 +413,13 @@ class BMPDatabase(DatabaseBase):
         Session = sessionmaker(bind=self.engine)
         with Session() as session:
             session.add_all(bmp.offsite_wintering_parameters)
-            session.commit()        
+            session.commit()      
+
+    def __create_reach_parameter(self, outputs:Outputs):
+        """crete reach parameters"""
+        logger.info("Creating reach_parameter table ... ")
+        self.save_table(Names.bmp_table_name_reach_parameter, outputs.reach_parameter_df)
+
     
     def __create_bmp_reach_bmp(self, subbasin_ids:list, reach_bmps:dict):
         """create reach_bmp table"""
