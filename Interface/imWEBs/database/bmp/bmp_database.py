@@ -22,7 +22,7 @@ from ...bmp.bmp import BMP
 from ...bmp.bmp_structure_dugout import StructureBMPDugout
 from ...bmp.bmp_structure_wascob import StructureBMPWascob
 from ...bmp.bmp_offsite_wintering import BMPOffsiteWintering
-
+from ...bmp.crop_rotation.crop_rotation import CropRotation
 from .bmp_01_point_source import PointSource
 from .bmp_02_flow_diversion import FlowDiversion
 from .bmp_03_reservoir import Reservoir
@@ -101,14 +101,18 @@ class BMPDatabase(DatabaseBase):
             logger.info(table)
             self.populate_defaults(table) 
 
+        logger.info("Creating management_unit_info ...")
+        field_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.unit_management_raster, BMPDatabase.COL_NAME_AREA_HA)
+        field_area_df.to_sql(Names.bmp_table_name_management_unit_info, con = self.engine, if_exists='replace',index=True)
+
         logger.info("Creating field_info ...")
         field_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.field_raster, BMPDatabase.COL_NAME_AREA_HA)
-        field_area_df.to_sql(FieldInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
+        field_area_df.to_sql(Names.bmp_table_name_field_info, con = self.engine, if_exists='replace',index=True)
         field_area_df.columns = ["FieldArea"]
 
         logger.info("Creating farm_info ...")
         farm_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.farm_raster, BMPDatabase.COL_NAME_AREA_HA)
-        farm_area_df.to_sql(FarmInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
+        farm_area_df.to_sql(Names.bmp_table_name_farm_info, con = self.engine, if_exists='replace',index=True)
         farm_area_df.columns = ["FarmArea"]
 
         logger.info("Creating subbasin_info ...")
@@ -117,7 +121,7 @@ class BMPDatabase(DatabaseBase):
                                                        outputs.potential_ruoff_coefficient_raster, 
                                                        outputs.depression_storage_capacity_raster, 
                                                        outputs.cn2_raster)
-        subbasin_area_df.to_sql(SubbasinInfo.__tablename__, con = self.engine, if_exists='replace',index=True)
+        subbasin_area_df.to_sql(Names.bmp_table_name_subbasin_info, con = self.engine, if_exists='replace',index=True)
         subbasin_ids = subbasin_area_df.index.to_list()
 
         subbasin_area_df = subbasin_area_df[BMPDatabase.COL_NAME_AREA_HA].to_frame()
@@ -125,15 +129,15 @@ class BMPDatabase(DatabaseBase):
 
         logger.info("Creating field_subbasin ...")
         self.__create_overlay(outputs.field_raster, outputs.subbasin_raster, 
-                              "Field", "Subbasin", field_area_df, subbasin_area_df, FieldSubbasin.__tablename__)
+                              "Field", "Subbasin", field_area_df, subbasin_area_df, Names.bmp_table_name_field_subbasin)
 
         logger.info("Creating farm_subbasin ...")
         self.__create_overlay(outputs.farm_raster, outputs.subbasin_raster, 
-                              "Farm", "Subbasin", farm_area_df, subbasin_area_df, FarmSubbasin.__tablename__)
+                              "Farm", "Subbasin", farm_area_df, subbasin_area_df, Names.bmp_table_name_farm_subbasin)
 
         logger.info("Creating field_farm ...")
         self.__create_overlay(outputs.field_raster, outputs.farm_raster, 
-                              "Field", "Farm", field_area_df, farm_area_df, FieldFarm.__tablename__) 
+                              "Field", "Farm", field_area_df, farm_area_df, Names.bmp_table_name_field_farm) 
         
         self.__create_subbasin_multiplier(subbasin_ids)
 
@@ -158,12 +162,28 @@ class BMPDatabase(DatabaseBase):
         #create bmp_scenarios table
         self.__create_bmp_scenarios(outputs)
 
-        #create grazing reach deposit table
-        #the start year could be read from somewhere later
-        self.__create_grazing_reach_deposit(1991)
-
         #just force to generate the reach vector, change it later
         reach = outputs.reach_vector
+
+    def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs):        
+        logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
+
+        rotation = CropRotation(outputs.unit_management_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
+        
+        logger.info("Crop Management ... ")
+        self.save_table(Names.bmp_table_name_crop_management, rotation.crop_management_df)
+
+        logger.info("Fertilizer Management ... ")
+        self.save_table(Names.bmp_table_name_fertilizer_management, rotation.fertilizer_management_df)
+
+        logger.info("Tillage Management ... ")
+        self.save_table(Names.bmp_table_name_tillage_management, rotation.tillage_management_df)
+
+        logger.info("Grazing Management ... ")
+        self.save_table(Names.bmp_table_name_grazing_management, rotation.grazing_management_df)
+
+        logger.info("Grazing reach deposit ... ")
+        self.create_grazing_reach_deposit(first_year)
 
     def __create_subbasin_info(self, 
                                 subbasin_raster:Raster,
@@ -201,21 +221,14 @@ class BMPDatabase(DatabaseBase):
         self.save_table(table_name, merged_df)   
     
     def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str)->pd.DataFrame:
-        #find max id from raster1     
-        spatial1_ras_max = spatial1_ras.configs.maximum   
-        if spatial1_ras_max == float('-inf') or spatial1_ras_max == float('inf'):
-            spatial1_ras_max = RasterExtension.get_max_value(spatial1_ras)   
-        raster1_max = int(math.pow(10, int(math.log10(spatial1_ras_max)) + 2))
-
-        #make a new raster with a unique id combining both raster 1 and raster 2
-        merged_raster = spatial1_ras + spatial2_ras * raster1_max
+        merged_raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
         df = RasterExtension.get_category_area_ha_dataframe(merged_raster,BMPDatabase.COL_NAME_AREA_HA)
         df[name1] = df.index % raster1_max
         df[name2] = (df.index - df[name1]) / raster1_max
 
         return df
     
-    def __create_grazing_reach_deposit(self, start_year:int):
+    def create_grazing_reach_deposit(self, start_year:int):
         """
         Create GRAMG_ReachDeposit table based on GRAMG_management, Field_Info, Livestock_parameter and Fertilizer_parameter.
 
@@ -231,16 +244,16 @@ class BMPDatabase(DatabaseBase):
         if grazing_management_df is None:
             return 
 
-        field_info_df = self.read_table("field_info")
-        livestock_parameter = self.read_table("livestock_parameter")
-        fertilizer_parameter = self.read_table("fertilizer_parameter")
+        field_info_df = self.read_table(Names.bmp_table_name_management_unit_info)
+        livestock_parameter = self.read_table(Names.bmp_table_name_livestock_parameter)
+        fertilizer_parameter = self.read_table(Names.bmp_table_name_fertilizer_parameter)
 
         #inner join grazing_management, field_info and livestock_parameter
         reach_deposit_df = grazing_management_df[grazing_management_df["Source"] == 1]
         reach_deposit_df = reach_deposit_df[reach_deposit_df["Access"] != 2]
-        reach_deposit_df = reach_deposit_df.merge(field_info_df, left_on="Location", right_index=True, how="inner")
-        reach_deposit_df = reach_deposit_df.merge(livestock_parameter, left_on="Ani_ID", right_index=True, how="inner")
-        reach_deposit_df = reach_deposit_df.merge(fertilizer_parameter, left_on="Man_ID", right_index=True, how="inner")
+        reach_deposit_df = reach_deposit_df.merge(field_info_df, left_on="Location", right_on= "id", how="inner")
+        reach_deposit_df = reach_deposit_df.merge(livestock_parameter, left_on="Ani_ID", right_on="ID", how="inner")
+        reach_deposit_df = reach_deposit_df.merge(fertilizer_parameter, left_on="Man_ID", right_on="IFNUM", how="inner")
 
         #calcualte manure and drinkwater
         reach_deposit_df["Manure"] = reach_deposit_df["GR_Density"] * reach_deposit_df["Area_Ha"] * reach_deposit_df["Ani_Weight"] * reach_deposit_df["Ani_adult"] / 100 / 1000 * reach_deposit_df["Man_Day"] * reach_deposit_df["DayFra"] * reach_deposit_df["Drinking_time"]

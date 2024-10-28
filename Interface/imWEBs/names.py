@@ -32,7 +32,7 @@ class Names:
     bmp_table_name_tillage_parameter = "non_structure_bmp_tillage_parameter"
     bmp_table_name_fertilizer_management = "non_structure_bmp_fertilizer_management"
     bmp_table_name_fertilizer_parameter = "non_structure_bmp_fertilizer_parameter"
-    bmp_table_name_grazing_parameter = "GRAMG_management"
+    bmp_table_name_grazing_management = "GRAMG_management"
     bmp_table_name_livestock_parameter = "non_structure_bmp_livestock_parameter"
     bmp_table_name_irrigation_management = "non_structure_bmp_irrigation_management"
     bmp_table_name_irrigation_parameter = "non_structure_bmp_irrigation_parameter"
@@ -61,6 +61,7 @@ class Names:
 
     bmp_table_name_farm_info = "farm_info"
     bmp_table_name_field_info = "field_info"
+    bmp_table_name_management_unit_info = "management_unit_info"
     bmp_table_name_field_farm = "field_farm"
     bmp_table_name_farm_subbasin = "farm_subbasin"
     bmp_table_name_field_subbasin = "field_subbasin"
@@ -223,6 +224,10 @@ class Names:
     fieldShpName = "field" + shapefile_extension
     fieldRasName = fieldShpName.replace(shapefile_extension, raster_extension)
     fiedWithOnlyAgricultureRasName = "fiedWithOnlyAgriCulture" + raster_extension
+
+    # management unit
+    managementUnitShpName = "management_unit" + shapefile_extension
+    managementUnitRasName = managementUnitShpName.replace(shapefile_extension, raster_extension)
 
     # Outlets
     insertOutletShpName = "insertOutlet" + shapefile_extension

@@ -43,9 +43,9 @@ class DatabaseBase:
         populate table from csv file, used to load the default tables, assuming the table name is same as the csv file name
         """
         
-        if self.check_table_exist(table_name):
-            logger.info(f"Table {table_name} already exist, skip")
-            return
+        # if self.check_table_exist(table_name):
+        #     logger.info(f"Table {table_name} already exist, skip")
+        #     return
 
         #try to find the corresponding csv file in the default folder
         csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defaults", f"{table_name}.csv")

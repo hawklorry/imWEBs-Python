@@ -281,6 +281,7 @@ class Outputs(FolderBase):
                 self.save_raster(raster, Names.fieldRasName)
 
         return raster
+        
     
     # @property
     # def field_without_agriculture_raster(self)->Raster:
@@ -292,6 +293,33 @@ class Outputs(FolderBase):
     #         self.save_raster(raster, Names.fieldWithOnlyAgricultureRasName)
 
     #     return raster
+
+    @property
+    def unit_management_raster(self)->Raster:
+        raster = self.get_raster(Names.managementUnitRasName)
+
+        if raster is None:
+            if self.field_raster is not None:
+                raster, raster1_max = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
+                self.save_raster(raster, Names.managementUnitRasName)
+
+                #convert to vector and assign field and subbasin id
+                vector = RasterExtension.raster_to_vector(raster)
+                vector = VectorExtension.decompsite_overlay_id(vector, "field", "subbasin", raster1_max)
+                self.save_vector(vector, Names.managementUnitShpName)
+
+        return raster
+
+
+    @property
+    def unit_management_vector(self)->Raster:
+        vector = self.get_vector(Names.managementUnitShpName)
+
+        if vector is None:
+            raster = self.unit_management_raster
+            vector = self.get_vector(Names.managementUnitShpName)
+
+        return vector
 
 #endregion    
 

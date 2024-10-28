@@ -89,7 +89,7 @@ BMPDistributions = {
     BMPType.BMP_TYPE_CROP:Names.bmp_table_name_crop_management,
     BMPType.BMP_TYPE_FERTILIZER:Names.bmp_table_name_fertilizer_management,
     BMPType.BMP_TYPE_TILLAGE:Names.bmp_table_name_tillage_management,
-    BMPType.BMP_TYPE_GRAZING:"",
+    BMPType.BMP_TYPE_GRAZING:Names.bmp_table_name_grazing_management,
     BMPType.BMP_TYPE_MANURE_STORAGE: Names.bmp_table_name_manure_storage_management,
     BMPType.BMP_TYPE_MANURE_FEEDLOT: Names.bmp_table_name_manure_feed_lot_management        
 }
@@ -108,7 +108,7 @@ BMPParameters = {
     BMPType.BMP_TYPE_CROP:Names.bmp_table_name_crop_parameter,
     BMPType.BMP_TYPE_FERTILIZER:Names.bmp_table_name_fertilizer_parameter,
     BMPType.BMP_TYPE_TILLAGE:Names.bmp_table_name_tillage_parameter,
-    BMPType.BMP_TYPE_GRAZING:Names.bmp_table_name_grazing_parameter,
+    BMPType.BMP_TYPE_GRAZING: "",
     BMPType.BMP_TYPE_MANURE_STORAGE: Names.bmp_table_name_manure_storage_parameter,
     BMPType.BMP_TYPE_MANURE_FEEDLOT: Names.bmp_table_name_manure_feed_lot_parameter        
 }

@@ -27,13 +27,28 @@ class VectorExtension:
         if len([field.name for field in vector.get_attribute_fields() if field.name == Names.field_name_raster_value]) <= 0:
             return vector
 
-        id_field = AttributeField(Names.field_name_id, FieldDataType.Int, 6, 0)
+        id_field = AttributeField(Names.field_name_id, FieldDataType.Int, 10, 0)
         vector.add_attribute_field(id_field)
 
         for i in range(vector.num_records):
             value = vector.get_attribute_value(i, Names.field_name_raster_value).get_value_as_f64()
             vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(int(value)))
         return vector
+    
+    @staticmethod
+    def decompsite_overlay_id(vector:Vector, name1:str, name2:str, raster1_max:int)->Vector:
+        field1 = AttributeField(name1, FieldDataType.Int, 10, 0)
+        field2 = AttributeField(name2, FieldDataType.Int, 10, 0)
+        vector.add_attribute_field(field1)
+        vector.add_attribute_field(field2)
+
+        for i in range(vector.num_records):
+            id = int(vector.get_attribute_value(i, Names.field_name_id).get_value_as_f64())
+            id1 = int(id % raster1_max)
+            id2 = int((id - id1) / raster1_max)
+            vector.set_attribute_value(i,name1,FieldData.new_int(id1))
+            vector.set_attribute_value(i,name2,FieldData.new_int(id2))
+        return vector       
 
     @staticmethod
     def get_unique_ids(vector:Vector)->list:

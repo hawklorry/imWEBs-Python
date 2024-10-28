@@ -58,3 +58,7 @@ class Model:
     def generate_parameters(self):
         """generate parameters"""
         self.bmp_databaes.populate_database(self.outputs)
+
+    def update_crop_rotation(self,crop_inventory_folder:str, first_year:int, last_year:int):
+        """update crop rotation"""
+        self.bmp_databaes.update_crop_rotation_AAFC_crop_inventory(crop_inventory_folder, first_year, last_year, self.outputs)

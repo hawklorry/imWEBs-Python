@@ -177,7 +177,14 @@ class ModelConfig(Config):
                         "wetland_stream_buffer_distance_m"],
 
             "marginal_crop_land":["non_agriculture_landuse_ids","buffer_size_m","slope_threshold_percentage"],
+
             "pasture_land":["non_agriculture_landuse_ids"],
+
+            #crop rotation
+            "crop_rotation":["method",
+                              "AAFC_crop_inventory_folder",
+                              "first_year",
+                              "last_year"],
 
             #model folder
             "model":["model_folder"]
@@ -190,3 +197,10 @@ class ModelConfig(Config):
     def generate_parameters(self):
         """watershed delineation""" 
         self.model.generate_parameters()
+
+    def update_crop_rotation(self):
+        self.model.update_crop_rotation(
+            getattr(self,"AAFC_crop_inventory_folder"),
+            int(getattr(self,"first_year")),
+            int(getattr(self,"last_year"))
+        )

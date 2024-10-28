@@ -168,3 +168,43 @@ class RasterExtension:
         
         return df[stat_type]    
     
+    @staticmethod
+    def get_majority_count(input_data_raster:Raster, feature_definition_raster:Raster)->dict:
+        """Get the majority count of input data raster in each feature definition raster"""
+
+        rows = input_data_raster.configs.rows
+        cols = input_data_raster.configs.columns
+        nodata_input = input_data_raster.configs.nodata
+        nodata_feature = feature_definition_raster.configs.nodata
+
+        majority_count = {}
+        for row in range(rows):
+            for col in range(cols):
+                if input_data_raster[row, col] != nodata_input and feature_definition_raster[row,col] != nodata_feature:
+                    input_id = int(input_data_raster[row, col])
+                    feature_id = int(feature_definition_raster[row, col])
+
+                    if feature_id not in majority_count:
+                        majority_count[feature_id] = {}
+                    if input_id not in majority_count[feature_id]:
+                        majority_count[feature_id][input_id] = 0
+                    
+                    majority_count[feature_id][input_id] = majority_count[feature_id][input_id] + 1
+        
+        feature_counts = {}
+        for feature, counts in majority_count.items():
+            feature_counts[feature] = max(counts, key = counts.get)
+
+        return feature_counts
+    
+    @staticmethod
+    def get_overlay_raster(spatial1_ras:Raster, spatial2_ras:Raster):
+        spatial1_ras_max = spatial1_ras.configs.maximum   
+        if spatial1_ras_max == float('-inf') or spatial1_ras_max == float('inf'):
+            spatial1_ras_max = RasterExtension.get_max_value(spatial1_ras)   
+        raster1_max = int(math.pow(10, int(math.log10(spatial1_ras_max)) + 2))
+
+        #make a new raster with a unique id combining both raster 1 and raster 2
+        return spatial1_ras + spatial2_ras * raster1_max, raster1_max
+
+        

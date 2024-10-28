@@ -1,0 +1,40 @@
+Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
+0,Non-crop land,Non-crop,,Not proceed
+1,Wheat,Cereals,SWHT,27
+4,Winter Wheat,Cereals,WWHT,28
+5,Barley,Cereals,BARL,31
+6,Oats,Cereals,OATS,32
+7,Fall Rye,Cereals,RYE,30
+9,Triticale,Cereals,RYE,30
+10,Mixed Oats and Peas,Other Crops,OATS,32
+12,Wheat (Soft White),Cereals,WWHT,28
+16,Buckwheat,Cereals,WWHT,28
+18,Faba Beans,Other Crops,GRBN,84
+19,Peas,Other Crops,PEAS,63
+20,Flax/Linola,Oilseeds,FLAX,65
+23,Canola,Oilseeds,CANA,76
+24,Sunflower,Other Crops,SUNF,74
+27,Corn,Other Crops,CORN,19
+28,Corn Grain,Other Crops,CORN,19
+29,"Beans (white, Navy)",Other Crops,GRBN,84
+35,Soybeans,Other Crops,SOYB,56
+36,Lentils,Other Crops,LENT,60
+62,Hay (grass),Forages,HAY,5
+63,Sorghum Sudangrass,Forages,HAY,5
+67,Green Feed Oats,Other Crops,OATS,32
+68,Green Feed Barley,Other Crops,BARL,31
+74,Millet (seed & feed),Other Crops,PMIL,34
+82,Wheat (Hard White),Cereals,WWHT,28
+100,Alfalfa,Forages,ALFA,52
+103,Clover (Red),Other Crops,PAST,12
+104,Clover (White),Other Crops,PAST,12
+121,Fescue (grass seed),Other Crops,PAST,12
+123,Rye Grass (annual),Other Crops,PAST,12
+159,Hay (native),Forages,HAY,5
+300,Pasture,Forages,PAST,12
+301,Fallow,Not Seeded,BARE,98
+302,Forage,Forages,ALFA,52
+303,Green Feed Millet,Other Crops,PMIL,34
+304,Green Feed Millet and Oats,Other Crops,PMIL,34
+998,Grazing Land,Other Crops,PAST,12
+999,No Data,Not Seeded,,27
