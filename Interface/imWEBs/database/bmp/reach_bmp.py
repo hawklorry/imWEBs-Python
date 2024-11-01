@@ -1,8 +1,10 @@
+from ...bmp.bmp_type import DefaultScenarioId
+
 class ReachBMPDistribution:
 	"""Location of reach bmps. Note that dugout is not part of the reach bmps"""
 
 	def __init__(self, reach):
-		self.Scenario = -1
+		self.Scenario = DefaultScenarioId
 		self.Reach = reach		
 		self.PointSource = 0
 		self.FlowDiversion = 0

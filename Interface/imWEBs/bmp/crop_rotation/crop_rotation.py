@@ -3,6 +3,7 @@ import os
 import numpy as np
 import random
 from ..bmp import BMP
+from ..bmp_type import DefaultScenarioId
 from whitebox_workflows import Vector, Raster
 from ...raster_extension import RasterExtension
 from ...vector_extension import VectorExtension
@@ -38,7 +39,7 @@ class CropRotation(FolderBase):
                  crop_inventory_raster_folder:str, 
                  first_year:int, 
                  last_year:int,
-                 scenario:int = -1):
+                 scenario:int = DefaultScenarioId):
         super().__init__(crop_inventory_raster_folder)
         self.management_unit_vector = management_unit_vector
         self.subbasin_raster = subbasin_raster

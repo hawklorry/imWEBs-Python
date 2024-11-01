@@ -162,6 +162,7 @@ class ModelConfig(Config):
             "structure_bmp":["dugout_boundary_shapefile",
                              "wascob_boundary_shapefile",
                              "riparian_buffer_shapefile",
+                             "filter_strip_shapefile",
                              "tile_drain_shapefile"],
 
             #feedlot will be delineated in a single subbasin, the catch basin will function as the outlet.

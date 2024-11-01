@@ -21,7 +21,10 @@ class Outputs(FolderBase):
     """
     Output folder where all intermediate and final processed files are saved
     """
-    def __init__(self, output_folder:str, input_folder:str, database_folder:str, 
+    def __init__(self, 
+                 output_folder:str, 
+                 input_folder:str,
+                 database_folder:str, 
                  stream_threshold_area_ha:float = 10,   #stream thrshold area
                  wetland_min_area_ha:float = 0.1,       #min wetland area
                  design_storm_return_period = 2         #design storm return period for reach width and depth
@@ -281,6 +284,19 @@ class Outputs(FolderBase):
                 self.save_raster(raster, Names.fieldRasName)
 
         return raster
+    
+    @property
+    def field_clipped_vector(self)->Vector:
+        """Clipped field vector by subbasin"""
+        vector = self.get_vector(Names.fieldClippedShpName)
+
+        if vector is None:
+            if self.field_raster is not None:
+                vector = RasterExtension.raster_to_vector(self.field_raster)
+                self.save_vector(vector, Names.fieldClippedShpName)
+
+        return vector
+
         
     
     # @property
@@ -1094,7 +1110,7 @@ class Outputs(FolderBase):
 
     @property
     def riparian_buffer_raster(self)->Raster:
-        raster = self.get_raster(Names.riparianBufferStripRasterName)
+        raster = self.get_raster(Names.riparianBufferRasterName)
     
         if raster is None:
             if self.inputs.raparian_buffer_vector is not None:
@@ -1105,27 +1121,27 @@ class Outputs(FolderBase):
                                                             field_name = id_field_name,
                                                             base_raster = self.inputs.dem_raster)
                 raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
-                self.save_raster(raster, Names.riparianBufferStripRasterName)
+                self.save_raster(raster, Names.riparianBufferRasterName)
 
         return raster
     
     @property
     def riparian_buffer_drainage_area_raster(self)->Raster:
-        raster = self.get_raster(Names.riparianBufferStripDrainageRasterName)
+        raster = self.get_raster(Names.riparianBufferDrainageRasterName)
 
         if raster is None:
             self.__create_riparian_buffer_distribution_paramter()
-            raster = self.get_raster(Names.riparianBufferStripDrainageRasterName)
+            raster = self.get_raster(Names.riparianBufferDrainageRasterName)
 
         return raster
 
     @property
     def riparian_buffer_parts_raster(self)->Raster:
-        raster = self.get_raster(Names.riparianBufferStripPartRasterName)
+        raster = self.get_raster(Names.riparianBufferPartRasterName)
 
         if raster is None:
             self.__create_riparian_buffer_distribution_paramter()
-            raster = self.get_raster(Names.riparianBufferStripPartRasterName)
+            raster = self.get_raster(Names.riparianBufferPartRasterName)
 
         return raster   
     
@@ -1293,8 +1309,8 @@ class Outputs(FolderBase):
         riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_K','Sol_porosity','Root_Depth']]
 
         #save to bmp database
-        self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferStripDrainageRasterName)
-        self.save_raster(riparian_buffer_parts_raster, Names.riparianBufferStripPartRasterName)
+        self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferDrainageRasterName)
+        self.save_raster(riparian_buffer_parts_raster, Names.riparianBufferPartRasterName)
         self.save_df(riparain_buffer_parameter_df, Names.riparianBufferParameterCSVName)
 
 #endregion

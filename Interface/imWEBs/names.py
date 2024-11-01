@@ -21,6 +21,7 @@ class Names:
     #structure bmps
     bmp_table_name_dugout = "structure_bmp_dugout"    
     bmp_table_name_riparian_buffer = "structure_bmp_riparian_buffer"    
+    bmp_table_name_filter_strip = "structure_bmp_filter_strip"    
     bmp_table_name_tile_drain = "structure_bmp_tile_drain"
     bmp_table_name_wascob = "structure_bmp_wascob"
 
@@ -67,8 +68,6 @@ class Names:
     bmp_table_name_field_subbasin = "field_subbasin"
     bmp_table_name_subbasin_info = "subbasin_info"
     bmp_table_name_subbasin_multiplier = "subbasin_multiplier"
-
-
 
     #
     bmp_table_name_offsite_watering = "offsite_watering"
@@ -134,12 +133,7 @@ class Names:
     streamNetworkShpName = "stream_network" + shapefile_extension
     streamPourPointShpName = "stream_pour_point" + shapefile_extension
     streamPourPointRasName = "stream_pour_point" + raster_extension
-    # streamLinkName = "stream_link" + raster_extension
     streamOrderRasName = "stream_order" + raster_extension
-    # streamOrderShpName = "stream_order" + shapefile_extension
-    # streamSlopeName = "streamSlope" + raster_extension
-    # streamDemName = "streamDem" + raster_extension
-    # streamDegreeName = "streamDegree" + raster_extension
 
     # Reach
     reachRasName = "reach" + raster_extension 
@@ -173,9 +167,9 @@ class Names:
     residualIntMinName = "residualIntMin" + raster_extension
     runoffCoeffName = "runoffCoeff" + raster_extension
     porosityName = "porosity" + raster_extension
-    fieldCapName = "field)capacity" + raster_extension
-    poreIndexName = "poreIndex" + raster_extension
-    wiltingPointName = "wiltingPoint" + raster_extension
+    fieldCapName = "field_capacity" + raster_extension
+    poreIndexName = "pore_index" + raster_extension
+    wiltingPointName = "wilting_point" + raster_extension
     moistureInitialName = "initial_moisture" + raster_extension
 
     manningName = "manning" + raster_extension
@@ -201,33 +195,33 @@ class Names:
     # Subbasin
     subbasinRasName = "subbasin" + raster_extension
     subbasinShpName = "subbasin" + shapefile_extension
-    # subbasinTempRasName = "subbasinTemp" + raster_extension
-    # subbasinTempShpName = "subbasinTemp" + shapefile_extension
 
     # Soil 
     soilName = "soil" + raster_extension
     soilMappedName = "soilMapped" + raster_extension
-    #soilUserName = "soilUser" + raster_extension
 
     # Landuse
     landuseName = "landuse" + raster_extension
     landuseMappedName = "landuseMapped" + raster_extension
-    #landuseUserName = "landuseUser" + raster_extension
 
     # Farm
     farmShpName = "farm" + shapefile_extension
     farmRasName = farmShpName.replace(shapefile_extension, raster_extension)
-    farmWithOnlyAgricultureRasName = "farmWithOnlyAgriCulture" + raster_extension
-    
+    farmWithOnlyAgricultureRasName = "farmWithOnlyAgriCulture" + raster_extension    
 
     # Field
     fieldShpName = "field" + shapefile_extension
     fieldRasName = fieldShpName.replace(shapefile_extension, raster_extension)
+    fieldClippedShpName = "fieldClipped" + shapefile_extension
     fiedWithOnlyAgricultureRasName = "fiedWithOnlyAgriCulture" + raster_extension
 
     # management unit
     managementUnitShpName = "management_unit" + shapefile_extension
     managementUnitRasName = managementUnitShpName.replace(shapefile_extension, raster_extension)
+
+    #
+
+
 
     # Outlets
     insertOutletShpName = "insertOutlet" + shapefile_extension
@@ -278,12 +272,27 @@ class Names:
     wascobShpName = "wascob" + shapefile_extension
     wascobRasName = wascobShpName.replace(shapefile_extension, raster_extension)
 
-    #Riparian Buffer Strip
-    riparianBufferStripShpName = "riparianBufferStrip" + shapefile_extension
-    riparianBufferStripRasterName = riparianBufferStripShpName.replace(shapefile_extension, raster_extension)
-    riparianBufferStripPartRasterName = "riparianBufferStripPart" + raster_extension
-    riparianBufferStripDrainageRasterName = "riparianBufferStripDrainage" + raster_extension
-    riparianBufferParameterCSVName = "riparianBufferStrip" + csv_extension
+    #Riparian Buffer
+    riparianBufferShpName = "riparian_buffer" + shapefile_extension
+    riparianBufferRasterName = riparianBufferShpName.replace(shapefile_extension, raster_extension)
+    riparianBufferPartRasterName = "riparian_buffer_part" + raster_extension
+    riparianBufferDrainageRasterName = "riparian_buffer_drinage" + raster_extension
+    riparianBufferParameterCSVName = "riparian_buffer_parameter" + csv_extension
+
+    #filter strip
+    filterStripShpName = "filter_strip" + shapefile_extension
+    filterStripRasterName = filterStripShpName.replace(shapefile_extension, raster_extension)
+    filterStripPartRasterName = "filter_strip_part" + raster_extension
+    filterStripDrainageRasterName = "filter_strip_drainage" + raster_extension
+    filterStripParameterCSVName = "filter_strip_parameter" + csv_extension
+
+    #Vegetation Filter Strip    
+    vegetationFilterStripShpName = "vegetationFilterStrip" + shapefile_extension
+    vegetationFilterStripRasterName = vegetationFilterStripShpName.replace(shapefile_extension, raster_extension)
+    # vegetationFilterStripPartRasterName = "vegetationFilterStripPart" + raster_extension
+    # vegetationFilterStripPartShpName = "vegetationFilterStripPart" + shapefile_extension
+    # vegetationFilterStripDrainageRasterName = "vegetationFilterStripDrainage" + raster_extension
+    # vegetationFilterStripDrainageShpName = "vegetationFilterStripDrainage" + shapefile_extension
 
     #tile drain
     tileDrainShpName = "tile_drain" + shapefile_extension
@@ -362,18 +371,6 @@ class Names:
     winteringSiteShpName = "winteringSite" + shapefile_extension
     winteringSiteRasterName = winteringSiteShpName.replace(shapefile_extension,raster_extension)
 
-    #Vegetation Filter Strip    
-    vegetationFilterStripShpName = "vegetationFilterStrip" + shapefile_extension
-    vegetationFilterStripRasterName = vegetationFilterStripShpName.replace(shapefile_extension, raster_extension)
-    # vegetationFilterStripPartRasterName = "vegetationFilterStripPart" + raster_extension
-    # vegetationFilterStripPartShpName = "vegetationFilterStripPart" + shapefile_extension
-    # vegetationFilterStripDrainageRasterName = "vegetationFilterStripDrainage" + raster_extension
-    # vegetationFilterStripDrainageShpName = "vegetationFilterStripDrainage" + shapefile_extension
-
-
-    
-
-
     #Pasture
     pastureLandRasName = "PasCropland" + raster_extension
     # pastureLandShpName = "PasCropland" + shapefile_extension
@@ -384,13 +381,23 @@ class Names:
     pastureGrazingShpName = "pastureGrazing" + shapefile_extension
 
     #Manure Setback
-    # manureSetbackShpName = "manureSetback" + shapefile_extension
-    # manureSetbackUserName = "manureSetbackUser" + raster_extension
+    manure48hShpName = "manure_within_48h" + shapefile_extension
+    manure48hRasName = manure48hShpName.replace(shapefile_extension, raster_extension)
+    manureSetbackShpName = "manure_setback" + shapefile_extension
+    manureSetbackRasName = manureSetbackShpName.replace(shapefile_extension, raster_extension)
+    manureNoOnSnowShpName = "manure_no_on_snow" + shapefile_extension
+    manureNoOnSnowRasName = manureNoOnSnowShpName.replace(shapefile_extension, raster_extension)
+    manureSpringShpName = "manure_spring" + shapefile_extension
+    manureSpringRasName = manureSpringShpName.replace(shapefile_extension, raster_extension)
+    manureNLimitShpName = "manure_n_limit" + shapefile_extension
+    manureNLimitRasname = manureNLimitShpName.replace(shapefile_extension, raster_extension)
+    manurePLimitShpName = "manure_p_limit" + shapefile_extension
+    manurePLimitRasname = manurePLimitShpName.replace(shapefile_extension, raster_extension)
+  
 
     # streamNetworkNoFieldName = "streamNetworkNoField" + raster_extension
     # averageDistanceToStreamName = "averageDistanceToStream" + raster_extension
     # averageSlopeToStreamName = "averageSlopeToStream" + raster_extension
-
 
     # grWaterSourceRasterName = "grWaterSource" + raster_extension
     # grAccessMgtRasterName = "grAccessMgt" + raster_extension
@@ -435,7 +442,8 @@ class Names:
         #structure_bmp
         "dugout_boundary_shapefile":dugoutShpName,
         "wascob_boundary_shapefile":wascobShpName,
-        "riparian_buffer_shapefile":riparianBufferStripShpName,
+        "riparian_buffer_shapefile":riparianBufferRasterName,
+        "filter_strip_shapefile":filterStripRasterName,
         "tile_drain_shapefile":tileDrainShpName,
 
         #areal non-structure bmp
@@ -445,9 +453,18 @@ class Names:
         "offsite_watering_shapefile": offsiteWinteringShpName
     }
 
+    @staticmethod
     def get_standard_file_name(item_name:str)->str:
         if item_name in Names.config_item_standard_name_lookup:
             return Names.config_item_standard_name_lookup[item_name]
         
         raise ValueError(f"{item_name} is not a valide name for standard file name.")
+    
+    @staticmethod
+    def remove_extension_from_raster_file(raster_file_name:str)->str:
+        return raster_file_name.replace(Names.raster_extension, "")
+    
+
+    
+
 

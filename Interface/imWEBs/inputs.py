@@ -154,6 +154,10 @@ class Inputs(FolderBase):
         return self.get_vector(Names.get_standard_file_name("riparian_buffer_shapefile"))    
     
     @property
+    def filter_strip_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("filter_strip_shapefile"))    
+    
+    @property
     def tile_drain_vector(self)->Vector:
         return self.get_vector(Names.get_standard_file_name("tile_drain_shapefile"))    
 
@@ -182,6 +186,8 @@ class Inputs(FolderBase):
     @property
     def bmp_types(self):
         bmps = []
+
+        #reach bmp
         if self.reservoir_vector is not None:
             bmps.append(BMPType.BMP_TYPE_RESERVOIR)
         if self.flow_diversion_vector is not None:
@@ -198,14 +204,27 @@ class Inputs(FolderBase):
             bmps.append(BMPType.BMP_TYPE_ACCESSMGT)
         if self.water_use_vector is not None:
             bmps.append(BMPType.BMP_TYPE_WATERUSE)
+
+        #structure bmp
         if self.dugout_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_DUGOUT)
         if self.wascob_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_WASCOB)
+        if self.tile_drain_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_FILTERSTRIP)
+        if self.raparian_buffer_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_RIPARIANBUFFER)
+        if self.filter_strip_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_FILTERSTRIP)
+
+        #non-structure
         if self.manure_storage_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_MANURE_STORAGE)
         if self.feedlot_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_MANURE_FEEDLOT)
+            
+
+        
 
         return bmps  
 

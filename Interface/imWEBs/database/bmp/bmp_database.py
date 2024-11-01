@@ -168,7 +168,7 @@ class BMPDatabase(DatabaseBase):
     def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs):        
         logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
 
-        rotation = CropRotation(outputs.unit_management_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
+        rotation = CropRotation(outputs.field_clipped_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
         
         logger.info("Crop Management ... ")
         self.save_table(Names.bmp_table_name_crop_management, rotation.crop_management_df)
@@ -184,6 +184,9 @@ class BMPDatabase(DatabaseBase):
 
         logger.info("Grazing reach deposit ... ")
         self.create_grazing_reach_deposit(first_year)
+
+        logger.info("Updating scenarios ...")
+        self.__create_bmp_scenarios(outputs, True)
 
     def __create_subbasin_info(self, 
                                 subbasin_raster:Raster,
@@ -244,7 +247,7 @@ class BMPDatabase(DatabaseBase):
         if grazing_management_df is None:
             return 
 
-        field_info_df = self.read_table(Names.bmp_table_name_management_unit_info)
+        field_info_df = self.read_table(Names.bmp_table_name_field_info)
         livestock_parameter = self.read_table(Names.bmp_table_name_livestock_parameter)
         fertilizer_parameter = self.read_table(Names.bmp_table_name_fertilizer_parameter)
 
@@ -426,7 +429,6 @@ class BMPDatabase(DatabaseBase):
         """crete reach parameters"""
         logger.info("Creating reach_parameter table ... ")
         self.save_table(Names.bmp_table_name_reach_parameter, outputs.reach_parameter_df)
-
     
     def __create_bmp_reach_bmp(self, subbasin_ids:list, reach_bmps:dict):
         """create reach_bmp table"""
@@ -435,12 +437,19 @@ class BMPDatabase(DatabaseBase):
         df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
         self.save_table(Names.bmp_table_name_reach_bmp, df)
 
-    def __create_bmp_scenarios(self, outputs:Outputs):
+    def __create_bmp_scenarios(self, outputs:Outputs, include_crop_rotation:bool = False):
         """create bmp scenarios table"""
         
         logger.info("Creating bmp_secenarios table ... ")
 
-        df = BMP.generate_bmp_scenarios_df(outputs.inputs.bmp_types)
+        bmp_types = outputs.inputs.bmp_types
+        if include_crop_rotation:
+            bmp_types.append(BMPType.BMP_TYPE_CROP)
+            bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
+            bmp_types.append(BMPType.BMP_TYPE_TILLAGE)
+            bmp_types.append(BMPType.BMP_TYPE_GRAZING)
+
+        df = BMP.generate_bmp_scenarios_df(bmp_types)
         self.save_table(Names.bmp_table_name_scenarios, df)
 
 #endregion

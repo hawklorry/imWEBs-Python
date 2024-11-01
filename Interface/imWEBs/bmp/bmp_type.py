@@ -74,8 +74,9 @@ ArealStructureBMPs = [
     BMPType.BMP_TYPE_WASCOB
 ]
 
-
+#bmp distribution
 BMPDistributions = {
+    #reach bmps use the same distriubtion table reach_bmp
     BMPType.BMP_TYPE_POINTSOURCE: Names.bmp_table_name_reach_bmp,
     BMPType.BMP_TYPE_FLOWDIVERSION_STREAM: Names.bmp_table_name_reach_bmp,
     BMPType.BMP_TYPE_RESERVOIR: Names.bmp_table_name_reach_bmp,
@@ -86,15 +87,38 @@ BMPDistributions = {
     BMPType.BMP_TYPE_ACCESSMGT:Names.bmp_table_name_reach_bmp,
     BMPType.BMP_TYPE_WATERUSE:Names.bmp_table_name_reach_bmp,
 
-    BMPType.BMP_TYPE_CROP:Names.bmp_table_name_crop_management,
-    BMPType.BMP_TYPE_FERTILIZER:Names.bmp_table_name_fertilizer_management,
-    BMPType.BMP_TYPE_TILLAGE:Names.bmp_table_name_tillage_management,
-    BMPType.BMP_TYPE_GRAZING:Names.bmp_table_name_grazing_management,
-    BMPType.BMP_TYPE_MANURE_STORAGE: Names.bmp_table_name_manure_storage_management,
-    BMPType.BMP_TYPE_MANURE_FEEDLOT: Names.bmp_table_name_manure_feed_lot_management        
+    #non-structure:[distribution_raster_name_in_hdf5]/[management_table_name]
+    #use field for crop, fertilizer, tillage and grazing
+    BMPType.BMP_TYPE_CROP:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_crop_management}",
+    BMPType.BMP_TYPE_FERTILIZER:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_fertilizer_management}",
+    BMPType.BMP_TYPE_TILLAGE:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_tillage_management}",
+    BMPType.BMP_TYPE_GRAZING:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_grazing_management}",
+    BMPType.BMP_TYPE_MANURE_STORAGE: f"{Names.remove_extension_from_raster_file(Names.manureStorageRasName)}/{Names.bmp_table_name_manure_storage_management}",
+    BMPType.BMP_TYPE_MANURE_FEEDLOT: f"{Names.remove_extension_from_raster_file(Names.feedlotRasName)}/{Names.bmp_table_name_manure_feed_lot_management}",     
+
+    #structure
+    #riparian buffer and filter strip has two distribution raster: part and drainage
+    #other structure bmps have only one distribution raster
+    BMPType.BMP_TYPE_RIPARIANBUFFER: f"{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}/{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}",  
+    BMPType.BMP_TYPE_FILTERSTRIP: f"{Names.remove_extension_from_raster_file(Names.filterStripPartRasterName)}/{Names.remove_extension_from_raster_file(Names.filterStripDrainageRasterName)}", 
+    BMPType.BMP_TYPE_DUGOUT:Names.remove_extension_from_raster_file(Names.dugoutRasName),
+    BMPType.BMP_TYPE_WASCOB:Names.remove_extension_from_raster_file(Names.wascobRasName),
+    BMPType.BMP_TYPE_TILEDRAIN:Names.remove_extension_from_raster_file(Names.tileDrainRasName),
+
+
+    #manure application adjustment:[distribution_raster_name_in_hdf5]/[management_table_name]
+    #they may share the same distribution raster, maybe field?
+    BMPType.BMP_TYPE_MI48H :  f"{Names.remove_extension_from_raster_file(Names.manure48hRasName)}/{Names.bmp_table_name_manure_incorporation_within_48h_management}",
+    BMPType.BMP_TYPE_MSETBACK :  f"{Names.remove_extension_from_raster_file(Names.manureSetbackRasName)}/{Names.bmp_table_name_manure_application_setback_management}",
+    BMPType.BMP_TYPE_NO_ONSNOW :  f"{Names.remove_extension_from_raster_file(Names.manureNoOnSnowRasName)}/{Names.bmp_table_name_manure_no_application_on_snow_management}",
+    BMPType.BMP_TYPE_NO_FALL :  f"{Names.remove_extension_from_raster_file(Names.manureSpringRasName)}/{Names.bmp_table_name_manure_spring_application_rather_than_fall_application_management}",
+    BMPType.BMP_TYPE_NITROGEN_LIMIT :  f"{Names.remove_extension_from_raster_file(Names.manureNLimitRasname)}/{Names.bmp_table_name_manure_application_based_on_soil_nitrogen_limit_management}",
+    BMPType.BMP_TYPE_PHOSPHORUS_LIMIT :  f"{Names.remove_extension_from_raster_file(Names.manurePLimitRasname)}/{Names.bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management}"
 }
 
+#bmp parameters
 BMPParameters = {
+    #reach bmps
     BMPType.BMP_TYPE_POINTSOURCE: Names.bmp_table_name_point_source,
     BMPType.BMP_TYPE_FLOWDIVERSION_STREAM: Names.bmp_table_name_flow_diversion,
     BMPType.BMP_TYPE_RESERVOIR: Names.bmp_table_name_reservoir,
@@ -105,11 +129,31 @@ BMPParameters = {
     BMPType.BMP_TYPE_ACCESSMGT:Names.bmp_table_name_managed_access_including_fencing,
     BMPType.BMP_TYPE_WATERUSE:Names.bmp_table_name_water_use,
 
+    #non-structure
+    #all non-structure bmps has only one parameter table except grazing which has three parameter table:[livestock_parameter]/[fertilizer_parameter]/[offsite_watering_parameter]
     BMPType.BMP_TYPE_CROP:Names.bmp_table_name_crop_parameter,
     BMPType.BMP_TYPE_FERTILIZER:Names.bmp_table_name_fertilizer_parameter,
-    BMPType.BMP_TYPE_TILLAGE:Names.bmp_table_name_tillage_parameter,
-    BMPType.BMP_TYPE_GRAZING: "",
+    BMPType.BMP_TYPE_TILLAGE:Names.bmp_table_name_tillage_parameter,    
     BMPType.BMP_TYPE_MANURE_STORAGE: Names.bmp_table_name_manure_storage_parameter,
-    BMPType.BMP_TYPE_MANURE_FEEDLOT: Names.bmp_table_name_manure_feed_lot_parameter        
+    BMPType.BMP_TYPE_MANURE_FEEDLOT: Names.bmp_table_name_manure_feed_lot_parameter,
+    BMPType.BMP_TYPE_GRAZING: f"{Names.bmp_table_name_livestock_parameter}/{Names.bmp_table_name_fertilizer_parameter}/{Names.bmp_table_name_offsite_watering}",
+
+    #structure
+    BMPType.BMP_TYPE_RIPARIANBUFFER: f"{Names.bmp_table_name_riparian_buffer}/{Names.bmp_table_name_crop_remove_parameter}",
+    BMPType.BMP_TYPE_FILTERSTRIP: f"{Names.bmp_table_name_filter_strip}/{Names.bmp_table_name_crop_remove_parameter}",
+    BMPType.BMP_TYPE_DUGOUT: Names.bmp_table_name_dugout,
+    BMPType.BMP_TYPE_WASCOB:Names.bmp_table_name_wascob,
+    BMPType.BMP_TYPE_TILEDRAIN:Names.bmp_table_name_tile_drain,
+
+    #manure application adjustment
+    #there is no parameter tables for maure application adjustment bmps
+    BMPType.BMP_TYPE_MI48H: "",
+    BMPType.BMP_TYPE_MSETBACK: "",
+    BMPType.BMP_TYPE_NO_ONSNOW: "",
+    BMPType.BMP_TYPE_NO_FALL : "",
+    BMPType.BMP_TYPE_NITROGEN_LIMIT: "",
+    BMPType.BMP_TYPE_PHOSPHORUS_LIMIT: ""
+
 }
 
+DefaultScenarioId = 2

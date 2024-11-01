@@ -1,7 +1,9 @@
+from ...bmp.bmp_type import DefaultScenarioId
+
 class BMPManagementBase:
     def __init__(self):
         """Base class for all bmp management tables. They start with same columns."""
-        self.Scenario = -1
+        self.Scenario = DefaultScenarioId
         self.Location = -1 
 
 class BMPManagementBaseWithYear(BMPManagementBase):
