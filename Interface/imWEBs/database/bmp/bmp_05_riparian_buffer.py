@@ -1,3 +1,5 @@
+from sqlalchemy import INT, TEXT, REAL
+
 class RiparianBuffer:
     """Distribution Table for BMP: Riparian buffer (5)"""
 
@@ -32,3 +34,12 @@ class RiparianBuffer:
         self.Sol_porosity = 0
         """Riparian buffer root depth (mm)"""
         self.Root_Depth = 0
+
+    @staticmethod 
+    def column_types()->dict:
+        buffer = RiparianBuffer()
+        return {col:(INT if col in ["Scenario","ID", "Year","RIBUF_ID","Subbasin","VegetationID"] else REAL) for col in dir(buffer) if "__" not in col}
+
+if __name__ == "__main__":
+    col_types = RiparianBuffer.column_types()
+    print(len(col_types))

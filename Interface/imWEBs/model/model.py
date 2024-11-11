@@ -55,10 +55,19 @@ class Model:
         """watershed delineation""" 
         self.outputs.delineate_watershed()
 
-    def generate_parameters(self):
+    def generate_parameters(self, reservoir_flow_routing:str, reservoir_flow_data_folder:str):
         """generate parameters"""
-        self.bmp_databaes.populate_database(self.outputs)
+
+        #bmp database
+        self.bmp_databaes.create_database_structure()
+        self.bmp_databaes.create_spatial_relationship_tables(self.outputs)
+        self.bmp_databaes.create_bmp_tables(self.outputs,reservoir_flow_routing, reservoir_flow_data_folder)
+
 
     def update_crop_rotation(self,crop_inventory_folder:str, first_year:int, last_year:int):
         """update crop rotation"""
         self.bmp_databaes.update_crop_rotation_AAFC_crop_inventory(crop_inventory_folder, first_year, last_year, self.outputs)
+
+    def run(self, scenario_id, scenario_name):
+        pass
+

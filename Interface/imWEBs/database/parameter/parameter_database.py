@@ -9,10 +9,22 @@ logger = logging.getLogger(__name__)
 class ParameterDatabase(DatabaseBase):
     """Access to parameter database."""
 
-    default_tables = ["Climate", "Discharge", "Interception", "NutrientCycling","PlantGrowth",
-                      "Sediment","Snow","SubArea","WaterBalance","Wetland",
-                      "LanduseLookup", "SoilLookup", "LanduseSoilLoopUpCalibration",
-                      "Lapse_rate", "LS_parameter"]
+    default_tables = ["Climate", 
+                      "Discharge", 
+                      "Interception",
+                      "NutrientCycling",
+                      "PlantGrowth",
+                      "Sediment",
+                      "Snow",
+                      "SubArea",
+                      "WaterBalance",
+                      "Wetland",
+                      "LanduseLookup",
+                      "SoilLookup", 
+                      "LanduseSoilLoopUpCalibration",
+                      "Lapse_rate", 
+                      "LS_parameter",
+                      "tile_drain"]
 
     def __init__(self, database_file):
         super().__init__(database_file) 

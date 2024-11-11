@@ -94,12 +94,12 @@ BMPDistributions = {
     BMPType.BMP_TYPE_TILLAGE:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_tillage_management}",
     BMPType.BMP_TYPE_GRAZING:f"{Names.remove_extension_from_raster_file(Names.fieldRasName)}/{Names.bmp_table_name_grazing_management}",
     BMPType.BMP_TYPE_MANURE_STORAGE: f"{Names.remove_extension_from_raster_file(Names.manureStorageRasName)}/{Names.bmp_table_name_manure_storage_management}",
-    BMPType.BMP_TYPE_MANURE_FEEDLOT: f"{Names.remove_extension_from_raster_file(Names.feedlotRasName)}/{Names.bmp_table_name_manure_feed_lot_management}",     
+    BMPType.BMP_TYPE_MANURE_FEEDLOT: f"{Names.remove_extension_from_raster_file(Names.feedlotBoundaryProcessedRasName)}/{Names.bmp_table_name_manure_feed_lot_management}",     
 
     #structure
     #riparian buffer and filter strip has two distribution raster: part and drainage
     #other structure bmps have only one distribution raster
-    BMPType.BMP_TYPE_RIPARIANBUFFER: f"{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}/{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}",  
+    BMPType.BMP_TYPE_RIPARIANBUFFER: f"{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}/{Names.remove_extension_from_raster_file(Names.riparianBufferDrainageRasterName)}",  
     BMPType.BMP_TYPE_FILTERSTRIP: f"{Names.remove_extension_from_raster_file(Names.filterStripPartRasterName)}/{Names.remove_extension_from_raster_file(Names.filterStripDrainageRasterName)}", 
     BMPType.BMP_TYPE_DUGOUT:Names.remove_extension_from_raster_file(Names.dugoutRasName),
     BMPType.BMP_TYPE_WASCOB:Names.remove_extension_from_raster_file(Names.wascobRasName),

@@ -163,7 +163,7 @@ class ScanrioConfig(Config):
                          cell_size=cell_size,
                          cell_num=cell_number,
                          subarea_num=30,
-                         subbasin_num=40,
+                         subbasin_num=self.model.outputs.number_of_subbasin,
                          start_date=self.start_date,
                          end_date=self.end_date,
                          data_type_station_ids=self.data_type_station_ids, 
@@ -188,38 +188,95 @@ class ScanrioConfig(Config):
         #create weight files use the climate stations selected by users
         coordinates = self.model.hydroclimate.station_coordinates
         previous_ids = []
-        previous_weight_file = ""
+        previous_weight_file = ""        
+        precipitation_weight_file = ""
+
+        #we will create the weight file in the model output folder to facilitate parameter.h5 generation.
+        #we will delete any previous weight file first
+        weight_file_folder = self.model.model_output_folder
+        for wf in [f for f in os.listdir(weight_file_folder) if "weight" in f and ".txt" in f]:
+            os.remove(os.path.join(weight_file_folder, wf))
+
+        #start to write
         for datatype, ids in self.data_type_station_ids.items():             
-            #we only need one for temperature so skip for TIMIN        
-            if datatype.upper() == "TMIN":
-                continue
+            #we only need one for temperature so skip for TIMIN 
+            #same for wind speed and direction    
+            if datatype.upper() == "TMIN" or datatype.upper() == "WD":
+                continue            
             
             #get weight file name
-            weight_file = f"weight_{datatype}.txt"
+            weight_file = f"weight_{datatype.lower()}.txt"
             if datatype.upper() == "TMAX":
-                weight_file = "weight_T.txt"
+                weight_file = "weight_t.txt"
+            if datatype.upper() == "WS":
+                weight_file = "weight_w.txt"
 
             logger.info(f"Writing {weight_file}")
 
             #just copy previous weight file if the stations are the same
             if len(previous_ids) > 0 and np.array_equal(np.sort(previous_ids), np.sort(ids)):
-                shutil.copyfile(os.path.join(self.scenario_folder, previous_weight_file),os.path.join(self.scenario_folder, weight_file))
+                shutil.copyfile(os.path.join(weight_file_folder, previous_weight_file),os.path.join(weight_file_folder, weight_file))
             else:
                 #write the weight file
                 WriteWeightFile(self.method, 
-                                os.path.join(self.scenario_folder, weight_file),
-                                self.model.outputs.mask_raster,
+                                os.path.join(weight_file_folder, weight_file),
+                                self.model.outputs.mask_refined_with_subbasin_raster,
                                 [coordinates[id] for id in ids])
             #save it
             previous_ids = ids
             previous_weight_file = weight_file
+            if datatype.upper() == "P":
+                precipitation_weight_file = weight_file
+
+        #copy weight file p for pet
+        if "PET" not in self.data_type_station_ids and len(precipitation_weight_file) > 0:
+            logger.info("Writing weight_pet.txt")
+            shutil.copyfile(os.path.join(weight_file_folder, precipitation_weight_file),os.path.join(weight_file_folder, "weight_pet.txt"))
+
+    def __generate_parameter_h5(self):
+        """
+        generate parameter h5 file
+        """
+        ParameterH5.generate_parameter_h5(self.scenario_folder, self.model.model_output_folder)
+
+    def __generate_reach_parameter(self):
+        """
+        Copy/create reach parameter from watershed/output folder.
+        It has same structure as the weight file. The header must start with #        
+        """
+        logger.info(f"Creating reachParameter.txt ...")
+        reach_parameter_df = self.model.outputs.reach_parameter_df.copy()
+
+        #write to file
+        reach_parameter_file = os.path.join(self.scenario_folder, Names.reachParameterTxtName)
+        reach_parameter_file_temp = os.path.join(self.scenario_folder, "temp.txt")
+        with open(reach_parameter_file,'w') as f:
+            f.writelines(f"{len(reach_parameter_df)}\n{len(reach_parameter_df.columns)}\n#")
+
+            reach_parameter_df.to_csv(reach_parameter_file_temp, sep = "\t", index=False)
+            with open(reach_parameter_file_temp,'r') as f_temp:
+                f.write(f_temp.read())
+
+        os.remove(reach_parameter_file_temp)
+    
+
+    def __generate_bmp_database(self):
+        """just copy the bmp database from database folder"""
+        shutil.copy(os.path.join(self.model.model_database_folder, Names.bmpDatabaseName), 
+                    os.path.join(self.scenario_folder, Names.bmpDatabaseName))
+
+    def __run_imwebs(self):
+        pass
 
     def generate_model_structure(self):
         """generate model structure"""
-        #self.__generate_file_in()
-        #self.__generate_file_out()
-        #self.__generate_config_fig()
+        self.__generate_file_in()
+        self.__generate_file_out()
+        self.__generate_config_fig()
         self.__generate_weight_file()
+        self.__generate_parameter_h5()
+        self.__generate_reach_parameter()
+        self.__generate_bmp_database()
 
 
 

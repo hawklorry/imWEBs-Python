@@ -32,9 +32,9 @@ class Names:
     bmp_table_name_tillage_management = "non_structure_bmp_tillage_management"
     bmp_table_name_tillage_parameter = "non_structure_bmp_tillage_parameter"
     bmp_table_name_fertilizer_management = "non_structure_bmp_fertilizer_management"
-    bmp_table_name_fertilizer_parameter = "non_structure_bmp_fertilizer_parameter"
+    bmp_table_name_fertilizer_parameter = "fertilizer_parameter"
     bmp_table_name_grazing_management = "GRAMG_management"
-    bmp_table_name_livestock_parameter = "non_structure_bmp_livestock_parameter"
+    bmp_table_name_livestock_parameter = "livestock_parameter"
     bmp_table_name_irrigation_management = "non_structure_bmp_irrigation_management"
     bmp_table_name_irrigation_parameter = "non_structure_bmp_irrigation_parameter"
     bmp_table_name_manure_storage_parameter = "non_structure_bmp_manure_storage_parameter"
@@ -72,7 +72,7 @@ class Names:
     #
     bmp_table_name_offsite_watering = "offsite_watering"
 
-
+    #----------------------------------------------------------------------------
 
     field_name_id = "id"
     field_name_subbasin = "subbasin"
@@ -83,8 +83,24 @@ class Names:
     #the feedlot column in manure storage layer
     field_name_feedlot = "feedlot"
 
-    #the catch basin column in feedlot
-    field_name_catch_basin = "cb"
+    #feedlot shapefile
+    field_name_feedlot_catch_basin = "cb"
+    field_name_feedlot_animal_id = "ani_id"
+    field_name_feedlot_adult = "adult"
+    field_name_feedlot_non_adult = "nonadult"
+    field_name_feedlot_storage_ids = "stoid"
+    field_name_feedlot_storage_ratios = "storatio"
+    fields_feedlot = [
+           field_name_feedlot_catch_basin,
+            field_name_feedlot_animal_id,
+            field_name_feedlot_adult,
+            field_name_feedlot_non_adult,
+            field_name_feedlot_storage_ids,
+            field_name_feedlot_storage_ratios 
+    ]
+
+
+    #-------------------------------------------------------------------------------
 
     #default raster extension
     raster_extension = ".tif"
@@ -113,8 +129,8 @@ class Names:
 
     # Mask
     boundaryShpName = "boundary" + shapefile_extension
-    maskRasName = "mask" + raster_extension
-    maskRefindedWithSubbasinRasName = "maskRefinedWithSubbasin" + raster_extension
+    maskRasName = "mask_before_subbasin_refinement" + raster_extension
+    maskRefindedWithSubbasinRasName = "mask" + raster_extension #don't change the name as it will be the base for parameter.h5
 
     # Flow Direction and Accumulation
     flowDirD8NoChangeName = "flow_dir_no_change" + raster_extension
@@ -139,12 +155,14 @@ class Names:
     reachRasName = "reach" + raster_extension 
     reachShpName = "reach" + shapefile_extension 
     reachParameterCsvName = bmp_table_name_reach_parameter + csv_extension
+    reachParameterTxtName = "reachParameter.txt"
     reachDepthName = "reach_depth" + raster_extension
     reachWidthName = "reach_width" + raster_extension
 
     # Slope
     slopeDegName = "slopeDeg" + raster_extension
     slopeRadiusName = "slopeRadius" + raster_extension
+    slopePercentName = "Slope" + raster_extension
 
     # parameters
     PRCName = "potentialRunoffCoefficient" + raster_extension
@@ -154,9 +172,9 @@ class Names:
     DSCAccAvgName = "DSC_Acc_Avg" + raster_extension
     Cn2AccAvgName = "CN2_Acc_Avg" + raster_extension
     flowLengthName = "flow_length" + raster_extension
-    usleKName = "usleK" + raster_extension
-    uslePName = "usleP" + raster_extension
-    usleCName = "usleC" + raster_extension
+    usleKName = "USLE_K" + raster_extension
+    uslePName = "USLE_P" + raster_extension
+    usleCName = "USLE_C" + raster_extension
     densityName = "density" + raster_extension
     sandName = "sand" + raster_extension
     clayName = "clay" + raster_extension    
@@ -170,7 +188,9 @@ class Names:
     fieldCapName = "field_capacity" + raster_extension
     poreIndexName = "pore_index" + raster_extension
     wiltingPointName = "wilting_point" + raster_extension
-    moistureInitialName = "initial_moisture" + raster_extension
+
+    #fixed name, don't change
+    moistureInitialName = "Moist_in" + raster_extension 
 
     manningName = "manning" + raster_extension
     velocityName = "velocity" + raster_extension
@@ -276,7 +296,7 @@ class Names:
     riparianBufferShpName = "riparian_buffer" + shapefile_extension
     riparianBufferRasterName = riparianBufferShpName.replace(shapefile_extension, raster_extension)
     riparianBufferPartRasterName = "riparian_buffer_part" + raster_extension
-    riparianBufferDrainageRasterName = "riparian_buffer_drinage" + raster_extension
+    riparianBufferDrainageRasterName = "riparian_buffer_drainage" + raster_extension
     riparianBufferParameterCSVName = "riparian_buffer_parameter" + csv_extension
 
     #filter strip
@@ -299,17 +319,17 @@ class Names:
     tileDrainRasName = tileDrainShpName.replace(shapefile_extension, raster_extension)
 
     # Cattle Feedlot
-    feedlotShpName = "feedlot" + shapefile_extension
-    feedlotRasName = feedlotShpName.replace(shapefile_extension, raster_extension)
+    feedlotShpName = "feedlot" + shapefile_extension    
     feedlotOutletShpName = "feedlot_outlet" + shapefile_extension
-    feedlotOutletRasName = feedlotOutletShpName.replace(shapefile_extension, raster_extension)
+    feedlotBoundaryProcessedRasName = "feedlotBoundaryProcessed" + raster_extension
 
     # Manure Storage - MSCD
     manureStorageShpName = "manure_storage" + shapefile_extension
     manureStorageRasName = manureStorageShpName.replace(shapefile_extension, raster_extension)
 
-    # offsite wintering - OFSW
-    offsiteWinteringShpName = "offsiteWintering" + shapefile_extension
+    # offsite wintering - fixed name - don't change
+    offsiteWinteringShpName = "grazingoffsitewatering" + shapefile_extension
+    offsiteWinteringRasName = "grazingoffsitewatering" + raster_extension
 
     #structures
     structureCombinedBoundaryShpName = "structureCombinedBoundary" + shapefile_extension
@@ -318,7 +338,7 @@ class Names:
 
     # Wetland
     wetlandShpName = "wetland" + shapefile_extension
-    wetlandName = "wetland" + raster_extension
+    wetlandRasName = "wetland" + raster_extension
     wetlandInactName = "wetlandInact" + raster_extension
     wetlandAlteredName = "wetlandAltered" + raster_extension
     wetlandDrainAlteredName = "wetlandDrainAltered" + raster_extension

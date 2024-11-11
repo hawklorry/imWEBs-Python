@@ -32,8 +32,8 @@ class DatabaseBase:
             return None
         return pd.read_sql(f"select * from {table_name}", self.engine)
 
-    def save_table(self, table_name:str, table_df:pd.DataFrame):
-        table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=False)
+    def save_table(self, table_name:str, table_df:pd.DataFrame, dtype:list = None, index = False):
+        table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=index, dtype=dtype)
 
     def check_table_exist(self, table_name:str)->bool:
         return len(pd.read_sql(f"SELECT tbl_name FROM sqlite_master where type='table' and tbl_name ='{table_name}'",self.engine)) > 0 

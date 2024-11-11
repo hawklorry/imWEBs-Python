@@ -12,7 +12,7 @@ class ArealBMP(BMP):
                  subbasin_raster:Raster,
                  reach_raster:Raster,
                  dem_raster:Raster):
-        super.__init__(bmp_vector, subbasin_raster)
+        super().__init__(bmp_vector, subbasin_raster)
 
         self.flow_direction_raster = flow_direction_raster
         self.reach_raster = reach_raster
@@ -61,9 +61,7 @@ class ArealBMP(BMP):
                         self.__bmp_raster[id].append((row, col))
             
         return self.__bmp_locations
-    
-
-    
+        
     @property
     def reach_ids(self)->dict:
         """The downstream reach id for each bmp"""

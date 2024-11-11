@@ -1,4 +1,4 @@
-from whitebox_workflows import Raster
+from whitebox_workflows import Raster, Vector
 from ..vector_extension import VectorExtension
 from ..raster_extension import RasterExtension
 from ..database.bmp.bmp_scenarios import BMP_scenarios
@@ -7,7 +7,7 @@ from .bmp_type import BMPParameters, BMPDistributions
 import pandas as pd
 
 class BMP:
-    def __init__(self,bmp_vector, subbasin_raster:Raster,):
+    def __init__(self,bmp_vector:Vector, subbasin_raster:Raster,):
         self.bmp_vector = bmp_vector
         self.subbasin_raster = subbasin_raster
 

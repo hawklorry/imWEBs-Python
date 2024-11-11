@@ -26,14 +26,17 @@ class FolderBase:
         df.to_csv(file_path, index=False)
         self.dfs[file_name] = df
 
-    def save_raster(self, raster:Raster, file_name:str, overwrite = True):
+    def save_raster(self, raster:Raster, file_name:str, overwrite = True, reload_from_file = True)->Raster:
         file_path = self.get_file_path(file_name)
 
         if os.path.exists(file_path) and not overwrite:
             raise ValueError(f"File: {file_path} already exists and overwrite is set to false.")
         
-        self.wbe.write_raster(raster, file_path)        
+        self.wbe.write_raster(raster, file_path)   
+        if reload_from_file:
+            raster = self.wbe.read_raster(file_path)     
         self.rasters[file_name] = raster
+        return raster
 
     def save_vector(self, vector:Vector, file_name:str, overwrite = True, reload_from_file = False):
         file_path = self.get_file_path(file_name)

@@ -1,0 +1,4 @@
+Parameter,Description,Unit,Module_ID,Value,Impact,Change,Max,Min,Use
+TSS_min,Tile Drain minimum TSS concentration,mg/l,ALL,50,,NC,1000,0,Y
+PN_min,Tile Drain minimum PN concentration,mg/l,ALL,0,,NC,100,0,Y
+PP_min,Tile Drain minimum PP concentration,mg/l,ALL,0,,NC,100,0,Y

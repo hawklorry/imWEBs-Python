@@ -1,7 +1,6 @@
 from typing import Any
 from sqlalchemy import Column, Integer, TEXT, REAL
 from .bmp_table import BMPTable
-from ...delineation.structure_attribute import StructureAttribute
 from .bmp_management_base import BMPManagementBaseWithYear
 from ...names import Names
 
@@ -31,38 +30,54 @@ class ManureFeedlot(BMPTable):
     """Manure event mean concentration"""
     Manure_EMC = Column(REAL)
 
-    def __init__(self, attribute:StructureAttribute = None):
-        if attribute is not None:
-            self.ID = attribute.id
-            self.ProducerID = self.ID
-            self.Subbasin = attribute.subbasin
-
-        self.CatBasID = 0
-
-        self.AniID = 1
+    def __init__(self, id:int, animal_id:int, subbasin:int, catch_basin_id:int):
+        self.ID = id
+        self.ProducerID = self.ID
+        self.Subbasin = subbasin
+        self.CatBasID = catch_basin_id
+        self.AniID = animal_id
         self.ManInitial = 0
         self.CN_change = 0.2
         self.PRC_change = 0.2
         self.Manure_EMC = 100000
 
 class ManureFeedlotManagement(BMPManagementBaseWithYear):
-    """Distribution Table for BMP: Manure feedlot (29)"""
-
-    #FDLMon,FDLDay,Days,AniAdult,AniNonAdult,ManStoID,ManStoDis,ManRemMon,ManRemDay,ManRemFra"
-    def __init__(self):
+    """
+    Distribution Table for BMP: Manure feedlot (29)
+    It has two operations:
+    1. Accumulate: FDLMon,FDLDay,Days,AniAdult,AniNonAdult
+    2. Remove: ManStoID,ManStoDis,ManRemMon,ManRemDay,ManRemFra
+    """
+    
+    def __init__(self, feedlot_id:int, adult:int, non_adult:int, manure_stroage_id:str, manure_storage_distribution:str):
+        """All data will be read from feedlot boundary shapefile"""
         super().__init__()
+
+        self.Location = feedlot_id
+
         self.FDLMon = 1
         self.FDLDay = 1
         self.Days = 120
 
         """Number of adult animals"""
-        self.AniAdult = 0
+        self.AniAdult = adult
         """Number of non-adult animals"""
-        self.AniNonAdult = 0
+        self.AniNonAdult = non_adult
 
-        self.ManStoID = 0
-        self.ManStoDis = 1
+        """Manure storage id spearate by /"""
+        self.ManStoID = manure_stroage_id
 
+        """
+        Manure storage distribution ratio separated by /
+        The total should be <= 1
+        The number of ratio is same as the number of manure storage        
+        """
+        self.ManStoDis = manure_storage_distribution
         self.ManRemMon = 10
         self.ManRemDay = 31
         self.ManRemFra = 1
+
+    @staticmethod
+    def column_types()->dict:
+        feedlot = ManureFeedlotManagement(0,0,0,"","")
+        return {col:(REAL if col == "ManRemFra" else (TEXT if col in ["ManStoID","ManStoDis"] else Integer)) for col in dir(feedlot) if "__" not in col}

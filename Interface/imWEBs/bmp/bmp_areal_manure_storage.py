@@ -1,6 +1,7 @@
 from .bmp_areal import ArealBMP
 from ..vector_extension import VectorExtension
-from ..database.bmp.bmp_27_manure_storage import ManureStorageParameter
+from ..database.bmp.bmp_27_manure_storage import ManureStorageParameter, ManureStorageManagement
+from ..names import Names
 
 class ArealBMPManureStorage(ArealBMP):
     """Manure Storage"""

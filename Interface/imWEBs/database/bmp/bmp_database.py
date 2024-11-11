@@ -13,9 +13,11 @@ from .farm_subbasin import FarmSubbasin
 from .subbasin_multiplier import SubbasinMultiplier
 from ...delineation.structure import Structure
 from ...names import Names
+from ...bmp.bmp_areal_manure_feedlot import ArealBMPManureFeedlot
 from ...bmp.bmp_areal_manure_storage import ArealBMPManureStorage
 from ...bmp.bmp_reach_manure_catch_basin import ReachBMPManureCatchBasin
 from ...bmp.bmp_reach_reservoir import ReachBMPReservoir
+from ...bmp.bmp_reach_wetland import ReachBMPWetland
 from ...bmp.bmp_type import BMPType
 from ...bmp.bmp_reach import ReachBMP
 from ...bmp.bmp import BMP
@@ -26,7 +28,7 @@ from ...bmp.crop_rotation.crop_rotation import CropRotation
 from .bmp_01_point_source import PointSource
 from .bmp_02_flow_diversion import FlowDiversion
 from .bmp_03_reservoir import Reservoir
-# from .bmp_05_riparian_buffer import RiparianBuffer
+from .bmp_05_riparian_buffer import RiparianBuffer
 # from .bmp_06_grass_waterway import GrassWaterWay
 # from .bmp_07_vegetation_filter_strip import FilterStrip
 from .bmp_09_isolated_wetland import Wetland
@@ -43,7 +45,7 @@ from .bmp_09_isolated_wetland import Wetland
 # from .bmp_26_applicaiton_based_on_soil_phosphorous_limit import ManureApplicationBasedOnPhosphorousLimitManagement
 from .bmp_27_manure_storage import ManureStorageParameter
 from .bmp_28_manure_catch_basin import ManureCatchBasinParameter
-from .bmp_29_manure_feedlot import ManureFeedlot
+from .bmp_29_manure_feedlot import ManureFeedlot, ManureFeedlotManagement
 # from .bmp_30_marginal_crop_management import MarginalCropManagement
 # from .bmp_31_marginal_fertilizer_management import MarginalFertilizerManagement
 # from .bmp_32_marginal_tillage_management import MarginalTillageManagement
@@ -57,6 +59,7 @@ from .bmp_39_offsite_watering import OffsiteWateringParameter
 from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFencingParameter
 from .bmp_41_wascob import Wascob
 #from .bmp_42_water_use import 
+import os
 
 
 from ..database_base import DatabaseBase, logger
@@ -83,13 +86,9 @@ class BMPDatabase(DatabaseBase):
 
     def __init__(self, database_file):
         super().__init__(database_file)
-        self.wbe = WbEnvironment()             
-
-    def populate_database(self, outputs:Outputs):
-        """
-        create all the parameter tables in bmp database
-        """        
-
+        self.wbe = WbEnvironment()   
+    
+    def create_database_structure(self):
         #remove the tables we want to update and then create them again
         logger.info("Creating table structure in bmp database ...")
         BMPTable.metadata.drop_all(self.engine)
@@ -101,18 +100,43 @@ class BMPDatabase(DatabaseBase):
             logger.info(table)
             self.populate_defaults(table) 
 
-        logger.info("Creating management_unit_info ...")
-        field_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.unit_management_raster, BMPDatabase.COL_NAME_AREA_HA)
-        field_area_df.to_sql(Names.bmp_table_name_management_unit_info, con = self.engine, if_exists='replace',index=True)
+    def create_bmp_tables(self, outputs:Outputs, 
+                          reservoir_flow_routing:str, reservoir_flow_data_folder:str):
+        """
+        create all the parameter tables in bmp database
+        """        
 
+        self.__create_bmp_manure_feedlot(outputs)
+        self.__create_bmp_manure_catchbasin(outputs)
+        self.__create_bmp_manure_storage(outputs)
+
+        self.__create_bmp_reservoir(outputs,reservoir_flow_routing, reservoir_flow_data_folder)
+        self.__create_bmp_wetland(outputs)
+        self.__create_bmp_dugout(outputs)
+        self.__create_bmp_wascob(outputs)
+        self.__create_bmp_riparian_buffer(outputs)
+
+        self.__create_bmp_offsite_wintering(outputs)
+
+        #create reach_bmp table
+        #all reach bmps should be added before this
+        self.__create_reach_parameter(outputs)
+        self.__create_bmp_reach_bmp(outputs)
+
+        #create bmp_scenarios table
+        self.__create_bmp_scenarios(outputs)
+
+#region spatial relationship
+
+    def create_spatial_relationship_tables(self,outputs:Outputs):
         logger.info("Creating field_info ...")
         field_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.field_raster, BMPDatabase.COL_NAME_AREA_HA)
-        field_area_df.to_sql(Names.bmp_table_name_field_info, con = self.engine, if_exists='replace',index=True)
+        self.save_table(Names.bmp_table_name_field_info, field_area_df, None, True)
         field_area_df.columns = ["FieldArea"]
 
         logger.info("Creating farm_info ...")
         farm_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.farm_raster, BMPDatabase.COL_NAME_AREA_HA)
-        farm_area_df.to_sql(Names.bmp_table_name_farm_info, con = self.engine, if_exists='replace',index=True)
+        self.save_table(Names.bmp_table_name_farm_info, farm_area_df, None, True)
         farm_area_df.columns = ["FarmArea"]
 
         logger.info("Creating subbasin_info ...")
@@ -121,7 +145,7 @@ class BMPDatabase(DatabaseBase):
                                                        outputs.potential_ruoff_coefficient_raster, 
                                                        outputs.depression_storage_capacity_raster, 
                                                        outputs.cn2_raster)
-        subbasin_area_df.to_sql(Names.bmp_table_name_subbasin_info, con = self.engine, if_exists='replace',index=True)
+        self.save_table(Names.bmp_table_name_subbasin_info, subbasin_area_df, None, True)
         subbasin_ids = subbasin_area_df.index.to_list()
 
         subbasin_area_df = subbasin_area_df[BMPDatabase.COL_NAME_AREA_HA].to_frame()
@@ -139,54 +163,7 @@ class BMPDatabase(DatabaseBase):
         self.__create_overlay(outputs.field_raster, outputs.farm_raster, 
                               "Field", "Farm", field_area_df, farm_area_df, Names.bmp_table_name_field_farm) 
         
-        self.__create_subbasin_multiplier(subbasin_ids)
-
-        #bmps
-        reach_bmps = {}
-        reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = self.__create_bmp_reservoir(outputs)
-        for type, struc in outputs.structures.items():            
-            id_subbasins = self.__create_bmp_structure(type, struc, outputs)
-            if type == "wetland":
-                reach_bmps[BMPType.BMP_TYPE_WETLAND] = id_subbasins
-        self.__create_bmp_manure_storage(outputs)   
-        reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = self.__create_bmp_manure_catchbasin(outputs) 
-        self.__create_bmp_riparian_buffer(outputs)
-        self.__create_bmp_offsite_wintering(outputs)
-
-
-        #create reach_bmp table
-        #all reach bmps should be added before this
-        self.__create_reach_parameter(outputs)
-        self.__create_bmp_reach_bmp(subbasin_ids, reach_bmps)
-
-        #create bmp_scenarios table
-        self.__create_bmp_scenarios(outputs)
-
-        #just force to generate the reach vector, change it later
-        reach = outputs.reach_vector
-
-    def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs):        
-        logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
-
-        rotation = CropRotation(outputs.field_clipped_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
-        
-        logger.info("Crop Management ... ")
-        self.save_table(Names.bmp_table_name_crop_management, rotation.crop_management_df)
-
-        logger.info("Fertilizer Management ... ")
-        self.save_table(Names.bmp_table_name_fertilizer_management, rotation.fertilizer_management_df)
-
-        logger.info("Tillage Management ... ")
-        self.save_table(Names.bmp_table_name_tillage_management, rotation.tillage_management_df)
-
-        logger.info("Grazing Management ... ")
-        self.save_table(Names.bmp_table_name_grazing_management, rotation.grazing_management_df)
-
-        logger.info("Grazing reach deposit ... ")
-        self.create_grazing_reach_deposit(first_year)
-
-        logger.info("Updating scenarios ...")
-        self.__create_bmp_scenarios(outputs, True)
+        self.__create_subbasin_multiplier(subbasin_ids)        
 
     def __create_subbasin_info(self, 
                                 subbasin_raster:Raster,
@@ -231,7 +208,233 @@ class BMPDatabase(DatabaseBase):
 
         return df
     
-    def create_grazing_reach_deposit(self, start_year:int):
+    def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
+        """populate default subbasin-muliplier"""
+        logger.info("Creating subbasin_multiplier ... ")
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all([SubbasinMultiplier(id) for id in subbasin_ids])
+            session.commit()
+
+    def __create_reach_parameter(self, outputs:Outputs):
+        """crete reach parameters"""
+        logger.info("Creating reach_parameter table ... ")
+        self.save_table(Names.bmp_table_name_reach_parameter, outputs.reach_parameter_df)
+
+#endregion
+   
+#region Structure BMPs
+    
+    def __create_bmp_dugout(self, outputs:Outputs):
+        if "dugout" not in outputs.structures:
+            return
+        
+        logger.info("Creating dugout ... ")
+        dugout = StructureBMPDugout(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, outputs.structures["dugout"])
+        self.save_table(Names.bmp_table_name_dugout, dugout.dugout_df)
+
+    def __create_bmp_wascob(self, outputs:Outputs):
+        if "wascob" not in outputs.structures:
+            return
+        
+        logger.info("Creating wascob ... ")
+        wascob = StructureBMPWascob(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, outputs.structures["wasob"])
+        self.save_table(Names.bmp_table_name_wascob, wascob.wascob_df)
+
+    def __create_bmp_riparian_buffer(self, outputs:Outputs):
+        df = outputs.riparian_buffer_parameter_df
+        if df is not None:
+            self.save_table(Names.bmp_table_name_riparian_buffer, df, RiparianBuffer.column_types())
+
+#endregion
+
+#region Manure Management BMPs
+
+    def __create_bmp_manure_feedlot(self, outputs:Outputs):
+        """Create parameter and management table for manure feedlot"""
+
+        if outputs.inputs.feedlot_boundary_vector is None:
+            return
+        
+        #get the structure and creat feedlot
+        feedlots = ArealBMPManureFeedlot(outputs.inputs.feedlot_boundary_vector,
+                                         outputs.flow_direction_raster,
+                                         outputs.subbasin_raster, 
+                                         outputs.reach_raster, 
+                                         outputs.dem_clipped_raster_for_model)
+
+        #parameter table        
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(feedlots.parameters)
+            session.commit()
+
+        #management table
+        self.save_table(Names.bmp_table_name_manure_feed_lot_management, feedlots.default_management_df, ManureFeedlotManagement.column_types())
+
+    def __create_bmp_manure_catchbasin(self, outputs:Outputs):
+        """Create parmater table for manure catch basin"""
+
+        if outputs.inputs.catchbasin_vector is None:
+            return {}
+        
+        logger.info("Creating manure catch basin parameter table ... ")
+        catchbasin = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
+                                outputs.subbasin_raster,
+                                outputs.reach_parameter_df)
+        
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(catchbasin.manure_catch_basin_parameters)
+            session.commit()         
+
+    def __create_bmp_manure_storage(self,outputs:Outputs):
+        """Create parmater and management table for manure storage"""
+
+        if outputs.inputs.manure_storage_boundary_vector is None:
+            return
+        
+        logger.info("Creating manure storage parameter table ... ")
+        storage = ArealBMPManureStorage(outputs.inputs.manure_storage_boundary_vector,
+                                outputs.flow_direction_raster,
+                                outputs.subbasin_raster,
+                                outputs.reach_raster,
+                                outputs.dem_clipped_raster)
+        
+        #parameter table
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(storage.manure_storage_parameters)
+            session.commit() 
+
+#endregion
+
+#region Reach BMPs
+
+    def __create_bmp_reach_bmp(self, outputs:Outputs):
+        """create reach_bmp table"""
+
+        logger.info("Creating reach_bmp table ... ")
+
+        reach_bmps = {} 
+
+        #wetland      
+        if "wetland" in outputs.structures:
+            reach_bmps[BMPType.BMP_TYPE_WETLAND] = ReachBMPWetland(outputs.structures["wetland"].boundary_processed_vector, outputs.subbasin_raster).subbasins
+        
+        #reservoir
+        if outputs.inputs.reservoir_vector is not None:
+            reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster).subbasins
+        
+        #catch basin
+        reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
+                                outputs.subbasin_raster,
+                                outputs.reach_parameter_df).subbasins
+
+        if len(reach_bmps) <= 0:
+            logger.info("There is no reach bmp, existing ... ")
+            return
+
+        #get all subbasins
+        subbasin_ids = range(1, int(RasterExtension.get_max_value(outputs.subbasin_raster)) + 1)
+
+        #save the table
+        df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
+        self.save_table(Names.bmp_table_name_reach_bmp, df)
+
+    def __create_bmp_wetland(self, outputs:Outputs):
+        if "wetland" not in outputs.structures:
+            return
+        
+        logger.info("Creating wetland ... ")
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all([Wetland(struc_attribute) for struc_attribute in outputs.structures["wetland"].attributes.values()])
+            session.commit()
+
+    def __create_bmp_reservoir(self, outputs:Outputs, 
+                           flow_method:str, 
+                           flow_data_folder:str):
+        """
+        populate reservoir parameter table
+        """
+
+        if outputs.inputs.reservoir_vector is None:
+            return {}
+        
+        logger.info("Creating reservoir parameter table ... ")
+        ReachBMPReservoir.validate(outputs.inputs.reservoir_vector, flow_method, flow_data_folder)
+        reservoir = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster)
+
+        for res in reservoir.reservoirs:
+            res.METHOD = flow_method
+            logger.info(f"Importing {res.FILE}.csv ...")
+            file_path = os.path.join(flow_data_folder, f"{res.FILE}.csv")
+            if os.path.exists(file_path):
+                self.save_table(res.FILE, pd.read_csv(file_path))
+
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(reservoir.reservoirs)
+            session.commit()  
+
+        return reservoir.subbasins
+
+#endregion
+
+    def __create_bmp_offsite_wintering(self, outputs:Outputs):
+        if outputs.inputs.offsite_watering_vector is None:
+            return
+        
+        logger.info("Creating offsite wintering parameter table ... ")
+        bmp = BMPOffsiteWintering(outputs.inputs.offsite_watering_vector, outputs.subbasin_raster)
+
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(bmp.offsite_wintering_parameters)
+            session.commit()      
+  
+    def __create_bmp_scenarios(self, outputs:Outputs, include_crop_rotation:bool = False):
+        """create bmp scenarios table"""
+        
+        logger.info("Creating bmp_secenarios table ... ")
+
+        bmp_types = outputs.inputs.bmp_types
+        if include_crop_rotation:
+            bmp_types.append(BMPType.BMP_TYPE_CROP)
+            bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
+            bmp_types.append(BMPType.BMP_TYPE_TILLAGE)
+            bmp_types.append(BMPType.BMP_TYPE_GRAZING)
+
+        df = BMP.generate_bmp_scenarios_df(bmp_types)
+        self.save_table(Names.bmp_table_name_scenarios, df)
+
+#region Crop Rotation
+
+    def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs):        
+        logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
+
+        rotation = CropRotation(outputs.field_clipped_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
+        
+        logger.info("Crop Management ... ")
+        self.save_table(Names.bmp_table_name_crop_management, rotation.crop_management_df)
+
+        logger.info("Fertilizer Management ... ")
+        self.save_table(Names.bmp_table_name_fertilizer_management, rotation.fertilizer_management_df)
+
+        logger.info("Tillage Management ... ")
+        self.save_table(Names.bmp_table_name_tillage_management, rotation.tillage_management_df)
+
+        logger.info("Grazing Management ... ")
+        self.save_table(Names.bmp_table_name_grazing_management, rotation.grazing_management_df)
+
+        logger.info("Grazing reach deposit ... ")
+        self.__create_grazing_reach_deposit(first_year)
+
+        logger.info("Updating scenarios ...")
+        self.__create_bmp_scenarios(outputs, True)
+
+    def __create_grazing_reach_deposit(self, start_year:int):
         """
         Create GRAMG_ReachDeposit table based on GRAMG_management, Field_Info, Livestock_parameter and Fertilizer_parameter.
 
@@ -316,140 +519,5 @@ class BMPDatabase(DatabaseBase):
 
         #save to database
         self.save_table("GRAMG_ReachDeposit",reach_deposit_df)
-
-
-#region BMPs
-
-    def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
-        """populate default subbasin-muliplier"""
-        logger.info("Creating subbasin_multiplier ... ")
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            session.add_all([SubbasinMultiplier(id) for id in subbasin_ids])
-            session.commit()
-
-    def __create_bmp_structure(self, structure_type:str, structure:Structure,outputs:Outputs)->dict:
-        """populate default structure parameter table""" 
-        logger.info(f"Creating {structure_type} parameter table ... ")      
-
-        if structure_type == "wetland" or structure_type == "feedlot":
-            Session = sessionmaker(bind=self.engine)
-            with Session() as session:
-                if structure_type == "wetland":
-                    session.add_all([Wetland(struc_attribute) for struc_attribute in structure.attributes.values()])
-                elif structure_type == "feedlot":
-                    session.add_all([ManureFeedlot(struc_attribute) for struc_attribute in structure.attributes.values()])
-                session.commit()
-        else:
-            #we couldn't create dugout and wascob parameter table with ORM as the primary key is not defined. Use pandas dataframe instead
-            if structure_type == "dugout":
-                self.__create_bmp_dugout(self,outputs,structure)
-            elif structure_type == "wascob":
-                self.__create_bmp_wascob(self,outputs,structure)
-        
-
-        id_subbasins = {}
-        for id, attribute in structure.attributes.items():
-            id_subbasins[id] = attribute.subbasin
-        return id_subbasins
-
-    def __create_bmp_riparian_buffer(self, outputs:Outputs):
-        df = outputs.riparian_buffer_parameter_df
-        if df is not None:
-            self.save_table(Names.bmp_table_name_riparian_buffer, df)
-
-    def __create_bmp_dugout(self, outputs:Outputs, dugout_structure:Structure):
-        dugout = StructureBMPDugout(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, dugout_structure)
-        self.save_table(Names.bmp_table_name_dugout, dugout.dugout_df)
-
-    def __create_bmp_wascob(self, outputs:Outputs, wascob_structure:Structure):
-        wascob = StructureBMPWascob(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, wascob_structure)
-        self.save_table(Names.bmp_table_name_dugout, wascob.wascob_df)
-
-    def __create_bmp_manure_storage(self,outputs:Outputs):
-        """populate default manure storage tables"""
-        if outputs.inputs.manure_storage_boundary_vector is None:
-            return
-        
-        logger.info("Creating manure storage parameter table ... ")
-        storage = ArealBMPManureStorage(outputs.inputs.manure_storage_boundary_vector,
-                                outputs.flow_direction_raster,
-                                outputs.subbasin_raster,
-                                outputs.reach_raster,
-                                outputs.dem_clipped_raster)
-        
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            session.add_all(storage.manure_storage_parameters)
-            session.commit()  
-
-    def __create_bmp_reservoir(self, outputs:Outputs)->dict:
-        """populate default reservoir parameter table"""
-        if outputs.inputs.reservoir_vector is None:
-            return {}
-        
-        logger.info("Creating reservoir parameter table ... ")
-        reservoir = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster)
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            session.add_all(reservoir.reservoirs)
-            session.commit()  
-
-        return reservoir.subbasins
-
-    def __create_bmp_manure_catchbasin(self, outputs:Outputs)->dict:
-        if outputs.inputs.catchbasin_vector is None:
-            return {}
-        
-        logger.info("Creating manure catch basin parameter table ... ")
-        catchbasin = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
-                                outputs.subbasin_raster,
-                                outputs.reach_parameter_df)
-        
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            session.add_all(catchbasin.manure_catch_basin_parameters)
-            session.commit()         
-
-        return catchbasin.subbasins
-    
-    def __create_bmp_offsite_wintering(self, outputs:Outputs):
-        if outputs.inputs.offsite_watering_vector is None:
-            return
-        
-        logger.info("Creating offsite wintering parameter table ... ")
-        bmp = BMPOffsiteWintering(outputs.inputs.offsite_watering_vector, outputs.subbasin_raster)
-
-        Session = sessionmaker(bind=self.engine)
-        with Session() as session:
-            session.add_all(bmp.offsite_wintering_parameters)
-            session.commit()      
-
-    def __create_reach_parameter(self, outputs:Outputs):
-        """crete reach parameters"""
-        logger.info("Creating reach_parameter table ... ")
-        self.save_table(Names.bmp_table_name_reach_parameter, outputs.reach_parameter_df)
-    
-    def __create_bmp_reach_bmp(self, subbasin_ids:list, reach_bmps:dict):
-        """create reach_bmp table"""
-
-        logger.info("Creating reach_bmp table ... ")
-        df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
-        self.save_table(Names.bmp_table_name_reach_bmp, df)
-
-    def __create_bmp_scenarios(self, outputs:Outputs, include_crop_rotation:bool = False):
-        """create bmp scenarios table"""
-        
-        logger.info("Creating bmp_secenarios table ... ")
-
-        bmp_types = outputs.inputs.bmp_types
-        if include_crop_rotation:
-            bmp_types.append(BMPType.BMP_TYPE_CROP)
-            bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
-            bmp_types.append(BMPType.BMP_TYPE_TILLAGE)
-            bmp_types.append(BMPType.BMP_TYPE_GRAZING)
-
-        df = BMP.generate_bmp_scenarios_df(bmp_types)
-        self.save_table(Names.bmp_table_name_scenarios, df)
 
 #endregion

@@ -7,6 +7,7 @@ from .lookup import Lookup
 import logging
 import numpy as np
 from .bmp.bmp_type import BMPType
+from .bmp.bmp_reach_reservoir import ReachBMPReservoir
 
 logger = logging.getLogger(__name__)
 
@@ -222,9 +223,6 @@ class Inputs(FolderBase):
             bmps.append(BMPType.BMP_TYPE_MANURE_STORAGE)
         if self.feedlot_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_MANURE_FEEDLOT)
-            
-
-        
 
         return bmps  
 
@@ -272,15 +270,24 @@ class Inputs(FolderBase):
         
         #check manure feedlot, catch basin and storage
         self.__check_manure_feedlot_catchbasin_storage()
+        self.__check_reservoir()
         
         #check if the soil/lookup raster ids are included in corresponding lookup csv files
         logger.info("Loading lookup tables ...")
         self.lookup_soil =  Lookup(self.soil_lookup_csv, self.soil_raster)
         self.lookup_landuse  = Lookup(self.landuse_lookup_csv, self.landuse_raster)
 
+    def __check_reservoir(self):
+        if self.reservoir_vector is None:
+            return 
+
+        ReachBMPReservoir.validate(self.reservoir_vector)
+
+
     def __check_manure_feedlot_catchbasin_storage(self):
         """
-        check manure feedlot catchbasin and storage
+        check manure feedlot catchbasin and storage.
+        Move this logic later to dedicated classes
         
         1. feedlot should have a cb column for catch basin id
         2. manure storage should have feedlot column for source feedlot
@@ -291,19 +298,25 @@ class Inputs(FolderBase):
         if self.feedlot_boundary_vector is None:
             return 
         
-        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)
-
+        #get all feedlot ids
+        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)     
+            
+        #make sure feedlot has all required columns
+        VectorExtension.check_fields_in_vector(self.feedlot_boundary_vector, Names.fields_feedlot)  
+        
         #check feedlot outlet id
+        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)     
         if self.feedlot_outlet_vector is not None:
             feedlot_outlet_ids = VectorExtension.get_unique_ids(self.feedlot_outlet_vector)
 
             if not np.array_equal(feedlot_ids.sort(), feedlot_outlet_ids.sort()):
                 raise ValueError("The ids in feedlot and catch basin doesn't match. Each feedlot should have only one feedlot outlet. Please check. ")
-            
+
+
         #check catch basin column in feedlot
         if self.catchbasin_vector is not None:
             catch_basin_ids = VectorExtension.get_unique_ids(self.catchbasin_vector)
-            feedlot_catchbasin_ids = VectorExtension.get_unique_field_value(self.feedlot_boundary_vector, Names.field_name_catch_basin)
+            feedlot_catchbasin_ids = VectorExtension.get_unique_field_value(self.feedlot_boundary_vector, Names.field_name_feedlot_catch_basin)
 
             for catch_basin in feedlot_catchbasin_ids.values():
                 if catch_basin not in catch_basin_ids:

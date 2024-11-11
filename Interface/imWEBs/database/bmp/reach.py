@@ -4,6 +4,10 @@ import pandas as pd
 from .reach_parameter import ReachParameter
 from ...raster_extension import RasterExtension
 from whitebox_workflows import Raster
+import math
+
+import logging
+logger = logging.getLogger(__name__)
 
 class Reach:
     """
@@ -44,7 +48,8 @@ class Reach:
         self.colNum = int(self.stream_network_raster.configs.columns)
 
         self.cellsize = dem_raster.configs.resolution_x
-        self.cellsize_ha = dem_raster.configs.resolution_x * dem_raster.configs.resolution_y / 10000        
+        self.cellsize_ha = dem_raster.configs.resolution_x * dem_raster.configs.resolution_y / 10000    
+        self.min_length = (dem_raster.configs.resolution_x + dem_raster.configs.resolution_y) / 4
         self.nodata = dem_raster.configs.nodata
 
         self.dX = [1, 1, 1, 0, -1, -1, -1, 0]
@@ -127,7 +132,7 @@ class Reach:
                 rch_in_row[i] = rch_in_row2[i]
                 rch_in_col[i] = rch_in_col2[i]
 
-        return rch_in_row, rch_in_col, np.maximum(rchmax - rchmin, 0.01)  # Minimal reach width is 0.01m
+        return rch_in_row, rch_in_col, np.maximum(rchmax - rchmin, self.min_length) 
 
     def __calculate_reach_mean(self, value_raster, name:str, min_value = None):
         #filter out the raster that are not on a stream       
@@ -272,7 +277,7 @@ class Reach:
                     flag = False
                     break
 
-            rchavg[i] = -1 * totalManning / totalManningNum
+            rchavg[i] = max(min(-1 * totalManning / totalManningNum, 0.1), 0.04)
 
         return rchavg
 
@@ -354,6 +359,7 @@ class Reach:
         reach_contribution_area_df = reach_contribution_area_df * self.cellsize_ha
 
         #return numpy array
+        #logger.info(reach_contribution_area_df)
         return reach_contribution_area_df["contri"].to_numpy()
 
     def __calculate_reach_elevation(self):

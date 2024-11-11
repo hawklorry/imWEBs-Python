@@ -184,7 +184,7 @@ class Delineation:
             pass
 
     @staticmethod
-    def get_flow_path_length(flow_dir_raster:Raster)->Raster:       
+    def get_flow_path_length(flow_dir_raster:Raster, dem_raster:Raster)->Raster:       
         """
         Replace plugin MaxUpslopeFlowpathLength
         """
@@ -213,14 +213,11 @@ class Delineation:
         gridLengths = [diagGridRes, gridResX, diagGridRes, gridResY, diagGridRes, gridResX, diagGridRes, gridResY]
 
         wbe = WbEnvironment()  
-        configs = flow_dir_raster.configs
-        configs.data_type = RasterDataType.F32
-        configs.nodata = 0
-
-        flow_length_raster = wbe.new_raster(configs)
-
-        configs.nodata = noData
-        temp_raster = wbe.new_raster(configs)
+        flow_length_raster = wbe.new_raster(dem_raster.configs)
+        for row in range(rows):
+            for col in range(cols):
+                flow_length_raster[row, col] = 0
+        temp_raster = wbe.new_raster(dem_raster.configs)
         
         for row in range(rows):
             for col in range(cols):
@@ -231,7 +228,7 @@ class Delineation:
                             z += 1
                     temp_raster[row, col] = z
                 else:
-                    temp_raster[row, col] = noData
+                    flow_length_raster[row, col] = noData
 
         for row in range(rows):
             for col in range(cols):
@@ -265,7 +262,7 @@ class Delineation:
                             flag = False
                         if not flag:
                             break
-       
+        
         return flow_length_raster
 
     @staticmethod

@@ -22,10 +22,12 @@ class imWEBs:
         """
         watershed delineation
         """
-        self.model_config.generate_parameters()
-        
+        self.model_config.generate_parameters()        
 
     def update_crop_rotation(self):
+        """
+        update crop rotation
+        """
         self.model_config.update_crop_rotation()
 
     def create_model(self):

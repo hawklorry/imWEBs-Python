@@ -61,7 +61,7 @@ class VectorExtension:
         return []
     
     @staticmethod
-    def get_unique_field_value(vector:Vector, field_name:str)->dict:
+    def get_unique_field_value(vector:Vector, field_name:str, type:type = int)->dict:
         exist, name = VectorExtension.check_field_in_vector(vector, field_name)
 
         if not exist:
@@ -74,7 +74,12 @@ class VectorExtension:
             id = int(vector.get_attribute_value(i, field_name_id).get_value_as_f64())
             field_value = vector.get_attribute_value(i, name)
             if not field_value.is_null():
-                field_values[id] = int(field_value.get_value_as_f64())
+                if type is int:
+                    if int(field_value.get_value_as_f64()) > 0:
+                        field_values[id] = int(field_value.get_value_as_f64())
+                elif type is str:
+                    if(len(field_value.get_as_string()) > 0):
+                        field_values[id] = field_value.get_as_string()
 
         return field_values
 
@@ -188,6 +193,13 @@ class VectorExtension:
             return True, fields[-1]
         else:
             return False, ""
+        
+    @staticmethod
+    def check_fields_in_vector(vector:Vector, field_names:list):
+        """check if vector has list of fields"""
+        for field in field_names:
+            if not VectorExtension.check_field_in_vector(vector, field)[0]:
+                raise ValueError(f"Couldn't find column {field} in {vector.file_name}. It should have following columns: {", ".join(list)}.")
         
     @staticmethod
     def vector_polygons_to_raster_with_boarder(polygon_vector:Vector, field_name:str, base_raster:Raster)->Raster:

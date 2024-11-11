@@ -171,6 +171,8 @@ class ModelConfig(Config):
                                  "manure_storage_boundary_shapefile",
                                  "offsite_watering_shapefile"],
 
+            "reservoir":["reservoir_flow_routing","reservoir_flow_data_folder"],
+
             #delineation parameters
             "delineation":["stream_threshold_area_ha",
                         "wetland_min_area_ha",
@@ -197,7 +199,8 @@ class ModelConfig(Config):
 
     def generate_parameters(self):
         """watershed delineation""" 
-        self.model.generate_parameters()
+        self.model.generate_parameters(getattr(self,"reservoir_flow_routing"), 
+                                       getattr(self,"reservoir_flow_data_folder"))
 
     def update_crop_rotation(self):
         self.model.update_crop_rotation(
