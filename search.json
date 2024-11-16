@@ -1,0 +1,241 @@
+[
+  {
+    "objectID": "user-guide/scenario_config.html",
+    "href": "user-guide/scenario_config.html",
+    "title": "Scenario Configuration File",
+    "section": "",
+    "text": "Model configure file is Microsoft Windows INI file used to specify scenario settings.\n\n\nSame settings as the one in model configuration file.\n\nmodel_folder - The folder where the model files will be created.\n\n\n\n\nThe basic settings for scenario.\n\nname - The name of the scenario. A sub-folder will be created with this name in the model folder and all the model files will be in that folder.\nmodel_type - The model type, cell or subarea.\ninterval - The time interval, daily or hourly\nstart_date - The start date of simulation in yyyy-mm-dd format. The start date of the hydroclimate database will be used if it’s empty.\nend_date - The end date of simulation in yyyy-mm-dd format. The end date of the hydroclimate database will be used if it’s empty.\n\n\n\n\nThe climate stations used for the simulation. The required format is ids separated by comma. The ids must match the one in ID column in STATIONS table of hydroclimate database.\n\n\n\n\n\n\nTip\n\n\n\nIf all hydroclimate stations will be used, leave all the items empty. This is the recommended approach.\n\n\n\nP - The stations ids for precipitation.\nT - The stations ids for temperature.\nRM - The stations ids for relative humidity.\nSR - The stations ids for solar radiation.\nWS - The stations ids for wind speed.\nWD - The stations ids for wind direction. This may be merged with wind speed later.\n\n\n\n\nThe method used to generate the weight file.\n\nmethod - The method for interpolation. Available methods include: average_uniform, grid_interpolation, inverse_distance, linear_triangle and thiessen_polygon.",
+    "crumbs": [
+      "User Guide",
+      "Scenario Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/scenario_config.html#model",
+    "href": "user-guide/scenario_config.html#model",
+    "title": "Scenario Configuration File",
+    "section": "",
+    "text": "Same settings as the one in model configuration file.\n\nmodel_folder - The folder where the model files will be created.",
+    "crumbs": [
+      "User Guide",
+      "Scenario Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/scenario_config.html#scenario",
+    "href": "user-guide/scenario_config.html#scenario",
+    "title": "Scenario Configuration File",
+    "section": "",
+    "text": "The basic settings for scenario.\n\nname - The name of the scenario. A sub-folder will be created with this name in the model folder and all the model files will be in that folder.\nmodel_type - The model type, cell or subarea.\ninterval - The time interval, daily or hourly\nstart_date - The start date of simulation in yyyy-mm-dd format. The start date of the hydroclimate database will be used if it’s empty.\nend_date - The end date of simulation in yyyy-mm-dd format. The end date of the hydroclimate database will be used if it’s empty.",
+    "crumbs": [
+      "User Guide",
+      "Scenario Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/scenario_config.html#climate_station",
+    "href": "user-guide/scenario_config.html#climate_station",
+    "title": "Scenario Configuration File",
+    "section": "",
+    "text": "The climate stations used for the simulation. The required format is ids separated by comma. The ids must match the one in ID column in STATIONS table of hydroclimate database.\n\n\n\n\n\n\nTip\n\n\n\nIf all hydroclimate stations will be used, leave all the items empty. This is the recommended approach.\n\n\n\nP - The stations ids for precipitation.\nT - The stations ids for temperature.\nRM - The stations ids for relative humidity.\nSR - The stations ids for solar radiation.\nWS - The stations ids for wind speed.\nWD - The stations ids for wind direction. This may be merged with wind speed later.",
+    "crumbs": [
+      "User Guide",
+      "Scenario Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/scenario_config.html#climate_interpolation",
+    "href": "user-guide/scenario_config.html#climate_interpolation",
+    "title": "Scenario Configuration File",
+    "section": "",
+    "text": "The method used to generate the weight file.\n\nmethod - The method for interpolation. Available methods include: average_uniform, grid_interpolation, inverse_distance, linear_triangle and thiessen_polygon.",
+    "crumbs": [
+      "User Guide",
+      "Scenario Configuration File"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "",
+    "text": "pip install imwebs",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "",
+    "text": "pip install imwebs",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html",
+    "href": "user-guide/model_config.html",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "Model configure file is a Microsoft Windows INI file used to specify the file source for watershed delineation, bmps and crop rotations. The sections and configures are list below.\n\n\n\n\n\n\nCoordination System\n\n\n\nAll the shapefiles and geotiff files must have the same coordination system.\n\n\n\n\n\n\n\n\nRaster Format\n\n\n\nAll raster files must be in GeoTIFF format and have the same resolution and covers same area.\n\n\n\n\n\n\n\n\nShapefile ID\n\n\n\nAll shapefiles must have an id column and have unique values. It’s not case-sensitive so it could id or ID.\n\n\n\n\n\n\n\n\nEmpty Files\n\n\n\nIf a file is not applicable to the watershed, just leave it empty.\n\n\n\n\n\n\n\n\nSection and Variable Name\n\n\n\nDon’t change the section and variable name.\n\n\n\n\n\ninput_folder - The folder location where all the input files will be read from. All the input files will be in the same folder.\n\n\n\n\nwatershed section contains the basic spatial files for the watershed.\n\ndem_raster - The dem raster file.\nsoil_raster - The soil raster file.\nlanduse_raster - The landuse raster file.\nstream_shapefile - The stream shapefile to burn stream.\nboundary_shapefile - The boundary shapefile to limit the watershed boundary.\nfarm_shapefile - The farm shapefile.\nfield_shapefile - The filed shapefile.\noutlet_shapefile - The output shapefile. Currently not used.\n\n\n\n\n\n\n\nMandatory Files\n\n\n\ndem, soil, landuse, stream, farm, field\n\n\n\n\n\nLookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.\n\nsoil_lookup - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.\nlanduse_lookup - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.\n\n\n\n\n\nhydroclimate - The hydroclimate sqlite database.\n\n\n\n\nThis section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.\n\npoint_source_shapefile - The point source point shapefile.\nflow_diversion_shapefile - The flow diversion point shapefile.\nreservoir_shapefile - The reservoir point shapefile.\nwetland_boundary_shapefile - The wetland boundary polygon shapefile.\nwetland_outlet_shapefile - The optional wetland outlet point shapefile which is not used in most of the time.\nmanure_catch_basin_shapefile - The manure catch basin point shapefile.\ngrass_waterway_shapefile - The grass waterway shapefile.\naccess_management_shapefile - The access management shapefile\nwater_use_shapefile - The water use shapefile.\n\n\n\n\n\n\n\nAttributes\n\n\n\nThe attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.\n\n\n\n\n\n\n\n\nKnown Bug in Copying REAL Attribute Values\n\n\n\nThe underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.\n\n\n\nreservoir\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\nManure Catch basin\n\nid - The catch basin id\n\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\nmanure_feedlot_boundary_shapefile - The feedlot boundary shapefile.\nmanure_feedlot_outlet_shapefile - The feedlot outlet shapefile.\nmanure_storage_boundary_shapefile - The manure storage boundary shapefile.\noffsite_watering_shapefile - The offsite watering shapefile.\n\n\n\n\nfeedlot\n\nid - The feedlot id\ncb - The catch basin id which must exist in the catch basin shapefile\nani_id - The animal id in the livestock parameter table\nadult - Number of the adult animals\nnonadult - Number of non-adult animals\nstoid - The manure storage ids separated with comma\nstoratio - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.\n\nFeedlot outlet\n\nid - The outlet id should be the same as the corresponding feedlot\n\nManure Storage\n\nid - The manure storage id\nfeedlot - The contributing feedlot id\n\n\n\n\n\n\nThis section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\n\n\n\nThe settings for watershed delineation.\n\nstream_threshold_area_ha - The threshold area for stream delineation in ha.\nwetland_min_area_ha - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nwetland_riparian_contribution_area_ha - The threshold contribution area of riparian wetland in ha. Not used.\nwetland_stream_buffer_distance_m - The wetland stream buffer distance in m. Not used.\n\n\n\n\nThe settings for marginal crop land charactorization. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are not agriculture.\nbuffer_size_m - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nslope_threshold_percentage - The threshold contribution area of riparian wetland in ha.\n\n\n\n\nThe settings for pasture land. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are charactoraized as pasture\n\n\n\n\nThe settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.\n\nmethod - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.\nAAFC_crop_inventory_folder - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g. 1991.tif.\nfirst_year - The first year to start the crop rotation\nlast_year - The year to end the crop rotation\n\n\n\n\nThe settings for model\n\nmodel_folder - The folder where the model files will be created.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#default",
+    "href": "user-guide/model_config.html#default",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "input_folder - The folder location where all the input files will be read from. All the input files will be in the same folder.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#watershed",
+    "href": "user-guide/model_config.html#watershed",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "watershed section contains the basic spatial files for the watershed.\n\ndem_raster - The dem raster file.\nsoil_raster - The soil raster file.\nlanduse_raster - The landuse raster file.\nstream_shapefile - The stream shapefile to burn stream.\nboundary_shapefile - The boundary shapefile to limit the watershed boundary.\nfarm_shapefile - The farm shapefile.\nfield_shapefile - The filed shapefile.\noutlet_shapefile - The output shapefile. Currently not used.\n\n\n\n\n\n\n\nMandatory Files\n\n\n\ndem, soil, landuse, stream, farm, field",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#lookup",
+    "href": "user-guide/model_config.html#lookup",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "Lookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.\n\nsoil_lookup - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.\nlanduse_lookup - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#database",
+    "href": "user-guide/model_config.html#database",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "hydroclimate - The hydroclimate sqlite database.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#reach_bmp",
+    "href": "user-guide/model_config.html#reach_bmp",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "This section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.\n\npoint_source_shapefile - The point source point shapefile.\nflow_diversion_shapefile - The flow diversion point shapefile.\nreservoir_shapefile - The reservoir point shapefile.\nwetland_boundary_shapefile - The wetland boundary polygon shapefile.\nwetland_outlet_shapefile - The optional wetland outlet point shapefile which is not used in most of the time.\nmanure_catch_basin_shapefile - The manure catch basin point shapefile.\ngrass_waterway_shapefile - The grass waterway shapefile.\naccess_management_shapefile - The access management shapefile\nwater_use_shapefile - The water use shapefile.\n\n\n\n\n\n\n\nAttributes\n\n\n\nThe attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.\n\n\n\n\n\n\n\n\nKnown Bug in Copying REAL Attribute Values\n\n\n\nThe underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.\n\n\n\nreservoir\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\nManure Catch basin\n\nid - The catch basin id",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#structure_bmp",
+    "href": "user-guide/model_config.html#structure_bmp",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "This section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#non_structure_bmp",
+    "href": "user-guide/model_config.html#non_structure_bmp",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "This section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\nmanure_feedlot_boundary_shapefile - The feedlot boundary shapefile.\nmanure_feedlot_outlet_shapefile - The feedlot outlet shapefile.\nmanure_storage_boundary_shapefile - The manure storage boundary shapefile.\noffsite_watering_shapefile - The offsite watering shapefile.\n\n\n\n\nfeedlot\n\nid - The feedlot id\ncb - The catch basin id which must exist in the catch basin shapefile\nani_id - The animal id in the livestock parameter table\nadult - Number of the adult animals\nnonadult - Number of non-adult animals\nstoid - The manure storage ids separated with comma\nstoratio - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.\n\nFeedlot outlet\n\nid - The outlet id should be the same as the corresponding feedlot\n\nManure Storage\n\nid - The manure storage id\nfeedlot - The contributing feedlot id",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#reservoir",
+    "href": "user-guide/model_config.html#reservoir",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#delineation",
+    "href": "user-guide/model_config.html#delineation",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "The settings for watershed delineation.\n\nstream_threshold_area_ha - The threshold area for stream delineation in ha.\nwetland_min_area_ha - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nwetland_riparian_contribution_area_ha - The threshold contribution area of riparian wetland in ha. Not used.\nwetland_stream_buffer_distance_m - The wetland stream buffer distance in m. Not used.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#marginal_crop_land",
+    "href": "user-guide/model_config.html#marginal_crop_land",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "The settings for marginal crop land charactorization. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are not agriculture.\nbuffer_size_m - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nslope_threshold_percentage - The threshold contribution area of riparian wetland in ha.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#pasture_land",
+    "href": "user-guide/model_config.html#pasture_land",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "The settings for pasture land. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are charactoraized as pasture",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#crop_rotation",
+    "href": "user-guide/model_config.html#crop_rotation",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "The settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.\n\nmethod - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.\nAAFC_crop_inventory_folder - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g. 1991.tif.\nfirst_year - The first year to start the crop rotation\nlast_year - The year to end the crop rotation",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  },
+  {
+    "objectID": "user-guide/model_config.html#model",
+    "href": "user-guide/model_config.html#model",
+    "title": "Model Configuration File",
+    "section": "",
+    "text": "The settings for model\n\nmodel_folder - The folder where the model files will be created.",
+    "crumbs": [
+      "User Guide",
+      "Model Configuration File"
+    ]
+  }
+]
