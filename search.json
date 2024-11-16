@@ -85,6 +85,26 @@
     ]
   },
   {
+    "objectID": "index.html#two-configuration-files",
+    "href": "index.html#two-configuration-files",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "Two Configuration Files",
+    "text": "Two Configuration Files\nimWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n\nModel Configuration File\nScenario Configuration File",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#logging",
+    "href": "index.html#logging",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "Logging",
+    "text": "Logging\nimWEBs uses Python logging system to output running info for debugging purpose. It’s recommended to setup the logging before running imWEBs.\nimport logging.config\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
     "objectID": "user-guide/model_config.html",
     "href": "user-guide/model_config.html",
     "title": "Model Configuration File",
