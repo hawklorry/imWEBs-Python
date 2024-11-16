@@ -1,0 +1,12 @@
+{
+  "hash": "156afa5b587abab1be29cb719099526a",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: 'imWEBs: create imWEBs models with Python'\n---\n\n\n\n## Installation\n\n`pip install imwebs`\n\n## Getting Started\n\n\n::: {#a6801b93 .cell execution_count=1}\n``` {.python .cell-code}\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()\n```\n:::\n\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

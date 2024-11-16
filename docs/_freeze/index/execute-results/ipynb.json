@@ -1,0 +1,11 @@
+{
+  "hash": "156afa5b587abab1be29cb719099526a",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: 'imWEBs: create imWEBs models with Python'\n---\n\n\n\n## Installation\n\n`pip install imwebs`\n\n## Getting Started\n\n\n::: {#e1b65665 .cell execution_count=1}\n``` {.python .cell-code}\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()\n```\n:::\n\n\n---\njupyter:\n  kernelspec:\n    display_name: Python 3 (ipykernel)\n    language: python\n    name: python3\n    path: C:\\Users\\hawkl\\AppData\\Roaming\\Python\\share\\jupyter\\kernels\\python3\n  language_info:\n    codemirror_mode:\n      name: ipython\n      version: 3\n    file_extension: .py\n    mimetype: text/x-python\n    name: python\n    nbconvert_exporter: python\n    pygments_lexer: ipython3\n    version: 3.12.1\n---\n",
+    "supporting": [
+      "index_files\\figure-ipynb"
+    ],
+    "filters": []
+  }
+}

@@ -1,0 +1,40 @@
+# Scenario Configuration File
+
+Model configure file is Microsoft Windows INI file used to specify scenario settings.
+
+## model
+
+Same settings as the one in [model configuration file](model_config.qmd).
+
+-   **model_folder** - The folder where the model files will be created.
+
+## scenario
+
+The basic settings for scenario.
+
+-   **name** - The name of the scenario. A sub-folder will be created with this name in the model folder and all the model files will be in that folder.
+-   **model_type** - The model type, cell or subarea.
+-   **interval** - The time interval, daily or hourly
+-   **start_date** - The start date of simulation in yyyy-mm-dd format. The start date of the hydroclimate database will be used if it's empty.
+-   **end_date** - The end date of simulation in yyyy-mm-dd format. The end date of the hydroclimate database will be used if it's empty.
+
+## climate_station
+
+The climate stations used for the simulation. The required format is ids separated by comma. The ids must match the one in ID column in STATIONS table of hydroclimate database.
+
+::: callout-tip
+If all hydroclimate stations will be used, leave all the items empty. This is the recommended approach.
+:::
+
+-   **P** - The stations ids for precipitation.
+-   **T** - The stations ids for temperature.
+-   **RM** - The stations ids for relative humidity.
+-   **SR** - The stations ids for solar radiation.
+-   **WS** - The stations ids for wind speed.
+-   **WD** - The stations ids for wind direction. This may be merged with wind speed later.
+
+## climate_interpolation
+
+The method used to generate the weight file.
+
+-   **method** - The method for interpolation. Available methods include: average_uniform, grid_interpolation, inverse_distance, linear_triangle and thiessen_polygon.

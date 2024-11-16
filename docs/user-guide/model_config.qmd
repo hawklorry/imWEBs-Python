@@ -1,0 +1,197 @@
+# Model Configuration File
+
+Model configure file is a Microsoft Windows INI file used to specify the file source for watershed delineation, bmps and crop rotations. The sections and configures are list below.
+
+::: callout-important
+## Coordination System
+
+All the shapefiles and geotiff files must have the same coordination system.
+:::
+
+::: callout-important
+## Raster Format
+
+All raster files must be in GeoTIFF format and have the same resolution and covers same area.
+:::
+
+::: callout-important
+## Shapefile ID
+
+All shapefiles must have an id column and have unique values. It's not case-sensitive so it could id or ID.
+:::
+
+::: callout-tip
+## Empty Files
+
+If a file is not applicable to the watershed, just leave it empty.
+:::
+
+::: callout-warning
+## Section and Variable Name
+
+Don't change the section and variable name.
+:::
+
+## default
+
+-   **input_folder** - The folder location where all the input files will be read from. All the input files will be in the same folder.
+
+## watershed
+
+watershed section contains the basic spatial files for the watershed.
+
+-   **dem_raster** - The dem raster file.
+-   **soil_raster** - The soil raster file.
+-   **landuse_raster** - The landuse raster file.
+-   **stream_shapefile** - The stream shapefile to burn stream.
+-   **boundary_shapefile** - The boundary shapefile to limit the watershed boundary.
+-   **farm_shapefile** - The farm shapefile.
+-   **field_shapefile** - The filed shapefile.
+-   **outlet_shapefile** - The output shapefile. Currently not used.
+
+::: callout-important
+## Mandatory Files
+
+dem, soil, landuse, stream, farm, field
+:::
+
+## lookup
+
+Lookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.
+
+-   **soil_lookup** - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.
+-   **landuse_lookup** - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.
+
+## database
+
+-   **hydroclimate** - The hydroclimate sqlite database.
+
+## reach_bmp
+
+This section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.
+
+-   **point_source_shapefile** - The point source point shapefile.
+-   **flow_diversion_shapefile** - The flow diversion point shapefile.
+-   **reservoir_shapefile** - The reservoir point shapefile.
+-   **wetland_boundary_shapefile** - The wetland boundary polygon shapefile.
+-   **wetland_outlet_shapefile** - The optional wetland outlet point shapefile which is not used in most of the time.
+-   **manure_catch_basin_shapefile** - The manure catch basin point shapefile.
+-   **grass_waterway_shapefile** - The grass waterway shapefile.
+-   **access_management_shapefile** - The access management shapefile
+-   **water_use_shapefile** - The water use shapefile.
+
+::: callout-important
+## Attributes
+
+The attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.
+:::
+
+::: callout-caution
+## Known Bug in Copying REAL Attribute Values
+
+The underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.
+:::
+
+-   reservoir
+    -   id - The reservoir id
+    -   **op** - operation date in yyyy-mm-dd format
+    -   **sa_em** - Emergency surface area
+    -   **v_em** - Emergency volume
+    -   **sa_pr** - Principal surface area
+    -   **v_pr** - Principal volume
+    -   **file** - The external file name used for rating curve or outflow time series. File extension is not included.
+-   Manure Catch basin
+    -   **id** - The catch basin id
+
+## structure_bmp
+
+This section defines the location and attributes of structure bmps.
+
+::: callout-warning
+Only riparian buffer is working in current version. Others will be supported later.
+:::
+
+-   **dugout_boundary_shapefile** - The dugout shapefile.
+-   **wascob_boundary_shapefile** - The WSCOB shapefile.
+-   **riparian_buffer_shapefile** - The riparian buffer shapefile.
+-   **filter_strip_shapefile** - The filter strip shapefile.
+-   **tile_drain_shapefile** - The tile drain shapefile.
+
+## non_structure_bmp
+
+This section defines the location and attributes of structure bmps.
+
+::: callout-warning
+Only riparian buffer is working in current version. Others will be supported later.
+:::
+
+-   **manure_feedlot_boundary_shapefile** - The feedlot boundary shapefile.
+-   **manure_feedlot_outlet_shapefile** - The feedlot outlet shapefile.
+-   **manure_storage_boundary_shapefile** - The manure storage boundary shapefile.
+-   **offsite_watering_shapefile** - The offsite watering shapefile.
+
+### Attributes
+
+-   feedlot
+
+    -   **id** - The feedlot id
+    -   **cb** - The catch basin id which must exist in the catch basin shapefile
+    -   **ani_id** - The animal id in the livestock parameter table
+    -   **adult** - Number of the adult animals
+    -   **nonadult** - Number of non-adult animals
+    -   **stoid** - The manure storage ids separated with comma
+    -   **storatio** - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.
+
+-   Feedlot outlet
+
+    -   **id** - The outlet id should be the same as the corresponding feedlot
+
+-   Manure Storage
+
+    -   **id** - The manure storage id
+    -   **feedlot** - The contributing feedlot id
+
+## reservoir
+
+This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It's assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.
+
+-   **reservoir_flow_routing** - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.
+-   **reservoir_flow_data_folder** - The folder where the external flow data is saved.
+
+## delineation
+
+The settings for watershed delineation.
+
+-   **stream_threshold_area_ha** - The threshold area for stream delineation in ha.
+-   **wetland_min_area_ha** - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.
+-   **wetland_riparian_contribution_area_ha** - The threshold contribution area of riparian wetland in ha. **Not used**.
+-   **wetland_stream_buffer_distance_m** - The wetland stream buffer distance in m. **Not used**.
+
+## marginal_crop_land
+
+The settings for marginal crop land charactorization. **Not used**.
+
+-   **non_agriculture_landuse_ids** - The landuse ids that are not agriculture.
+-   **buffer_size_m** - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.
+-   **slope_threshold_percentage** - The threshold contribution area of riparian wetland in ha.
+
+## pasture_land
+
+The settings for pasture land. **Not used**.
+
+-   **non_agriculture_landuse_ids** - The landuse ids that are charactoraized as pasture
+
+## crop_rotation
+
+The settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.
+
+-   **method** - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.
+-   **AAFC_crop_inventory_folder** - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g. 1991.tif.
+-   **first_year** - The first year to start the crop rotation
+-   **last_year** - The year to end the crop rotation
+
+## model
+
+The settings for model
+
+-   **model_folder** - The folder where the model files will be created.

@@ -1,0 +1,15 @@
+# imWEBs: create imWEBs models with Python
+
+## Installation
+
+`pip install imwebs`
+
+## Getting Started
+
+```{python}
+from imWEBs.imwebs import imWEBs
+
+#The first the is the model config file and the second is the scenario config file.
+imwebs = imWEBs("imwebs_config_model_stc.ini","imwebs_config_scenario_stc.ini")
+#imwebs.generate_all()
+```

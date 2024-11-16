@@ -1,0 +1,33 @@
+project:
+  type: website
+  output-dir: publish
+
+website:
+  title: "imWEBs"
+  page-footer: "© 2024 University of Guelph"
+  repo-url: https://github.com/hawklorry/imWEBs-Python
+  repo-actions: [edit]
+  repo-subdir: docs
+  page-navigation: true
+  bread-crumbs: false # I can\'t get this to work properly, disabled for now
+    
+  sidebar:
+    style: docked
+    search: true
+    contents: 
+      - section: "User Guide"
+        href: index.qmd
+        contents:
+        - user-guide/model_config.qmd 
+        - user-guide/scenario_config.qmd     
+   
+format:
+  html:
+    theme: cosmo
+    toc: true
+  ipynb: 
+    theme: cosmo
+    toc: true
+
+execute:
+  freeze: auto
