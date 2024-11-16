@@ -59,7 +59,7 @@
     "href": "index.html",
     "title": "imWEBs: create imWEBs models with Python",
     "section": "",
-    "text": "pip install imwebs",
+    "text": "It’s recommended to install in a separate Python environment.\npip install imwebs",
     "crumbs": [
       "User Guide"
     ]
@@ -69,7 +69,7 @@
     "href": "index.html#installation",
     "title": "imWEBs: create imWEBs models with Python",
     "section": "",
-    "text": "pip install imwebs",
+    "text": "It’s recommended to install in a separate Python environment.\npip install imwebs",
     "crumbs": [
       "User Guide"
     ]
