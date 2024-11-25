@@ -481,7 +481,7 @@ class Delineation:
         return stream_network_modified_raster
 
     @staticmethod
-    def reorder_raster_id(raster:Raster):
+    def reorder_raster_id(raster:Raster)->dict[int, int]:
         """
         it will modify the raster
 
@@ -502,5 +502,114 @@ class Delineation:
                         id_map[id] = count
                     raster[row, col] = id_map[id]
 
+        return id_map
 
+    @staticmethod
+    def create_drainage_area_raster(structure_raster:Raster, flow_direction_raster:Raster, subbasin_raster:Raster)->Raster:
+        """
+        Borrow from VFSandRBS
+        """
+        row, col, x, y = 0, 0, 0, 0
+        z = 0.0
+        i, c = 0, 0
+        flag = False
+        flowDir = 0.0
+
+        if structure_raster is None:
+            return None
+        
+        wbe = WbEnvironment()
+
+
+        rows = flow_direction_raster.configs.rows
+        cols = flow_direction_raster.configs.columns
+        structure_nodata = structure_raster.configs.nodata
+        subbasin_nodata = subbasin_raster.configs.nodata
+
+        drainage_area_raster = wbe.new_raster(subbasin_raster.configs)
+
+        #flag if the cells has been traced
+        flag2D = np.zeros((rows, cols), dtype=bool)
+
+
+        dX = [1, 1, 1, 0, -1, -1, -1, 0]
+        dY = [-1, 0, 1, 1, 1, 0, -1, -1]
+        LnOf2 = 0.693147180559945
+        path = []
+        pathInside = []
+        vfsOrRbsDrain = {}
+        vfsOrRbsInside = {}
+        vfsOrRbsLength = {}
+        celldist = (structure_raster.configs.resolution_x + structure_raster.configs.resolution_y) / 2.0
+
+        for row in range(rows):
+            for col in range(cols):
+                if subbasin_raster[row, col] != subbasin_nodata and not flag2D[row, col]:
+                    path = []
+                    pathInside = []
+
+                    x = col
+                    y = row
+
+                    path.append((y, x))
+
+                    flag = True
+                    length = 0.0
+
+                    while flag:
+                        flowDir = flow_direction_raster[y, x]
+                        if flowDir > 0:
+                            c = int(math.log(flowDir) / LnOf2)
+
+                            lastVFSorRBSID = structure_raster[y, x]
+                            isVisited = flag2D[y, x]
+
+                            if lastVFSorRBSID != structure_nodata and not isVisited:
+                                pathInside.append((y, x))
+                                length += celldist * (1.41421356 if c in [1, 4, 16, 64] else 1)
+
+                            #get x,y for downstream cell
+                            x += dX[c]
+                            y += dY[c]
+
+                            #check to see if the next cell is edge, different riparian buffer. If yes, add it to the list
+                            if (structure_raster[y, x] == structure_nodata 
+                                or structure_raster[y, x] != lastVFSorRBSID 
+                                or flow_direction_raster[y, x] == 0) and lastVFSorRBSID != structure_nodata:
+                                #recalculate the current position
+                                loc = (y - dY[c], x - dX[c])
+
+                                if loc in vfsOrRbsDrain:
+                                    vfsOrRbsDrain[loc].extend(path)
+                                else:
+                                    vfsOrRbsDrain[loc] = path.copy()
+
+                                if loc in vfsOrRbsInside:
+                                    vfsOrRbsInside[loc].extend(pathInside)
+                                else:
+                                    vfsOrRbsInside[loc] = pathInside.copy()
+
+                                if loc in vfsOrRbsLength:
+                                    vfsOrRbsLength[loc] = max(length, vfsOrRbsLength[loc])
+                                else:
+                                    vfsOrRbsLength[loc] = length
+                                break
+
+                            if not isVisited:
+                                path.append((y, x))
+                        else:
+                            flag = False
+
+                    #update the flag
+                    for loc in path:
+                        flag2D[loc[0], loc[1]] = True
+
+     
+        for outLoc in vfsOrRbsDrain.keys():
+            structure_id = int(structure_raster[outLoc[0], outLoc[1]])
+
+            for loc in vfsOrRbsDrain[outLoc]:
+                drainage_area_raster[loc[0], loc[1]] = structure_id
+
+        return drainage_area_raster
 

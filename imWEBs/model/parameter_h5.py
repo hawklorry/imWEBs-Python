@@ -45,8 +45,10 @@ class ParameterH5:
         if not os.path.exists(imwebs_h5_exe):
             raise ValueError(f"Couldn't find imwebsh5.exe.")        
         result = subprocess.run([imwebs_h5_exe] + [output_folder], capture_output=True, text=True)
-        logger.info(result.stdout)
-        logger.info(result.stderr)
+        if len(result.stdout) > 0:
+            logger.info(result.stdout)        
+        if len(result.stderr) > 0:
+            logger.info(result.stderr)
 
         #check if parameter.h5 is generated
         if not os.path.exists(os.path.join(output_folder,Names.parameteH5Name)):

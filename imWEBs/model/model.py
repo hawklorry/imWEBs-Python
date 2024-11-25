@@ -68,6 +68,10 @@ class Model:
         """update crop rotation"""
         self.bmp_databaes.update_crop_rotation_AAFC_crop_inventory(crop_inventory_folder, first_year, last_year, self.outputs)
 
+    def generate_subarea(self)->int:
+        """generate subarea, subareasoil and subarealanduse"""
+        return self.bmp_databaes.create_subarea(self.outputs)
+
     def run(self, scenario_id, scenario_name):
         pass
 

@@ -26,14 +26,18 @@ class DatabaseBase:
         """read distinct list of given column in given table"""
         return pd.read_sql(f"select distinct {column_name} from {table_name}", self.engine)
 
-    def read_table(self, table_name:str)->pd.DataFrame:
+    def read_table(self, table_name:str, columns:list = None)->pd.DataFrame:
         """read the whole table and return dataframe"""
         if not self.check_table_exist(table_name):
             return None
-        return pd.read_sql(f"select * from {table_name}", self.engine)
+        
+        if columns is None:
+            return pd.read_sql(f"select * from {table_name}", self.engine)
+        else:
+            return pd.read_sql(f"select {','.join(columns)} from {table_name}", self.engine)
 
     def save_table(self, table_name:str, table_df:pd.DataFrame, dtype:list = None, index = False):
-        table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=index, dtype=dtype)
+        table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=index, dtype=dtype,chunksize=1000)
 
     def check_table_exist(self, table_name:str)->bool:
         return len(pd.read_sql(f"SELECT tbl_name FROM sqlite_master where type='table' and tbl_name ='{table_name}'",self.engine)) > 0 

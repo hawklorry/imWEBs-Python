@@ -14,6 +14,8 @@ from .vector_extension import VectorExtension
 from .database.parameter.parameter_database import ParameterDatabase
 import pandas as pd
 from .bmp.bmp_type import DefaultScenarioId
+from .iuh import IUH
+from .database.bmp.subarea import SubArea
 
 import logging
 logger = logging.getLogger(__name__)
@@ -79,6 +81,18 @@ class Outputs(FolderBase):
             raster = self.save_raster(raster, Names.wetlandRasName, True, True)
 
         return raster
+    
+    @property
+    def feedlot_raster(self)->Raster:
+        if "feedlot" in self.structures:
+            return self.structures["feedlot"].boundary_processed_raster
+        return None
+    
+    @property
+    def feedlot_drainage_area_raster(self)->Raster:
+        if "feedlot" in self.structures:
+            return self.structures["feedlot"].get_dainage_area_raster(self.flow_direction_raster, self.subarea_raster)
+        return None
 
     @property
     def structures(self)->dict[str, Structure]:
@@ -347,33 +361,6 @@ class Outputs(FolderBase):
     #         self.save_raster(raster, Names.fieldWithOnlyAgricultureRasName)
 
     #     return raster
-
-    @property
-    def unit_management_raster(self)->Raster:
-        raster = self.get_raster(Names.managementUnitRasName)
-
-        if raster is None:
-            if self.field_raster is not None:
-                raster, raster1_max = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
-                raster = self.save_raster(raster, Names.managementUnitRasName, True, True)
-
-                #convert to vector and assign field and subbasin id
-                vector = RasterExtension.raster_to_vector(raster)
-                vector = VectorExtension.decompsite_overlay_id(vector, "field", "subbasin", raster1_max)
-                self.save_vector(vector, Names.managementUnitShpName)
-
-        return raster
-
-
-    @property
-    def unit_management_vector(self)->Raster:
-        vector = self.get_vector(Names.managementUnitShpName)
-
-        if vector is None:
-            raster = self.unit_management_raster
-            vector = self.get_vector(Names.managementUnitShpName)
-
-        return vector
 
 #endregion    
 
@@ -1373,13 +1360,219 @@ class Outputs(FolderBase):
 
 #endregion
 
+#region iuh
+
+    def __create_iuh_rasters(self):
+        logger.info("Generating IUH rasters ... ")
+        max_min_v = self.parameter.parameter_database.iuh_max_min_v        
+
+        iuh = IUH(self.dem_clipped_raster_for_model, self.slope_percent_raster,
+                  self.flow_direction_raster, self.flow_acc_raster, self.manning_raster,self.stream_network_raster)
+        
+        #2yr
+        logger.info("2 yr ...")
+        radius_parameter = self.parameter.parameter_database.iuh_2yr
+        iuh_2yr = iuh.generate_travel_time_average_standard_deviation(radius_parameter[0], radius_parameter[1],max_min_v[0], max_min_v[1])
+        self.save_raster(iuh_2yr[0], Names.iuhAverage2yrRasName)
+        self.save_raster(iuh_2yr[1], Names.iuhStandardDeviation2yrRasName)
+
+        #10yr
+        logger.info("10 yr ...")
+        radius_parameter = self.parameter.parameter_database.iuh_10yr
+        iuh_10yr = iuh.generate_travel_time_average_standard_deviation(radius_parameter[0], radius_parameter[1],max_min_v[0], max_min_v[1])
+        self.save_raster(iuh_10yr[0], Names.iuhAverage10yrRasName)
+        self.save_raster(iuh_10yr[1], Names.iuhStandardDeviation10yrRasName)
+
+        #100yr
+        logger.info("100 yr ...")
+        radius_parameter = self.parameter.parameter_database.iuh_100yr
+        iuh_100yr = iuh.generate_travel_time_average_standard_deviation(radius_parameter[0], radius_parameter[1],max_min_v[0], max_min_v[1])
+        self.save_raster(iuh_100yr[0], Names.iuhAverage100yrRasName)
+        self.save_raster(iuh_100yr[1], Names.iuhStandardDeviation100yrRasName)
+
+    @property
+    def iuh_t0_2yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhAverage2yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhAverage2yrRasName)
+
+        return raster
+    
+    @property
+    def iuh_delta_2yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhStandardDeviation2yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhStandardDeviation2yrRasName)
+
+        return raster
+    
+    @property
+    def iuh_t0_10yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhAverage10yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhAverage10yrRasName)
+
+        return raster
+    
+    @property
+    def iuh_delta_10yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhStandardDeviation10yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhStandardDeviation10yrRasName)
+
+        return raster
+    
+    @property
+    def iuh_t0_100yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhAverage100yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhAverage100yrRasName)
+
+        return raster
+    
+    @property
+    def iuh_delta_100yr_raster(self)->Raster:
+        raster = self.get_raster(Names.iuhStandardDeviation100yrRasName)
+
+        if raster is None:
+            self.__create_iuh_rasters()
+            raster = self.get_raster(Names.iuhStandardDeviation100yrRasName)
+
+        return raster
+
+
+#endregion
+
+#region subarea
+
+    @property
+    def subarea_raster(self)->Raster:
+        raster = self.get_raster(Names.subareaRasName)
+
+        if raster is None:
+            if self.field_raster is not None:
+                logging.info("Creating subarea raster and vector ...")
+                raster, raster1_max = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
+                
+                #re-order the id and return the old id to new id dict
+                old_id_to_new_id_dict = Delineation.reorder_raster_id(raster)
+                raster = self.save_raster(raster, Names.subareaRasName, True, True)
+
+                #convert to vector and assign field and subbasin id
+                vector = RasterExtension.raster_to_vector(raster)
+                vector = VectorExtension.decompsite_overlay_id(vector, old_id_to_new_id_dict, "FieldId", "SubbasinId", raster1_max)
+                self.save_vector(vector, Names.subareaShpName, True, True)
+        return raster
+
+
+    @property
+    def subarea_vector(self)->Raster:
+        vector = self.get_vector(Names.subareaShpName)
+
+        if vector is None:
+            raster = self.subarea_raster
+            vector = self.get_vector(Names.subareaShpName)
+
+        return vector
+    
+    @property
+    def subarea_cellindex_df(self)->pd.DataFrame:
+        """The CellSubarea"""       
+
+        nodata = self.mask_refined_with_subbasin_raster.configs.nodata
+        cell_index = 0
+        cell_subarea = {}
+        for row in range(self.inputs.rows):
+            for col in range(self.inputs.columns):
+                if self.mask_refined_with_subbasin_raster[row, col] == nodata:
+                    continue
+                cell_subarea[cell_index] = self.subarea_raster[row, col]
+                cell_index = cell_index + 1
+
+        df = pd.DataFrame.from_dict(cell_subarea, orient="index")
+        df.reset_index(inplace=True)
+        df.columns = ['CellIndex','SubareaId']
+
+        return df
+    
+    @property
+    def subarea_df(self)->pd.DataFrame:
+        """
+        Return subarea as dataframe
+        """
+        logger.info("Creating subarea ...")
+        fieldIds = VectorExtension.get_unique_field_value(self.subarea_vector, "FieldId")
+        field_df = pd.DataFrame.from_dict(fieldIds, orient="index")
+        field_df.columns = ["FieldId"]
+
+        subbasinIds = VectorExtension.get_unique_field_value(self.subarea_vector, "SubbasinId")
+        subbasin_df = pd.DataFrame.from_dict(subbasinIds, orient="index")
+        subbasin_df.columns = ["SubbasinId"]
+
+        area_df = RasterExtension.get_category_area_ha_dataframe(self.subarea_raster, "Area")
+
+        elevation_df = RasterExtension.get_zonal_statistics(self.dem_clipped_raster_for_model, self.subarea_raster, "mean","Elevation")
+        slope_df = RasterExtension.get_zonal_statistics(self.slope_percent_raster, self.subarea_raster, "mean","Slope")
+        uslep_df = RasterExtension.get_zonal_statistics(self.uslep_raster, self.subarea_raster, "mean","USLE_P")
+        moist_init_df = RasterExtension.get_zonal_statistics(self.initial_soil_moisture_raster, self.subarea_raster, "mean","MoistureInitial")
+        flow_acc_df = RasterExtension.get_zonal_statistics(self.flow_acc_raster, self.subarea_raster, "mean","FlowAccumulationAverage")
+
+        wetland_flag_raster = self.wetland_raster.con(f"value == {self.wetland_raster.configs.nodata}", 0, 1)
+        wetland_area_ha_df = RasterExtension.get_zonal_statistics(wetland_flag_raster, self.subarea_raster, "total","wetland_count") * self.inputs.cellsize_ha
+        wetland_area_ha_df.fillna(0,inplace=True)
+        wetland_area_ha_df.columns = ["wetland_area_ha"]
+        
+        #iuh
+        iuh_t0_2yr_df = RasterExtension.get_zonal_statistics(self.iuh_t0_2yr_raster, self.subarea_raster, "mean","TravelTimeAverage2")
+        iuh_t0_10yr_df = RasterExtension.get_zonal_statistics(self.iuh_t0_10yr_raster, self.subarea_raster, "mean","TravelTimeAverage10")
+        iuh_t0_100yr_df = RasterExtension.get_zonal_statistics(self.iuh_t0_100yr_raster, self.subarea_raster, "mean","TravelTimeAverage100")
+
+        iuh_delta_2yr_df = RasterExtension.get_zonal_statistics(self.iuh_delta_2yr_raster, self.subarea_raster, "mean","TravelTimeStd2")
+        iuh_delta_10yr_df = RasterExtension.get_zonal_statistics(self.iuh_delta_10yr_raster, self.subarea_raster, "mean","TravelTimeStd10")
+        iuh_delta_100yr_df = RasterExtension.get_zonal_statistics(self.iuh_delta_100yr_raster, self.subarea_raster, "mean","TravelTimeStd100")
+
+        #merge
+        subarea_df = pd.concat([field_df, subbasin_df, area_df, elevation_df, slope_df, uslep_df, moist_init_df, flow_acc_df, wetland_area_ha_df, 
+                   iuh_t0_2yr_df,iuh_t0_10yr_df,iuh_t0_100yr_df, iuh_delta_2yr_df,iuh_delta_10yr_df,iuh_delta_100yr_df], axis=1)
+        
+        #calculate wetland fraction
+        subarea_df["WetlandFraction"] = subarea_df["wetland_area_ha"] / subarea_df["Area"]
+        subarea_df["WetlandFraction"] = subarea_df["WetlandFraction"].fillna(0)
+
+        #1 for topography weight
+        subarea_df["TopographyWeight"] = 1
+
+        #1/10 of subarea area
+        subarea_df["LateralWidth"] = np.sqrt(subarea_df["Area"] * 10000) / 10
+
+        #
+        subarea_df.index.name = "Id"
+        subarea_df.reset_index(inplace=True)
+
+        return subarea_df[["Id","SubbasinId","FieldId","Area","Elevation","Slope","USLE_P","MoistureInitial","FlowAccumulationAverage","WetlandFraction",
+                            "TravelTimeAverage2","TravelTimeAverage10","TravelTimeAverage100",
+                            "TravelTimeStd2","TravelTimeStd10","TravelTimeStd100",
+                            "TopographyWeight","LateralWidth"]]
+
+#endregion
+
     @property
     def offsite_watering_raster(self)->Raster:
         raster = self.get_raster(Names.offsiteWinteringRasName)
-
         if raster is None:
-            raster = VectorExtension.vector_to_raster(self.inputs.offsite_watering_vector, self.dem_clipped_raster_for_model)
-            self.save_raster(raster, Names.offsiteWinteringRasName)
+            if self.inputs.offsite_watering_vector is not None:
+                raster = VectorExtension.vector_to_raster(self.inputs.offsite_watering_vector, self.dem_clipped_raster_for_model)
+                self.save_raster(raster, Names.offsiteWinteringRasName)
         return raster
 
     def delineate_watershed(self):

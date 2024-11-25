@@ -36,16 +36,19 @@ class VectorExtension:
         return vector
     
     @staticmethod
-    def decompsite_overlay_id(vector:Vector, name1:str, name2:str, raster1_max:int)->Vector:
+    def decompsite_overlay_id(vector:Vector, old_id_to_new_id_dict:dict[int, int], name1:str, name2:str, raster1_max:int)->Vector:
         field1 = AttributeField(name1, FieldDataType.Int, 10, 0)
         field2 = AttributeField(name2, FieldDataType.Int, 10, 0)
         vector.add_attribute_field(field1)
         vector.add_attribute_field(field2)
 
+        new_id_to_old_id_dict = {value: key for key, value in old_id_to_new_id_dict.items()}
+
         for i in range(vector.num_records):
-            id = int(vector.get_attribute_value(i, Names.field_name_id).get_value_as_f64())
-            id1 = int(id % raster1_max)
-            id2 = int((id - id1) / raster1_max)
+            new_id = int(vector.get_attribute_value(i, Names.field_name_id).get_value_as_f64())
+            old_id = new_id_to_old_id_dict[new_id]
+            id1 = int(old_id % raster1_max)
+            id2 = int((old_id - id1) / raster1_max)
             vector.set_attribute_value(i,name1,FieldData.new_int(id1))
             vector.set_attribute_value(i,name2,FieldData.new_int(id2))
         return vector       

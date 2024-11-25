@@ -203,8 +203,9 @@ class ModelConfig(Config):
                                        getattr(self,"reservoir_flow_data_folder"))
 
     def update_crop_rotation(self):
-        self.model.update_crop_rotation(
-            getattr(self,"AAFC_crop_inventory_folder"),
-            int(getattr(self,"first_year")),
-            int(getattr(self,"last_year"))
-        )
+        if getattr(self,"method") == "crop_inventory":
+            self.model.update_crop_rotation(
+                getattr(self,"AAFC_crop_inventory_folder"),
+                int(getattr(self,"first_year")),
+                int(getattr(self,"last_year"))
+            )

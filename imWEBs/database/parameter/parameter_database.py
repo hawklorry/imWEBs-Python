@@ -142,6 +142,30 @@ class ParameterDatabase(DatabaseBase):
     
     @property
     def wetland_cons(self)->float:
-        return self.__get_single_parameter("Wetland","Wet_Cons")  
+        return self.__get_single_parameter("Wetland","Wet_Cons")      
+     
+#endregion
+
+#region IUH Parameter
+
+    @property
+    def iuh_max_min_v(self)->tuple[float,float]:
+        return (self.__get_single_parameter("Discharge",f"maxV"),self.__get_single_parameter("Discharge",f"minV"))
+
+    @property
+    def iuh_2yr(self)->tuple[float,float]:
+        return self.__get_iuh_radius_parameter(2)
     
+    @property
+    def iuh_10yr(self)->tuple[float,float]:
+        return self.__get_iuh_radius_parameter(10)
+
+    @property
+    def iuh_100yr(self)->tuple[float,float]:
+        return self.__get_iuh_radius_parameter(100)    
+    
+    def __get_iuh_radius_parameter(self, design_storm)->tuple[float,float]:
+        return (self.__get_single_parameter("Discharge",f"radiusA{design_storm}"),self.__get_single_parameter("Discharge",f"radiusB{design_storm}"))
+
+
 #endregion

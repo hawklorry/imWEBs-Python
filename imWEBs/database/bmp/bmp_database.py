@@ -60,6 +60,7 @@ from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFenci
 from .bmp_41_wascob import Wascob
 #from .bmp_42_water_use import 
 import os
+import gc
 
 
 from ..database_base import DatabaseBase, logger
@@ -121,6 +122,7 @@ class BMPDatabase(DatabaseBase):
         #create reach_bmp table
         #all reach bmps should be added before this
         self.__create_reach_parameter(outputs)
+        self.__create_reach_lookup()
         self.__create_bmp_reach_bmp(outputs)
 
         #create bmp_scenarios table
@@ -186,23 +188,46 @@ class BMPDatabase(DatabaseBase):
 
         return mergered_df
 
-    def __create_overlay(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str, raster1_area_df:pd.DataFrame, raster2_area_df:pd.DataFrame, table_name:str):
+    def __create_overlay(self, 
+                         spatial1_ras:Raster, spatial2_ras:Raster, 
+                         name1:str, name2:str, 
+                         raster1_area_df:pd.DataFrame, raster2_area_df:pd.DataFrame, 
+                         table_name:str,
+                         fraction_name1:str = None, fraction_name2:str = None, include_id_in_column_name:bool = False):
         overlay_area_df = self.__get_overlay_area(spatial1_ras, spatial2_ras, name1, name2)
         
         merged_df = overlay_area_df.merge(raster1_area_df, left_on= name1, right_index=True, how="left")
         merged_df = merged_df.merge(raster2_area_df, left_on= name2, right_index=True, how="left")
 
         #calculate the ratio
-        merged_df["ID"] = merged_df.index
-        merged_df[f"To{name1}"] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name1}Area"]
-        merged_df[f"To{name2}"] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name2}Area"]
+        merged_df.reset_index(inplace=True)
+        merged_df["ID"] = merged_df.index + 1
 
-        merged_df = merged_df[["ID", name1, name2, BMPDatabase.COL_NAME_AREA_HA, f"To{name1}", f"To{name2}"]]     
+        #get fraction column name
+        if fraction_name1 is None:
+            fraction_name1 = f"To{name1}"
+        if fraction_name2 is None:
+            fraction_name2 = f"To{name2}"
+
+        #calculate fraction 
+        merged_df[fraction_name1] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name1}Area"]
+        merged_df[fraction_name2] = merged_df[BMPDatabase.COL_NAME_AREA_HA] / merged_df[f"{name2}Area"]
+
+        col_name1 = name1
+        col_name2 = name2
+        if include_id_in_column_name:
+            col_name1 = f"{name1}Id"
+            col_name2 = f"{name2}Id"
+            merged_df[col_name1] = merged_df[name1]
+            merged_df[col_name2] = merged_df[name2]
+
+        merged_df = merged_df[[col_name1, col_name2, BMPDatabase.COL_NAME_AREA_HA, fraction_name1, fraction_name2]]     
         self.save_table(table_name, merged_df)   
     
-    def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str)->pd.DataFrame:
+    def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str, area_column_name = "")->pd.DataFrame:
         merged_raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
-        df = RasterExtension.get_category_area_ha_dataframe(merged_raster,BMPDatabase.COL_NAME_AREA_HA)
+        area_col = area_column_name if len(area_column_name) > 0 else BMPDatabase.COL_NAME_AREA_HA
+        df = RasterExtension.get_category_area_ha_dataframe(merged_raster,area_col)
         df[name1] = df.index % raster1_max
         df[name2] = (df.index - df[name1]) / raster1_max
 
@@ -220,6 +245,27 @@ class BMPDatabase(DatabaseBase):
         """crete reach parameters"""
         logger.info("Creating reach_parameter table ... ")
         self.save_table(Names.bmp_table_name_reach_parameter, outputs.reach_parameter_df)
+
+    def __create_reach_lookup(self):
+        """Replace generateReachLookupTable"""
+
+        logger.info("Creating reach_lookup table ...")
+        df = self.read_table(Names.bmp_table_name_reach_parameter, ["reach_id","receive_reach_id"])
+        df.set_index("reach_id", inplace=True)
+        reach_receive_reach = df["receive_reach_id"].to_dict()
+
+        #get all downstream reaches of a reach
+        reach_lookup = []
+        for r in reach_receive_reach:
+            rr = r
+            rank = 1
+            while rr > 0:
+                reach_lookup.append((r, reach_receive_reach[rr], rank))
+                rank = rank + 1
+                rr = reach_receive_reach[rr]
+
+        #save to database
+        self.save_table(Names.bmp_table_name_reach_lookup, pd.DataFrame(reach_lookup, columns=['UpStream', 'DownStream', 'Rank']))
 
 #endregion
    
@@ -519,5 +565,67 @@ class BMPDatabase(DatabaseBase):
 
         #save to database
         self.save_table("GRAMG_ReachDeposit",reach_deposit_df)
+
+#endregion
+
+#region subarea
+
+    def create_subarea(self,outputs:Outputs)->int:
+        #cellsubarea
+        logger.info("Creating CellSubarea ...")
+        self.save_table(Names.bmp_table_name_subarea_cell, outputs.subarea_cellindex_df)
+
+        #subarea 
+        subarea_df = outputs.subarea_df
+        self.save_table(Names.bmp_table_name_subarea, subarea_df)
+
+        #SubAreaSoilType
+        logger.info("Creating SubAreaSoilType ...")
+        subarea_soil_df = self.__get_overlay_area(outputs.subarea_raster, outputs.mapped_soil_raster, 
+                              "SubareaId", "SoilTypeId", "Area")[["SubareaId", "SoilTypeId", "Area"]]
+        self.save_table(Names.bmp_table_name_subarea_soil, subarea_soil_df)
+
+        #SubAreaLandUseType
+        logger.info("Creating SubAreaLandUseType ...")
+        subarea_landuse_df = self.__get_overlay_area(outputs.subarea_raster, outputs.mapped_landuse_raster, 
+                              "SubareaId", "LanduseTypeId", "Area")[["SubareaId", "LanduseTypeId", "Area"]]
+        self.save_table(Names.bmp_table_name_subarea_landuse, subarea_landuse_df)     
+
+        #subarea-structure relationship
+        self.__create_subarea_spatial_relationship_tables(outputs)  
+
+        return len(subarea_df)
+
+    def __create_subarea_spatial_relationship_tables(self,outputs:Outputs):        
+        subarea_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.subarea_raster, BMPDatabase.COL_NAME_AREA_HA)
+        subarea_area_df.columns = ["SubareaArea"]
+
+        #riparian buffer
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_parts_raster, Names.bmp_table_name_subarea_riparian_buffer_lookup)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_drainage_area_raster, Names.bmp_table_name_subarea_riparian_buffer_drainage_lookup)
+        
+        #feedlot
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_raster, Names.bmp_table_name_subarea_feedlot_lookup)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_drainage_area_raster, Names.bmp_table_name_subarea_feedlot_drainage_lookup)
+        
+
+    def __create_subarea_structure_lookup_table(self, subarea_area_df:pd.DataFrame, subarea_raster:Raster, structure_raster:Raster, table_name:str):
+        """Create subarea structure lookup table for given structure raster"""
+        
+        if structure_raster is None:
+            return
+        
+        logger.info(f"Creating {table_name} ...")
+        structure_area_df = RasterExtension.get_category_area_ha_dataframe(structure_raster, BMPDatabase.COL_NAME_AREA_HA)
+        structure_area_df.columns = ["LocationArea"]
+
+        self.__create_overlay(subarea_raster, structure_raster, 
+                              "Subarea", "Location", 
+                              subarea_area_df, structure_area_df, 
+                              table_name,
+                              "FractionToSubarea","FractionToBmp", True) 
+        
+        gc.collect()
+
 
 #endregion

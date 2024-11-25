@@ -16,6 +16,7 @@ from ..outputs import Outputs
 from ..model.model import Model
 import numpy as np
 import shutil
+from ..subarea.parameter_subarea import ParameterSubarea
 
 logger = logging.getLogger(__name__)
 
@@ -150,19 +151,19 @@ class ScenarioConfig(Config):
         #get cell size and number of valid cells for cell-based model
         cell_size = -1
         cell_number = -1
+        subarea_number = -1
         if self.model_type == "cell":
             cell_size = self.model.outputs.inputs.cell_size
             cell_number = self.model.outputs.number_of_valid_cell
         else:
-            #read subarea info some where
-            pass
+            subarea_number = self.model.generate_subarea()
 
         #create file.in
         file_in = FileIn(folder = self.scenario_folder, 
                          model_type=self.model_type, 
                          cell_size=cell_size,
                          cell_num=cell_number,
-                         subarea_num=30,
+                         subarea_num=subarea_number,
                          subbasin_num=self.model.outputs.number_of_subbasin,
                          start_date=self.start_date,
                          end_date=self.end_date,
@@ -259,9 +260,13 @@ class ScenarioConfig(Config):
 
         os.remove(reach_parameter_file_temp)
     
+    def __generate_parameter_subarea_database(self):
+        if self.model_type == "subarea":
+            p = ParameterSubarea(self.model.outputs)
+            p.generate()
 
     def __generate_bmp_database(self):
-        """just copy the bmp database from database folder"""
+        """just copy the bmp database from database folder""" 
         shutil.copy(os.path.join(self.model.model_database_folder, Names.bmpDatabaseName), 
                     os.path.join(self.scenario_folder, Names.bmpDatabaseName))
 
@@ -275,7 +280,8 @@ class ScenarioConfig(Config):
         self.__generate_config_fig()
         self.__generate_weight_file()
         self.__generate_parameter_h5()
-        self.__generate_reach_parameter()
+        self.__generate_reach_parameter() 
+        self.__generate_parameter_subarea_database()       
         self.__generate_bmp_database()
 
 

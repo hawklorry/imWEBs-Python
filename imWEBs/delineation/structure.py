@@ -11,6 +11,7 @@ import math
 from collections import defaultdict
 import logging
 import os
+from .delineation import Delineation
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,8 @@ class Structure(FolderBase):
         self.__structure_outlet_original_raster_name = f"{self.structure_type}OutletOriginal{Names.raster_extension}"
         self.__structure_outlet_processed_raster_name = f"{self.structure_type}OutletProcessed{Names.raster_extension}"        
         self.__structure_outlet_processed_vector_name = f"{self.structure_type}OutletProcessed{Names.shapefile_extension}"
+
+        self.__structure_drainage_area_raster_name = f"{self.structure_type}DrainageArea{Names.raster_extension}"
 
 
         #individual structure list
@@ -186,6 +189,16 @@ class Structure(FolderBase):
 
         return raster
     
+    def get_dainage_area_raster(self, flow_direction_raster:Raster, subbasin_raster:Raster):
+        """The drainage area raster. Used for subarea version."""
+        raster = self.get_raster(self.__structure_drainage_area_raster_name)
+
+        if raster is None:
+            raster = Delineation.create_drainage_area_raster(self.boundary_processed_raster, flow_direction_raster, subbasin_raster)
+            raster = self.save_raster(raster, self.__structure_drainage_area_raster_name, True, True)
+
+        return raster
+
     @property 
     def attributes(self)->dict:
         """structure attribute dictionary including id, area, subbasin and contribution area"""
@@ -239,7 +252,7 @@ class Structure(FolderBase):
             field_data = [
                 FieldData.new_int(id),
                 FieldData.new_int(int(id_subbasin_dict[id])),
-                FieldData.new_real(id_contribution_area_dict[id])
+                FieldData.new_real(0 if id in id_contribution_area_dict else id_contribution_area_dict[id]) 
             ]
             out_vector.add_attribute_record(field_data, deleted=False)
 
@@ -302,7 +315,6 @@ class Structure(FolderBase):
         #assign subbasin id and contribution area to the shapefile also remove the structure that are not included in subbasin    
         processed_boundary_vector = self.__creatd_processed_boundary_vector(bmp2sub,bmp_contribute_area)
         self.save_vector(processed_boundary_vector, self.__structure_boundary_processed_vector_name)
-
 
 #region Zhangbin - Not used anymore
 

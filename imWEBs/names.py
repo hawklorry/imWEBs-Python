@@ -7,6 +7,7 @@ class Names:
     bmp_table_name_scenarios = "bmp_scenarios"
 
     #reach bmps
+    bmp_table_name_reach_lookup = "reach_lookup"
     bmp_table_name_reach_parameter = "reach_parameter"
     bmp_table_name_reach_bmp = "reach_bmp"
     bmp_table_name_point_source = "reach_bmp_point_source"
@@ -57,17 +58,37 @@ class Names:
     bmp_table_name_manure_application_based_on_soil_nitrogen_limit_management = "manure_adjustment_application_based_on_soil_nitrogen_limit_management"
     bmp_table_name_manure_application_based_on_soil_phosphorous_limit_management = "manure_adjustment_application_based_on_soil_phosphorous_limit_management"
 
+    
+
     #other tables
     bmp_table_name_ls_parameter = "LS_parameter"
 
     bmp_table_name_farm_info = "farm_info"
     bmp_table_name_field_info = "field_info"
-    bmp_table_name_management_unit_info = "management_unit_info"
     bmp_table_name_field_farm = "field_farm"
     bmp_table_name_farm_subbasin = "farm_subbasin"
     bmp_table_name_field_subbasin = "field_subbasin"
     bmp_table_name_subbasin_info = "subbasin_info"
     bmp_table_name_subbasin_multiplier = "subbasin_multiplier"
+
+    #subarea - all fixed names, don't change
+    bmp_table_name_subarea = "Subarea"
+    bmp_table_name_subarea_soil = "SubareaSoilType"
+    bmp_table_name_subarea_landuse = "SubareaLandUseType"
+    bmp_table_name_subarea_cell = "CellSubarea"
+
+    bmp_table_name_subarea_riparian_buffer_lookup = "SubareaRiparianBufferLookup"
+    bmp_table_name_subarea_vegetative_filter_strip_lookup = "SubareaVegetativeFilterStripLookup"
+    bmp_table_name_subarea_feedlot_lookup = "SubareaFeedlotLookup"
+    bmp_table_name_subarea_manure_storage_lookup = "SubareaManureStorageLookup"
+
+    bmp_table_name_subarea_riparian_buffer_drainage_lookup = "SubareaRiparianBufferDrainageLookup"
+    bmp_table_name_subarea_vegetative_filter_strip_drainage_lookup = "SubareaVegetativeFilterStripDrainageLookup"
+    bmp_table_name_subarea_feedlot_drainage_lookup = "SubareaFeedlotDrainageLookup"
+    bmp_table_name_subarea_wascob_drainage_lookup = "SubareaWascobDrainageLookup"
+    bmp_table_name_subarea_tile_drain_drainage_lookup = "SubareaTileDrainLookup"
+
+
 
     #
     bmp_table_name_offsite_watering = "offsite_watering"
@@ -116,6 +137,7 @@ class Names:
     hydroclimateDatabasename = "hydroclimate" + sqlite_extension
     bmpDatabaseName = "bmp" + sqlite_extension
     parameterDatabaseName = "parameter" + sqlite_extension
+    parameterSubareaDatabaseName = "parameter_subarea" + sqlite_extension
 
     # Lookup
     soilLookupName = "soilLookup" + lookup_extension
@@ -236,8 +258,8 @@ class Names:
     fiedWithOnlyAgricultureRasName = "fiedWithOnlyAgriCulture" + raster_extension
 
     # management unit
-    managementUnitShpName = "management_unit" + shapefile_extension
-    managementUnitRasName = managementUnitShpName.replace(shapefile_extension, raster_extension)
+    subareaShpName = "subarea" + shapefile_extension
+    subareaRasName = subareaShpName.replace(shapefile_extension, raster_extension)
 
     #
 
@@ -414,6 +436,14 @@ class Names:
     manurePLimitShpName = "manure_p_limit" + shapefile_extension
     manurePLimitRasname = manurePLimitShpName.replace(shapefile_extension, raster_extension)
   
+    #iuh
+    iuhAverage2yrRasName = "iuh_t0_2yr" + raster_extension
+    iuhStandardDeviation2yrRasName = "iuh_delta_2yr" + raster_extension
+    iuhAverage10yrRasName = "iuh_t0_10yr" + raster_extension
+    iuhStandardDeviation10yrRasName = "iuh_delta_10yr" + raster_extension
+    iuhAverage100yrRasName = "iuh_t0_100yr" + raster_extension
+    iuhStandardDeviation100yrRasName = "iuh_delta_100yr" + raster_extension
+
 
     # streamNetworkNoFieldName = "streamNetworkNoField" + raster_extension
     # averageDistanceToStreamName = "averageDistanceToStream" + raster_extension
