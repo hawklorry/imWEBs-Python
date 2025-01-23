@@ -21,7 +21,11 @@ website:
         - user-guide/model_config.qmd 
         - user-guide/scenario_config.qmd     
       - section: "BMPs"
-        - bmps/wascob_tiledrain.qmd
+        contents: 
+        - bmps/wascob.qmd
+        - bmps/tiledrain.qmd
+        - bmps/crop_management.qmd
+
    
 format:
   html:

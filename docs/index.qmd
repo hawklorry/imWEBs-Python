@@ -12,13 +12,11 @@ It's recommended to install in a separate Python environment.
 
 ## Getting Started
 
-```{python}
-from imWEBs.imwebs import imWEBs
+***from imWEBs.imwebs import imWEBs***
 
-#The first the is the model config file and the second is the scenario config file.
-imwebs = imWEBs("imwebs_config_model_stc.ini","imwebs_config_scenario_stc.ini")
-#imwebs.generate_all()
-```
+***#The first the is the model config file and the second is the scenario config file. imwebs = imWEBs("imwebs_config_model_stc.ini","imwebs_config_scenario_stc.ini")***
+
+***imwebs.generate_all()***
 
 ## Two Configuration Files
 
