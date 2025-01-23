@@ -115,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">imWEBs: create imWEBs models with Python</h1>
+          <h1 class="quarto-secondary-nav-title"></h1>
         </a>     
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -162,6 +162,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">BMPs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bmps/wascob.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">WASCob</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bmps/tiledrain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tile Drain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bmps/crop_management.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Crop Management</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -172,35 +201,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#imwebs-create-imwebs-models-with-python" id="toc-imwebs-create-imwebs-models-with-python" class="nav-link active" data-scroll-target="#imwebs-create-imwebs-models-with-python">imWEBs: create imWEBs models with Python</a>
+  <ul class="collapse">
+  <li><a href="#prerequisite" id="toc-prerequisite" class="nav-link" data-scroll-target="#prerequisite">Prerequisite</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
   <li><a href="#two-configuration-files" id="toc-two-configuration-files" class="nav-link" data-scroll-target="#two-configuration-files">Two Configuration Files</a></li>
   <li><a href="#logging" id="toc-logging" class="nav-link" data-scroll-target="#logging">Logging</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title d-none d-lg-block">imWEBs: create imWEBs models with Python</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
+<section id="imwebs-create-imwebs-models-with-python" class="level1">
+<h1>imWEBs: create imWEBs models with Python</h1>
+<section id="prerequisite" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisite">Prerequisite</h2>
+<p><a href="https://dotnet.microsoft.com/en-us/download/dotnet/9.0">.NET Runtime 9.0</a> is required to run the integrated imWEBsInputTool. The basic runtime for console app should be sufficient.</p>
+</section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>It’s recommended to install in a separate Python environment.</p>
@@ -208,13 +231,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<div id="3fd520f4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> imWEBs.imwebs <span class="im">import</span> imWEBs</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#The first the is the model config file and the second is the scenario config file.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>imwebs <span class="op">=</span> imWEBs(<span class="st">"imwebs_config_model_stc.ini"</span>,<span class="st">"imwebs_config_scenario_stc.ini"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#imwebs.generate_all()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p><strong><em>from imWEBs.imwebs import imWEBs</em></strong></p>
+<p><strong><em>#The first the is the model config file and the second is the scenario config file. imwebs = imWEBs(“imwebs_config_model_stc.ini”,“imwebs_config_scenario_stc.ini”)</em></strong></p>
+<p><strong><em>imwebs.generate_all()</em></strong></p>
 </section>
 <section id="two-configuration-files" class="level2">
 <h2 class="anchored" data-anchor-id="two-configuration-files">Two Configuration Files</h2>
@@ -227,10 +246,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="logging" class="level2">
 <h2 class="anchored" data-anchor-id="logging">Logging</h2>
 <p>imWEBs uses Python logging system to output running info for debugging purpose. It’s recommended to setup the logging before running imWEBs.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging.config</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>logging.basicConfig(level<span class="op">=</span>logging.INFO, <span class="bu">format</span><span class="op">=</span><span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging.config</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>logging.basicConfig(level<span class="op">=</span>logging.INFO, <span class="bu">format</span><span class="op">=</span><span class="st">'</span><span class="sc">%(asctime)s</span><span class="st"> - </span><span class="sc">%(levelname)s</span><span class="st"> - </span><span class="sc">%(message)s</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

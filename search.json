@@ -59,7 +59,17 @@
     "href": "index.html",
     "title": "imWEBs: create imWEBs models with Python",
     "section": "",
-    "text": "It’s recommended to install in a separate Python environment.\npip install imwebs",
+    "text": ".NET Runtime 9.0 is required to run the integrated imWEBsInputTool. The basic runtime for console app should be sufficient.\n\n\n\nIt’s recommended to install in a separate Python environment.\npip install imwebs\n\n\n\nfrom imWEBs.imwebs import imWEBs\n#The first the is the model config file and the second is the scenario config file. imwebs = imWEBs(“imwebs_config_model_stc.ini”,“imwebs_config_scenario_stc.ini”)\nimwebs.generate_all()\n\n\n\nimWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n\nModel Configuration File\nScenario Configuration File\n\n\n\n\nimWEBs uses Python logging system to output running info for debugging purpose. It’s recommended to setup the logging before running imWEBs.\nimport logging.config\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')",
+    "crumbs": [
+      "User Guide"
+    ]
+  },
+  {
+    "objectID": "index.html#prerequisite",
+    "href": "index.html#prerequisite",
+    "title": "imWEBs: create imWEBs models with Python",
+    "section": "",
+    "text": ".NET Runtime 9.0 is required to run the integrated imWEBsInputTool. The basic runtime for console app should be sufficient.",
     "crumbs": [
       "User Guide"
     ]
@@ -78,8 +88,8 @@
     "objectID": "index.html#getting-started",
     "href": "index.html#getting-started",
     "title": "imWEBs: create imWEBs models with Python",
-    "section": "Getting Started",
-    "text": "Getting Started\n\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()",
+    "section": "",
+    "text": "from imWEBs.imwebs import imWEBs\n#The first the is the model config file and the second is the scenario config file. imwebs = imWEBs(“imwebs_config_model_stc.ini”,“imwebs_config_scenario_stc.ini”)\nimwebs.generate_all()",
     "crumbs": [
       "User Guide"
     ]
@@ -88,8 +98,8 @@
     "objectID": "index.html#two-configuration-files",
     "href": "index.html#two-configuration-files",
     "title": "imWEBs: create imWEBs models with Python",
-    "section": "Two Configuration Files",
-    "text": "Two Configuration Files\nimWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n\nModel Configuration File\nScenario Configuration File",
+    "section": "",
+    "text": "imWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n\nModel Configuration File\nScenario Configuration File",
     "crumbs": [
       "User Guide"
     ]
@@ -98,10 +108,131 @@
     "objectID": "index.html#logging",
     "href": "index.html#logging",
     "title": "imWEBs: create imWEBs models with Python",
-    "section": "Logging",
-    "text": "Logging\nimWEBs uses Python logging system to output running info for debugging purpose. It’s recommended to setup the logging before running imWEBs.\nimport logging.config\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')",
+    "section": "",
+    "text": "imWEBs uses Python logging system to output running info for debugging purpose. It’s recommended to setup the logging before running imWEBs.\nimport logging.config\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')",
     "crumbs": [
       "User Guide"
+    ]
+  },
+  {
+    "objectID": "bmps/tiledrain.html",
+    "href": "bmps/tiledrain.html",
+    "title": "Tile Drain",
+    "section": "",
+    "text": "Tile drain improve the drainage of fields with poor drainage capacity. It uses underground perforated drain pipes to direct water to an outlet. It may work together with wascobs.\n\n\nTwo shapefiles are required:\n\nTile drain polygon shapefile to specify the location and attributes of the tile drain fields\nOptional tile drain outlet shapefile to appoint outlet for tile drain fields\n\nIt’s assumed that the tile drain polygon has 1-1 relationship with the field polygon as field id is required for the tile drain parameter table. The system doesn’t check this relationship. It’s modellers’ responsibility to check and pre-process the polygons.\nThe polygon shapefile must have four data fields as shown below.\n\nid - unique ids\noutlet - outlet id pointing to outlets in tile drain outlet shapefile\ndepth - drain pipe invert depth in mm\nspacing - drain pipe spacing in mm\n\nThe tile drain outlet shapefile will be used as subbasin outlet. It must have an id column with values consistent with the one used in the outlet column in the tile drain polygon shapefile.\n\n\n\nIn the model configuration file,\n\nset tile_drain_shapefile to the name of the tile drain polygon shapefile.\nset tile_drain_outlet_shapefile to the name of the tile drain outlet shapefile.\n\ntile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_outlet.shp\n\n\n\n\n\n\nThe shapefile is a poygon shapefile.\nid column is included in the shapefile and has unique values.\noutlet column is included in the shapefile and the id could be found in tile drain outlet shapefile. The value could be empty.\ndepth and spacing column are included in the shapefile and the values are not empty\n\n\n\n\n\nThe shapefile has an id column with unique values.\n\n\n\n\n\n\nUse tile drain outlet shapefile as pour point during watershed delineation if it’s defined.\nGenerate tile drain parameter table. To determine the outlet reach id:\n\nIf the tile drain outlet shapefile is defined and the outlet data field is not empty, use the reach that corresponds to the outlet\nElse find the lowest subbasin included in the tile drain polygon. There is a problem here as not all part of subbasin is in the polygon, we may need to use the subarea to get this, i.e. tile drain at the subarea level.\n\nAdd tile drain polygon to parameter.h5",
+    "crumbs": [
+      "BMPs",
+      "Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/tiledrain.html#required-inputs",
+    "href": "bmps/tiledrain.html#required-inputs",
+    "title": "Tile Drain",
+    "section": "",
+    "text": "Two shapefiles are required:\n\nTile drain polygon shapefile to specify the location and attributes of the tile drain fields\nOptional tile drain outlet shapefile to appoint outlet for tile drain fields\n\nIt’s assumed that the tile drain polygon has 1-1 relationship with the field polygon as field id is required for the tile drain parameter table. The system doesn’t check this relationship. It’s modellers’ responsibility to check and pre-process the polygons.\nThe polygon shapefile must have four data fields as shown below.\n\nid - unique ids\noutlet - outlet id pointing to outlets in tile drain outlet shapefile\ndepth - drain pipe invert depth in mm\nspacing - drain pipe spacing in mm\n\nThe tile drain outlet shapefile will be used as subbasin outlet. It must have an id column with values consistent with the one used in the outlet column in the tile drain polygon shapefile.",
+    "crumbs": [
+      "BMPs",
+      "Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/tiledrain.html#configuration-setup",
+    "href": "bmps/tiledrain.html#configuration-setup",
+    "title": "Tile Drain",
+    "section": "",
+    "text": "In the model configuration file,\n\nset tile_drain_shapefile to the name of the tile drain polygon shapefile.\nset tile_drain_outlet_shapefile to the name of the tile drain outlet shapefile.\n\ntile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_outlet.shp",
+    "crumbs": [
+      "BMPs",
+      "Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/tiledrain.html#validation",
+    "href": "bmps/tiledrain.html#validation",
+    "title": "Tile Drain",
+    "section": "",
+    "text": "The shapefile is a poygon shapefile.\nid column is included in the shapefile and has unique values.\noutlet column is included in the shapefile and the id could be found in tile drain outlet shapefile. The value could be empty.\ndepth and spacing column are included in the shapefile and the values are not empty\n\n\n\n\n\nThe shapefile has an id column with unique values.",
+    "crumbs": [
+      "BMPs",
+      "Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/tiledrain.html#processing-steps",
+    "href": "bmps/tiledrain.html#processing-steps",
+    "title": "Tile Drain",
+    "section": "",
+    "text": "Use tile drain outlet shapefile as pour point during watershed delineation if it’s defined.\nGenerate tile drain parameter table. To determine the outlet reach id:\n\nIf the tile drain outlet shapefile is defined and the outlet data field is not empty, use the reach that corresponds to the outlet\nElse find the lowest subbasin included in the tile drain polygon. There is a problem here as not all part of subbasin is in the polygon, we may need to use the subarea to get this, i.e. tile drain at the subarea level.\n\nAdd tile drain polygon to parameter.h5",
+    "crumbs": [
+      "BMPs",
+      "Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/crop_management.html",
+    "href": "bmps/crop_management.html",
+    "title": "Crop Management",
+    "section": "",
+    "text": "Crop Management\nCrop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it’s usually prepared manually and imported to bmp database.\nAAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it’s possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file. One example is given below.\n[crop_rotation]\nmethod = crop_inventory\nAAFC_crop_inventory_folder = C:\\Work\\Git\\imWEBs\\imWEBs-Python\\notebooks\\stc\\data\\crop_inventory \nfirst_year = 1991\nlast_year = 2010\nUsers will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It’s also required to have same coordination system as other input files.",
+    "crumbs": [
+      "BMPs",
+      "Crop Management"
+    ]
+  },
+  {
+    "objectID": "bmps/wascob.html",
+    "href": "bmps/wascob.html",
+    "title": "WASCob",
+    "section": "",
+    "text": "WASCOB (Water and Sediment Control Basin) blocks water from drainage area. The ponded water drains through tile drain system. It always work with the tile drain system.\n\n\nWASCOB point shapefile is the only input. It specifies the location of the wascob which usually the intercection of the berm and the overland drainage. It’s not neccessary that the point falls exatcly on the drainage path. The system will snap the point to the delineated streams.\nWASCOB shapefile must have six data fields as shown below. The name must match the ones given below.\n\nid - unique ids\nyear - the year wascob beomes effective. It assumes it starts from the first day of the year\nheight - berm cres elevation in m\nmax_vol - the max volumne of the ponding area in 104 m3\nmax_area - the max surface area of the ponding aera in ha\ncapacity - the discharge capacity in m3/day. Do we need this?\n\n\n\n\nIn the model configuration file, set wascob_outlet_shapefile to the name of the wascob point shapefile.\nwascob_outlet_shapefile = wascob.shp\n\n\n\n\nwascob is a point shapefile.\nid column is included in the shapefile and has unique values.\nThe tile drain bmp is present\nwascob falls on a tile drain field\n\n\n\n\n\nUse wascob as pour point during watershed delineation\nGenerate drainage area raster which is essentially the corresponding subbasin.\nGenerate wascob parameter table. To determine the outlet reach id:\n\nFind the corresponding tile drain field based on spatial relationship of wascob point shapefile and tile drain polygon shapefile.\nFind the outlet reach for the identified tile drain field and use it for the wacob.\n\nAdd wascob drainage area raster to parameter.h5",
+    "crumbs": [
+      "BMPs",
+      "WASCob"
+    ]
+  },
+  {
+    "objectID": "bmps/wascob.html#required-inputs",
+    "href": "bmps/wascob.html#required-inputs",
+    "title": "WASCob",
+    "section": "",
+    "text": "WASCOB point shapefile is the only input. It specifies the location of the wascob which usually the intercection of the berm and the overland drainage. It’s not neccessary that the point falls exatcly on the drainage path. The system will snap the point to the delineated streams.\nWASCOB shapefile must have six data fields as shown below. The name must match the ones given below.\n\nid - unique ids\nyear - the year wascob beomes effective. It assumes it starts from the first day of the year\nheight - berm cres elevation in m\nmax_vol - the max volumne of the ponding area in 104 m3\nmax_area - the max surface area of the ponding aera in ha\ncapacity - the discharge capacity in m3/day. Do we need this?",
+    "crumbs": [
+      "BMPs",
+      "WASCob"
+    ]
+  },
+  {
+    "objectID": "bmps/wascob.html#configuration-setup",
+    "href": "bmps/wascob.html#configuration-setup",
+    "title": "WASCob",
+    "section": "",
+    "text": "In the model configuration file, set wascob_outlet_shapefile to the name of the wascob point shapefile.\nwascob_outlet_shapefile = wascob.shp",
+    "crumbs": [
+      "BMPs",
+      "WASCob"
+    ]
+  },
+  {
+    "objectID": "bmps/wascob.html#validation",
+    "href": "bmps/wascob.html#validation",
+    "title": "WASCob",
+    "section": "",
+    "text": "wascob is a point shapefile.\nid column is included in the shapefile and has unique values.\nThe tile drain bmp is present\nwascob falls on a tile drain field",
+    "crumbs": [
+      "BMPs",
+      "WASCob"
+    ]
+  },
+  {
+    "objectID": "bmps/wascob.html#processing-steps",
+    "href": "bmps/wascob.html#processing-steps",
+    "title": "WASCob",
+    "section": "",
+    "text": "Use wascob as pour point during watershed delineation\nGenerate drainage area raster which is essentially the corresponding subbasin.\nGenerate wascob parameter table. To determine the outlet reach id:\n\nFind the corresponding tile drain field based on spatial relationship of wascob point shapefile and tile drain polygon shapefile.\nFind the outlet reach for the identified tile drain field and use it for the wacob.\n\nAdd wascob drainage area raster to parameter.h5",
+    "crumbs": [
+      "BMPs",
+      "WASCob"
     ]
   },
   {
@@ -109,7 +240,7 @@
     "href": "user-guide/model_config.html",
     "title": "Model Configuration File",
     "section": "",
-    "text": "Model configure file is a Microsoft Windows INI file used to specify the file source for watershed delineation, bmps and crop rotations. The sections and configures are list below.\n\n\n\n\n\n\nCoordination System\n\n\n\nAll the shapefiles and geotiff files must have the same coordination system.\n\n\n\n\n\n\n\n\nRaster Format\n\n\n\nAll raster files must be in GeoTIFF format and have the same resolution and covers same area.\n\n\n\n\n\n\n\n\nShapefile ID\n\n\n\nAll shapefiles must have an id column and have unique values. It’s not case-sensitive so it could id or ID.\n\n\n\n\n\n\n\n\nEmpty Files\n\n\n\nIf a file is not applicable to the watershed, just leave it empty.\n\n\n\n\n\n\n\n\nSection and Variable Name\n\n\n\nDon’t change the section and variable name.\n\n\n\n\n\ninput_folder - The folder location where all the input files will be read from. All the input files will be in the same folder.\n\n\n\n\nwatershed section contains the basic spatial files for the watershed.\n\ndem_raster - The dem raster file.\nsoil_raster - The soil raster file.\nlanduse_raster - The landuse raster file.\nstream_shapefile - The stream shapefile to burn stream.\nboundary_shapefile - The boundary shapefile to limit the watershed boundary.\nfarm_shapefile - The farm shapefile.\nfield_shapefile - The filed shapefile.\noutlet_shapefile - The output shapefile. Currently not used.\n\n\n\n\n\n\n\nMandatory Files\n\n\n\ndem, soil, landuse, stream, farm, field\n\n\n\n\n\nLookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.\n\nsoil_lookup - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.\nlanduse_lookup - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.\n\n\n\n\n\nhydroclimate - The hydroclimate sqlite database.\n\n\n\n\nThis section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.\n\npoint_source_shapefile - The point source point shapefile.\nflow_diversion_shapefile - The flow diversion point shapefile.\nreservoir_shapefile - The reservoir point shapefile.\nwetland_boundary_shapefile - The wetland boundary polygon shapefile.\nwetland_outlet_shapefile - The optional wetland outlet point shapefile which is not used in most of the time.\nmanure_catch_basin_shapefile - The manure catch basin point shapefile.\ngrass_waterway_shapefile - The grass waterway shapefile.\naccess_management_shapefile - The access management shapefile\nwater_use_shapefile - The water use shapefile.\n\n\n\n\n\n\n\nAttributes\n\n\n\nThe attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.\n\n\n\n\n\n\n\n\nKnown Bug in Copying REAL Attribute Values\n\n\n\nThe underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.\n\n\n\nreservoir\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\nManure Catch basin\n\nid - The catch basin id\n\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\nmanure_feedlot_boundary_shapefile - The feedlot boundary shapefile.\nmanure_feedlot_outlet_shapefile - The feedlot outlet shapefile.\nmanure_storage_boundary_shapefile - The manure storage boundary shapefile.\noffsite_watering_shapefile - The offsite watering shapefile.\n\n\n\n\nfeedlot\n\nid - The feedlot id\ncb - The catch basin id which must exist in the catch basin shapefile\nani_id - The animal id in the livestock parameter table\nadult - Number of the adult animals\nnonadult - Number of non-adult animals\nstoid - The manure storage ids separated with comma\nstoratio - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.\n\nFeedlot outlet\n\nid - The outlet id should be the same as the corresponding feedlot\n\nManure Storage\n\nid - The manure storage id\nfeedlot - The contributing feedlot id\n\n\n\n\n\n\nThis section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\n\n\n\nThe settings for watershed delineation.\n\nstream_threshold_area_ha - The threshold area for stream delineation in ha.\nwetland_min_area_ha - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nwetland_riparian_contribution_area_ha - The threshold contribution area of riparian wetland in ha. Not used.\nwetland_stream_buffer_distance_m - The wetland stream buffer distance in m. Not used.\n\n\n\n\nThe settings for marginal crop land charactorization. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are not agriculture.\nbuffer_size_m - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nslope_threshold_percentage - The threshold contribution area of riparian wetland in ha.\n\n\n\n\nThe settings for pasture land. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are charactoraized as pasture\n\n\n\n\nThe settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.\n\nmethod - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.\nAAFC_crop_inventory_folder - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g. 1991.tif.\nfirst_year - The first year to start the crop rotation\nlast_year - The year to end the crop rotation\n\n\n\n\nThe settings for model\n\nmodel_folder - The folder where the model files will be created.",
+    "text": "Model configure file is a Microsoft Windows INI file used to specify the file source for watershed delineation, bmps and crop rotations. The sections and configures are list below.\n\n\n\n\n\n\nCoordination System\n\n\n\nAll the shapefiles and geotiff files must have the same coordination system.\n\n\n\n\n\n\n\n\nRaster Format\n\n\n\nAll raster files must be in GeoTIFF format and have the same resolution and covers same area.\n\n\n\n\n\n\n\n\nShapefile ID\n\n\n\nAll shapefiles must have an id column and have unique values. It’s not case-sensitive so it could id or ID.\n\n\n\n\n\n\n\n\nEmpty Files\n\n\n\nIf a file is not applicable to the watershed, just leave it empty.\n\n\n\n\n\n\n\n\nSection and Variable Name\n\n\n\nDon’t change the section and variable name.\n\n\n\n\n\ninput_folder - The folder location where all the input files will be read from. All the input files will be in the same folder.\n\n\n\n\nwatershed section contains the basic spatial files for the watershed.\n\ndem_raster - The dem raster file.\nsoil_raster - The soil raster file.\nlanduse_raster - The landuse raster file.\nstream_shapefile - The stream shapefile to burn stream.\nboundary_shapefile - The boundary shapefile to limit the watershed boundary.\nfarm_shapefile - The farm shapefile.\nfield_shapefile - The filed shapefile.\noutlet_shapefile - The output shapefile. Currently not used.\n\n\n\n\n\n\n\nMandatory Files\n\n\n\ndem, soil, landuse, stream, farm, field\n\n\n\n\n\nLookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.\n\nsoil_lookup - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.\nlanduse_lookup - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.\n\n\n\n\n\nhydroclimate - The hydroclimate sqlite database.\n\n\n\n\n\n\n\nHydroclimate Database Format\n\n\n\nOnly the latest hydroclimate database format is supports. The new format has a STATIONS table and one table each climate data type. If the database is not in this format, use the static method: imWEBs.database.hydroclimate.HydroClimateDatabase.migrate. The input is the file path to the database. The database will be modified directly so backup the old database before running this utility.\n\n\n\n\n\nThis section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.\n\npoint_source_shapefile - The point source point shapefile.\nflow_diversion_shapefile - The flow diversion point shapefile.\nreservoir_shapefile - The reservoir point shapefile.\nwetland_boundary_shapefile - The wetland boundary polygon shapefile.\nwetland_outlet_shapefile - The optional wetland outlet point shapefile which is not used in most of the time.\nmanure_catch_basin_shapefile - The manure catch basin point shapefile.\ngrass_waterway_shapefile - The grass waterway shapefile.\naccess_management_shapefile - The access management shapefile\nwater_use_shapefile - The water use shapefile.\n\n\n\n\n\n\n\nAttributes\n\n\n\nThe attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.\n\n\n\n\n\n\n\n\nKnown Bug in Copying REAL Attribute Values\n\n\n\nThe underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.\n\n\n\nreservoir\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\nManure Catch basin\n\nid - The catch basin id\n\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nwascob_outlet_shapefile - The WSCOB outlet shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.\n\n\n\n\nwascob_boundary_shapefile\n\nid - The WASCOB id\noutlet - The outlet id. It must exists in wascob_outlet_shapefile\n\nwascob_outlet_shapefile\n\nid - The wascob id which should be unique.\n\n\n\n\n\n\nThis section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\nmanure_feedlot_boundary_shapefile - The feedlot boundary shapefile.\nmanure_feedlot_outlet_shapefile - The feedlot outlet shapefile.\nmanure_storage_boundary_shapefile - The manure storage boundary shapefile.\noffsite_watering_shapefile - The offsite watering shapefile.\n\n\n\n\nfeedlot\n\nid - The feedlot id\ncb - The catch basin id which must exist in the catch basin shapefile\nani_id - The animal id in the livestock parameter table\nadult - Number of the adult animals\nnonadult - Number of non-adult animals\nstoid - The manure storage ids separated with comma\nstoratio - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.\n\nFeedlot outlet\n\nid - The outlet id should be the same as the corresponding feedlot\n\nManure Storage\n\nid - The manure storage id\nfeedlot - The contributing feedlot id\n\n\n\n\n\n\nThis section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\n\n\n\nThe settings for watershed delineation.\n\nstream_threshold_area_ha - The threshold area for stream delineation in ha.\nwetland_min_area_ha - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nwetland_riparian_contribution_area_ha - The threshold contribution area of riparian wetland in ha. Not used.\nwetland_stream_buffer_distance_m - The wetland stream buffer distance in m. Not used.\n\n\n\n\nThe settings for marginal crop land charactorization. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are not agriculture.\nbuffer_size_m - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.\nslope_threshold_percentage - The threshold contribution area of riparian wetland in ha.\n\n\n\n\nThe settings for pasture land. Not used.\n\nnon_agriculture_landuse_ids - The landuse ids that are charactoraized as pasture\n\n\n\n\nThe settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.\n\nmethod - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.\nAAFC_crop_inventory_folder - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g. 1991.tif.\nfirst_year - The first year to start the crop rotation\nlast_year - The year to end the crop rotation\n\n\n\n\nThe settings for model\n\nmodel_folder - The folder where the model files will be created.",
     "crumbs": [
       "User Guide",
       "Model Configuration File"
@@ -153,7 +284,7 @@
     "href": "user-guide/model_config.html#database",
     "title": "Model Configuration File",
     "section": "",
-    "text": "hydroclimate - The hydroclimate sqlite database.",
+    "text": "hydroclimate - The hydroclimate sqlite database.\n\n\n\n\n\n\n\nHydroclimate Database Format\n\n\n\nOnly the latest hydroclimate database format is supports. The new format has a STATIONS table and one table each climate data type. If the database is not in this format, use the static method: imWEBs.database.hydroclimate.HydroClimateDatabase.migrate. The input is the file path to the database. The database will be modified directly so backup the old database before running this utility.",
     "crumbs": [
       "User Guide",
       "Model Configuration File"
@@ -175,7 +306,7 @@
     "href": "user-guide/model_config.html#structure_bmp",
     "title": "Model Configuration File",
     "section": "",
-    "text": "This section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.",
+    "text": "This section defines the location and attributes of structure bmps.\n\n\n\n\n\n\nWarning\n\n\n\nOnly riparian buffer is working in current version. Others will be supported later.\n\n\n\ndugout_boundary_shapefile - The dugout shapefile.\nwascob_boundary_shapefile - The WSCOB shapefile.\nwascob_outlet_shapefile - The WSCOB outlet shapefile.\nriparian_buffer_shapefile - The riparian buffer shapefile.\nfilter_strip_shapefile - The filter strip shapefile.\ntile_drain_shapefile - The tile drain shapefile.\n\n\n\n\nwascob_boundary_shapefile\n\nid - The WASCOB id\noutlet - The outlet id. It must exists in wascob_outlet_shapefile\n\nwascob_outlet_shapefile\n\nid - The wascob id which should be unique.",
     "crumbs": [
       "User Guide",
       "Model Configuration File"

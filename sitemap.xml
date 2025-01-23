@@ -2,14 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hawklorry.github.io/imWEBs-Python/user-guide/scenario_config.html</loc>
-    <lastmod>2024-11-16T03:53:59.872Z</lastmod>
+    <lastmod>2024-12-14T01:32:35.824Z</lastmod>
   </url>
   <url>
     <loc>https://hawklorry.github.io/imWEBs-Python/index.html</loc>
-    <lastmod>2024-11-16T04:28:37.774Z</lastmod>
+    <lastmod>2025-01-23T19:40:13.949Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hawklorry.github.io/imWEBs-Python/bmps/tiledrain.html</loc>
+    <lastmod>2025-01-23T19:54:31.639Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hawklorry.github.io/imWEBs-Python/bmps/crop_management.html</loc>
+    <lastmod>2025-01-23T19:41:42.462Z</lastmod>
+  </url>
+  <url>
+    <loc>https://hawklorry.github.io/imWEBs-Python/bmps/wascob.html</loc>
+    <lastmod>2025-01-23T19:54:49.007Z</lastmod>
   </url>
   <url>
     <loc>https://hawklorry.github.io/imWEBs-Python/user-guide/model_config.html</loc>
-    <lastmod>2024-11-16T03:53:59.871Z</lastmod>
+    <lastmod>2024-12-14T01:32:44.675Z</lastmod>
   </url>
 </urlset>
