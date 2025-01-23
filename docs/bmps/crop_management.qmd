@@ -1,0 +1,15 @@
+# Crop Management
+
+Crop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it's usually prepared manually and imported to bmp database.
+
+AAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it's possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file. One example is given below.
+
+```         
+[crop_rotation]
+method = crop_inventory
+AAFC_crop_inventory_folder = C:\Work\Git\imWEBs\imWEBs-Python\notebooks\stc\data\crop_inventory 
+first_year = 1991
+last_year = 2010
+```
+
+Users will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It's also required to have same coordination system as other input files.

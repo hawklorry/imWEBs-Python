@@ -194,13 +194,14 @@ class Structure(FolderBase):
         raster = self.get_raster(self.__structure_drainage_area_raster_name)
 
         if raster is None:
-            raster = Delineation.create_drainage_area_raster(self.boundary_processed_raster, flow_direction_raster, subbasin_raster)
-            raster = self.save_raster(raster, self.__structure_drainage_area_raster_name, True, True)
+            logger.info(f"Creating drainage area for {self.structure_type} ...")
+            parts_raster, drainage_raster = Delineation.create_parts_drainage_area_raster(self.boundary_processed_raster, flow_direction_raster, subbasin_raster)
+            raster = self.save_raster(drainage_raster, self.__structure_drainage_area_raster_name, True, True)
 
         return raster
 
     @property 
-    def attributes(self)->dict:
+    def attributes(self)->dict[int, StructureAttribute]:
         """structure attribute dictionary including id, area, subbasin and contribution area"""
         if self.__attributes is None:
             if self.boundary_processed_vector is None:
@@ -252,7 +253,7 @@ class Structure(FolderBase):
             field_data = [
                 FieldData.new_int(id),
                 FieldData.new_int(int(id_subbasin_dict[id])),
-                FieldData.new_real(0 if id in id_contribution_area_dict else id_contribution_area_dict[id]) 
+                FieldData.new_real(0 if id not in id_contribution_area_dict else id_contribution_area_dict[id]) 
             ]
             out_vector.add_attribute_record(field_data, deleted=False)
 

@@ -11,6 +11,7 @@ from .field_subbasin import FieldSubbasin
 from .field_farm import FieldFarm
 from .farm_subbasin import FarmSubbasin
 from .subbasin_multiplier import SubbasinMultiplier
+from .outlet_drainage import OutletDrainage
 from ...delineation.structure import Structure
 from ...names import Names
 from ...bmp.bmp_areal_manure_feedlot import ArealBMPManureFeedlot
@@ -23,6 +24,7 @@ from ...bmp.bmp_reach import ReachBMP
 from ...bmp.bmp import BMP
 from ...bmp.bmp_structure_dugout import StructureBMPDugout
 from ...bmp.bmp_structure_wascob import StructureBMPWascob
+from ...bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 from ...bmp.bmp_offsite_wintering import BMPOffsiteWintering
 from ...bmp.crop_rotation.crop_rotation import CropRotation
 from .bmp_01_point_source import PointSource
@@ -37,6 +39,7 @@ from .bmp_09_isolated_wetland import Wetland
 # from .bmp_15_fertilizer_management import FertlizerManagement, FertilizerParameter
 # from .bmp_16_grazing_management import GrazingManagement
 # from .bmp_18_irrigation_management import irrigation_management, irrigation_parameter
+from .bmp_19_tile_drain_management import TileDrainParameter
 # from .bmp_21_manure_incorporation_within_48h import ManureIncorporationWithin48hManagemet
 # from .bmp_22_manure_application_setback import ManureApplicationSetbackManagement
 # from .bmp_23_no_application_on_snow import ManureNoApplicaitonOnSnowManagement
@@ -115,7 +118,9 @@ class BMPDatabase(DatabaseBase):
         self.__create_bmp_wetland(outputs)
         self.__create_bmp_dugout(outputs)
         self.__create_bmp_wascob(outputs)
+        self.__create_bmp_tile_drain(outputs)
         self.__create_bmp_riparian_buffer(outputs)
+        self.__create_outlet_drainage(outputs)
 
         self.__create_bmp_offsite_wintering(outputs)
 
@@ -284,8 +289,50 @@ class BMPDatabase(DatabaseBase):
             return
         
         logger.info("Creating wascob ... ")
-        wascob = StructureBMPWascob(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, outputs.structures["wasob"])
-        self.save_table(Names.bmp_table_name_wascob, wascob.wascob_df)
+        wascob = StructureBMPWascob(outputs.inputs.wascob_boundary_vector, outputs.subbasin_raster, outputs.structures["wascob"],
+                                    outputs.field_raster, outputs.dem_clipped_raster_for_model, outputs.inputs.wascob_outlet_vector)
+        self.save_table(Names.bmp_table_name_wascob, wascob.wascob_df, Wascob.column_types())
+
+    def __create_bmp_tile_drain(self, outputs:Outputs):
+        if outputs.inputs.tile_drain_vector is None:
+            return
+        
+        logger.info("Creating tile drain ... ")
+        tile_drain = StructureBMPTileDrain(outputs.tile_drain_vector, outputs.tile_drain_raster, outputs.subbasin_raster,
+                                    outputs.field_raster, outputs.dem_clipped_raster_for_model)
+        self.save_table(Names.bmp_table_name_tile_drain, tile_drain.tile_drain_df, TileDrainParameter.column_types())
+
+    def __create_outlet_drainage(self, outputs:Outputs): 
+        df_reach_tile_drain = None
+        df_reach_wascob = None
+        if self.check_table_exist(Names.bmp_table_name_tile_drain):
+            df_reach_tile_drain = self.read_distinct_list(Names.bmp_table_name_tile_drain, "OutletReachId")
+            df_reach_tile_drain["tile_drain"] = 3800
+            df_reach_tile_drain.set_index("OutletReachId", inplace=True)
+
+        if self.check_table_exist(Names.bmp_table_name_wascob):
+            df_reach_wascob = self.read_distinct_list(Names.bmp_table_name_wascob, "OutletReachId")
+            df_reach_wascob["wascob"] = 10368
+            df_reach_wascob.set_index("OutletReachId", inplace=True)
+
+        if df_reach_wascob is None and df_reach_tile_drain is None:
+            return
+
+        logger.info("Creating outlet_drainage ... ")
+        if df_reach_wascob is None:
+            df_outlet_drainage = df_reach_tile_drain
+            df_outlet_drainage["wascob"] = 0
+        else:
+            df_outlet_drainage = pd.concat([df_reach_tile_drain,df_reach_wascob],axis=1)
+            df_outlet_drainage.fillna(0, inplace=True)        
+
+        df_outlet_drainage["DrainageCapacity"] = df_outlet_drainage["wascob"] + df_outlet_drainage["tile_drain"]
+        df_outlet_drainage["Reach"] = df_outlet_drainage.index
+        df_outlet_drainage.sort_index(inplace=True)
+        df_outlet_drainage.reset_index(inplace=True)
+        df_outlet_drainage["Id"] = df_outlet_drainage.index + 1
+
+        self.save_table(Names.bmp_table_name_outlet_drainage, df_outlet_drainage[["Id","Reach","DrainageCapacity"]])
 
     def __create_bmp_riparian_buffer(self, outputs:Outputs):
         df = outputs.riparian_buffer_parameter_df
@@ -373,9 +420,10 @@ class BMPDatabase(DatabaseBase):
             reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster).subbasins
         
         #catch basin
-        reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
-                                outputs.subbasin_raster,
-                                outputs.reach_parameter_df).subbasins
+        if outputs.inputs.catchbasin_vector is not None:
+            reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
+                                    outputs.subbasin_raster,
+                                    outputs.reach_parameter_df).subbasins
 
         if len(reach_bmps) <= 0:
             logger.info("There is no reach bmp, existing ... ")
@@ -570,7 +618,7 @@ class BMPDatabase(DatabaseBase):
 
 #region subarea
 
-    def create_subarea(self,outputs:Outputs)->int:
+    def create_subarea(self,outputs:Outputs, override = False)->int:
         #cellsubarea
         logger.info("Creating CellSubarea ...")
         self.save_table(Names.bmp_table_name_subarea_cell, outputs.subarea_cellindex_df)
@@ -596,26 +644,36 @@ class BMPDatabase(DatabaseBase):
 
         return len(subarea_df)
 
-    def __create_subarea_spatial_relationship_tables(self,outputs:Outputs):        
+    def __create_subarea_spatial_relationship_tables(self,outputs:Outputs, override = False):        
         subarea_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.subarea_raster, BMPDatabase.COL_NAME_AREA_HA)
         subarea_area_df.columns = ["SubareaArea"]
 
         #riparian buffer
-        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_parts_raster, Names.bmp_table_name_subarea_riparian_buffer_lookup)
-        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_drainage_area_raster, Names.bmp_table_name_subarea_riparian_buffer_drainage_lookup)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_parts_raster, Names.bmp_table_name_subarea_riparian_buffer_lookup, override)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_drainage_area_raster, Names.bmp_table_name_subarea_riparian_buffer_drainage_lookup, override)
         
         #feedlot
-        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_raster, Names.bmp_table_name_subarea_feedlot_lookup)
-        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_drainage_area_raster, Names.bmp_table_name_subarea_feedlot_drainage_lookup)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_raster, Names.bmp_table_name_subarea_feedlot_lookup, override)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_drainage_area_raster, Names.bmp_table_name_subarea_feedlot_drainage_lookup, override)
         
+        #wascob
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.wascob_drainage_area_raster, Names.bmp_table_name_subarea_wascob_drainage_lookup, override)
 
-    def __create_subarea_structure_lookup_table(self, subarea_area_df:pd.DataFrame, subarea_raster:Raster, structure_raster:Raster, table_name:str):
+        #tile drain
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.tile_drain_raster, Names.bmp_table_name_subarea_tile_drain_drainage_lookup, override)
+
+
+    def __create_subarea_structure_lookup_table(self, subarea_area_df:pd.DataFrame, subarea_raster:Raster, 
+                                                structure_raster:Raster, table_name:str, override = False):
         """Create subarea structure lookup table for given structure raster"""
         
         if structure_raster is None:
-            return
+            return      
         
         logger.info(f"Creating {table_name} ...")
+        if not override and self.check_table_exist(table_name):
+            logger.info(f"Table exists, skip ...")
+
         structure_area_df = RasterExtension.get_category_area_ha_dataframe(structure_raster, BMPDatabase.COL_NAME_AREA_HA)
         structure_area_df.columns = ["LocationArea"]
 
@@ -626,6 +684,5 @@ class BMPDatabase(DatabaseBase):
                               "FractionToSubarea","FractionToBmp", True) 
         
         gc.collect()
-
 
 #endregion

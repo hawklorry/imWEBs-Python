@@ -161,6 +161,7 @@ class ModelConfig(Config):
             #wasco will be the outlet of the subbasin
             "structure_bmp":["dugout_boundary_shapefile",
                              "wascob_boundary_shapefile",
+                             "wascob_outlet_shapefile",
                              "riparian_buffer_shapefile",
                              "filter_strip_shapefile",
                              "tile_drain_shapefile"],

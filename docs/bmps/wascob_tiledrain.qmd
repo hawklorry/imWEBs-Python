@@ -1,0 +1,119 @@
+# Tile Drain
+
+Tile drain improve the drainage of fields with poor drainage capacity. It uses underground perforated drain pipes to direct water to an outlet. It may work together with wascobs.
+
+## Required Inputs
+
+Two shapefiles are required:
+
+1.  Tile drain polygon shapefile to specify the location and attributes of the tile drain fields
+
+2.  ***Optional*** tile drain outlet shapefile to appoint outlet for tile drain fields
+
+It's assumed that the tile drain polygon has 1-1 relationship with the field polygon as field id is required for the tile drain parameter table. The system doesn't check this relationship. It's modellers' responsibility to check and pre-process the polygons.
+
+The polygon shapefile must have four data fields as shown below.
+
+1.  id - unique ids
+
+2.  outlet - outlet id pointing to outlets in tile drain outlet shapefile
+
+3.  depth - drain pipe invert depth in mm
+
+4.  spacing - drain pipe spacing in mm
+
+The tile drain outlet shapefile will be used as subbasin outlet. It must have an id column with values consistent with the one used in the outlet column in the tile drain polygon shapefile.
+
+## Configuration Setup
+
+In the model configuration file,
+
+-   set tile_drain_shapefile to the name of the tile drain polygon shapefile.
+
+-   set tile_drain_outlet_shapefile to the name of the tile drain outlet shapefile.
+
+{{\<
+
+tile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_outlet.shp
+
+> }}
+
+## Validation
+
+### Tile Drain Polygon Shapefile
+
+1.  The shapefile is a poygon shapefile.
+
+2.  id column is included in the shapefile and has unique values.
+
+3.  outlet column is included in the shapefile and the id could be found in tile drain outlet shapefile. The value could be empty.
+
+4.  depth and spacing column are included in the shapefile and the values are not empty
+
+### Tile Drain Outlet Point Shapefile
+
+1.  The shapefile has an id column with unique values.
+
+## Processing Steps
+
+1.  Use tile drain outlet shapefile as pour point during watershed delineation if it's defined.
+
+2.  Generate tile drain parameter table. To determine the outlet reach id:
+
+    1.  If the tile drain outlet shapefile is defined and the outlet data field is not empty, use the reach that corresponds to the outlet
+
+    2.  Else find the lowest subbasin included in the tile drain polygon. ***There is a problem here as not all part of subbasin is in the polygon, we may need to use the subarea to get this, i.e. tile drain at the subarea level.***
+
+3.  Add tile drain polygon to parameter.h5
+
+# WASCob (Water and Sediment Control Basin)
+
+WASCOB blocks water from drainage area. The ponded water drains through tile drain system. It always work with the tile drain system.
+
+## Required Inputs
+
+WASCOB point shapefile is the only input. It specifies the location of the wascob which usually the intercection of the berm and the overland drainage. It's not neccessary that the point falls exatcly on the drainage path. The system will snap the point to the delineated streams.
+
+WASCOB shapefile must have six data fields as shown below. The name must match the ones given below.
+
+1.  **id** - unique ids
+
+2.  **year** - the year wascob beomes effective. It assumes it starts from the first day of the year
+
+3.  **height** - berm cres elevation in m
+
+4.  **max_vol** - the max volumne of the ponding area in 10^4^ m^3^
+
+5.  **max_area** - the max surface area of the ponding aera in ha
+
+6.  **capacity** - the discharge capacity in m^3^/day. ***Do we need this?***
+
+## Configuration Setup
+
+In the model configuration file, set wascob_outlet_shapefile to the name of the wascob point shapefile.
+
+{{< wascob_outlet_shapefile = wascob.shp >}}
+
+## Validation
+
+1.  wascob is a point shapefile.
+
+2.  id column is included in the shapefile and has unique values.
+
+3.  The tile drain bmp is present
+
+4.  wascob falls on a tile drain field
+
+## Processing Steps
+
+1.  Use wascob as pour point during watershed delineation
+
+2.  Generate drainage area raster which is essentially the corresponding subbasin.
+
+3.  Generate wascob parameter table. To determine the outlet reach id:
+
+    1.  Find the corresponding tile drain field based on spatial relationship of wascob point shapefile and tile drain polygon shapefile.
+
+    2.  Find the outlet reach for the identified tile drain field and use it for the wacob.
+
+4.  Add wascob drainage area raster to parameter.h5

@@ -66,6 +66,12 @@ Lookup files are csv files that project ids to imWEBs internal ids. The first ro
 
 -   **hydroclimate** - The hydroclimate sqlite database.
 
+::: callout-important
+## Hydroclimate Database Format
+
+Only the latest hydroclimate database format is supports. The new format has a STATIONS table and one table each climate data type. If the database is not in this format, use the static method: *imWEBs.database.hydroclimate.HydroClimateDatabase.migrate*. The input is the file path to the database. The database will be modified directly so backup the old database before running this utility.
+:::
+
 ## reach_bmp
 
 This section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.
@@ -113,9 +119,22 @@ Only riparian buffer is working in current version. Others will be supported lat
 
 -   **dugout_boundary_shapefile** - The dugout shapefile.
 -   **wascob_boundary_shapefile** - The WSCOB shapefile.
+-   **wascob_outlet_shapefile** - The WSCOB outlet shapefile.
 -   **riparian_buffer_shapefile** - The riparian buffer shapefile.
 -   **filter_strip_shapefile** - The filter strip shapefile.
 -   **tile_drain_shapefile** - The tile drain shapefile.
+
+### Attribute
+
+-   **wascob_boundary_shapefile**
+
+    -   id - The WASCOB id
+
+    -   outlet - The outlet id. It must exists in **wascob_outlet_shapefile**
+
+-   **wascob_outlet_shapefile**
+
+    -   id - The wascob id which should be unique.
 
 ## non_structure_bmp
 

@@ -1,10 +1,10 @@
 {
-  "hash": "156afa5b587abab1be29cb719099526a",
+  "hash": "c743656f4c0b469e811e317a3efe79a1",
   "result": {
     "engine": "jupyter",
-    "markdown": "---\ntitle: 'imWEBs: create imWEBs models with Python'\n---\n\n\n\n## Installation\n\n`pip install imwebs`\n\n## Getting Started\n\n\n::: {#a6801b93 .cell execution_count=1}\n``` {.python .cell-code}\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()\n```\n:::\n\n\n",
+    "markdown": "---\ntitle: 'imWEBs: create imWEBs models with Python'\n---\n\n\n\n## Installation\n\nIt's recommended to install in a separate Python environment.\n\n`pip install imwebs`\n\n## Getting Started\n\n\n::: {#3fd520f4 .cell execution_count=1}\n``` {.python .cell-code}\nfrom imWEBs.imwebs import imWEBs\n\n#The first the is the model config file and the second is the scenario config file.\nimwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n#imwebs.generate_all()\n```\n:::\n\n\n## Two Configuration Files\n\nimWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n\n-   [Model Configuration File](user-guide/model_config.qmd)\n\n-   [Scenario Configuration File](user-guide/scenario_config.qmd)\n\n## Logging\n\nimWEBs uses Python logging system to output running info for debugging purpose. It's recommended to setup the logging before running imWEBs.\n\n``` python\nimport logging.config\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n```\n\n",
     "supporting": [
-      "index_files"
+      "index_files\\figure-html"
     ],
     "filters": [],
     "includes": {}

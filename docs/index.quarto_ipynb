@@ -1,0 +1,71 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# imWEBs: create imWEBs models with Python\n",
+        "\n",
+        "## Prerequisite\n",
+        "\n",
+        "[.NET Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) is required to run the integrated imWEBsInputTool. The basic runtime for console app should be sufficient.\n",
+        "\n",
+        "## Installation\n",
+        "\n",
+        "It's recommended to install in a separate Python environment.\n",
+        "\n",
+        "`pip install imwebs`\n",
+        "\n",
+        "## Getting Started\n"
+      ],
+      "id": "051eac12"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from imWEBs.imwebs import imWEBs\n",
+        "\n",
+        "#The first the is the model config file and the second is the scenario config file.\n",
+        "imwebs = imWEBs(\"imwebs_config_model_stc.ini\",\"imwebs_config_scenario_stc.ini\")\n",
+        "#imwebs.generate_all()"
+      ],
+      "id": "0a6c4670",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Two Configuration Files\n",
+        "\n",
+        "imWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.\n",
+        "\n",
+        "-   [Model Configuration File](user-guide/model_config.qmd)\n",
+        "\n",
+        "-   [Scenario Configuration File](user-guide/scenario_config.qmd)\n",
+        "\n",
+        "## Logging\n",
+        "\n",
+        "imWEBs uses Python logging system to output running info for debugging purpose. It's recommended to setup the logging before running imWEBs.\n",
+        "\n",
+        "``` python\n",
+        "import logging.config\n",
+        "logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n",
+        "```"
+      ],
+      "id": "dadcdb14"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "C:\\Users\\hawkl\\AppData\\Roaming\\Python\\share\\jupyter\\kernels\\python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

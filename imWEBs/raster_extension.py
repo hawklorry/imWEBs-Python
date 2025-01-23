@@ -1,4 +1,4 @@
-from whitebox_workflows import WbEnvironment, Raster, Vector
+from whitebox_workflows import WbEnvironment, Raster, Vector,AttributeField, FieldDataType,FieldData
 from io import StringIO
 import pandas as pd
 import logging
@@ -25,7 +25,7 @@ class RasterExtension:
         return max_value         
 
     @staticmethod
-    def raster_to_vector(raster:Raster, vector_type:str = "polygon")->Vector:
+    def raster_to_vector(raster:Raster, vector_type:str = "polygon", use_fid = False)->Vector:
         """Convert raster to vector and add an id column as the value"""
         wbe = WbEnvironment()
 
@@ -38,7 +38,7 @@ class RasterExtension:
         else:
             vector = wbe.raster_to_vector_lines(raster)
 
-        return VectorExtension.add_id_for_raster_value(vector)
+        return VectorExtension.add_id_for_raster_value(vector, use_fid)
 
     @staticmethod 
     def get_number_of_valid_cell(raster:Raster):
@@ -112,10 +112,10 @@ class RasterExtension:
 
         return standar_raster_config.rows == check_raster_config.rows and \
             standar_raster_config.columns == check_raster_config.columns and \
-            standar_raster_config.resolution_x == check_raster_config.resolution_x and \
-            standar_raster_config.resolution_y == check_raster_config.resolution_y and \
+            int(standar_raster_config.resolution_x) == int(check_raster_config.resolution_x) and \
+            int(standar_raster_config.resolution_y) == int(check_raster_config.resolution_y) and \
             math.fabs(standar_raster_config.east - check_raster_config.east) <= standar_raster_config.resolution_x and \
-            math.fabs(standar_raster_config.west == check_raster_config.west) <= standar_raster_config.resolution_y and \
+            math.fabs(standar_raster_config.west - check_raster_config.west) <= standar_raster_config.resolution_y and \
             standar_raster_config.epsg_code == check_raster_config.epsg_code
     
     @staticmethod
@@ -169,7 +169,7 @@ class RasterExtension:
         return df[stat_type]    
     
     @staticmethod
-    def get_majority_count(input_data_raster:Raster, feature_definition_raster:Raster)->dict:
+    def get_majority_count(input_data_raster:Raster, feature_definition_raster:Raster)->dict[int, int]:
         """Get the majority count of input data raster in each feature definition raster"""
 
         rows = input_data_raster.configs.rows
@@ -206,5 +206,52 @@ class RasterExtension:
 
         #make a new raster with a unique id combining both raster 1 and raster 2
         return spatial1_ras + spatial2_ras * raster1_max, raster1_max
+    
+    # @staticmethod
+    # def get_overlay_raster_without_multiparts(spatial1_ras:Raster, spatial2_ras:Raster, spatial1_id_column_name:str, spatial2_id_column_name:str)-> tuple[Raster, Vector]:
+    #     """
+    #     get overlayer raster and separate multiparts polygons. The values of the result raster will have ids starting from 1
+        
+    #     caution: this doesn't work probably due to the bugs in whitebox workflow
+        
+    #     """
+    #             #this will assign unique values for each unique combination of spatial1 and spatial2
+    #     raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
+    #     wbe = WbEnvironment()
+    #     wbe.write_raster(raster, r"C:\Work\imWEBs\test\gg\watershed\output\test1.tif")
+    #     raster = wbe.read_raster(r"C:\Work\imWEBs\test\gg\watershed\output\test1.tif")
+
+    #     #convert to vector to separate multiparts
+    #     vector = RasterExtension.raster_to_vector(raster, "polygon", True)
+    #     wbe.write_vector(vector, r"C:\Work\imWEBs\test\gg\watershed\output\test1.shp")
+    #     vector = wbe.read_vector(r"C:\Work\imWEBs\test\gg\watershed\output\test.shp")
+
+    #     #convert to raster and use FID as the raster value
+    #     #in this raster, the multiparts will have differnt ids
+    #     raster = wbe.vector_polygons_to_raster(input = vector, field_name = Names.field_name_id, base_raster = spatial2_ras)
+        
+    #     wbe.write_raster(raster, r"C:\Work\imWEBs\test\gg\watershed\output\test2.tif")
+
+    #     #add and populate two foreign id columns and id column
+    #     vector.add_attribute_field(AttributeField(Names.field_name_id, FieldDataType.Int, 10, 0))
+    #     vector.add_attribute_field(AttributeField(spatial1_id_column_name, FieldDataType.Int, 10, 0))
+    #     vector.add_attribute_field(AttributeField(spatial2_id_column_name, FieldDataType.Int, 10, 0))
+
+    #     dict_spatial1 = RasterExtension.get_zonal_statistics(spatial1_ras, raster,"max","col1")["col1"].to_dict() 
+    #     dict_spatial2 = RasterExtension.get_zonal_statistics(spatial2_ras, raster,"max","col2")["col2"].to_dict() 
+
+    #     for i in range(vector.num_records):
+    #         vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(i + 1))
+    #         vector.set_attribute_value(i,spatial1_id_column_name,FieldData.new_int(int(dict_spatial1[i+1])))
+    #         vector.set_attribute_value(i,spatial2_id_column_name,FieldData.new_int(int(dict_spatial2[i+1])))
+
+    #     return (raster, vector)
+
+
+
+
+    
+
+
 
         

@@ -16,6 +16,7 @@ import pandas as pd
 from .bmp.bmp_type import DefaultScenarioId
 from .iuh import IUH
 from .database.bmp.subarea import SubArea
+from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 
 import logging
 logger = logging.getLogger(__name__)
@@ -91,8 +92,59 @@ class Outputs(FolderBase):
     @property
     def feedlot_drainage_area_raster(self)->Raster:
         if "feedlot" in self.structures:
-            return self.structures["feedlot"].get_dainage_area_raster(self.flow_direction_raster, self.subarea_raster)
+            return self.structures["feedlot"].get_dainage_area_raster(self.flow_direction_raster, self.subbasin_raster)
         return None
+    
+    @property
+    def wascob_drainage_area_raster(self)->Raster:
+        if "wascob" in self.structures:
+            return self.structures["wascob"].get_dainage_area_raster(self.flow_direction_raster, self.subbasin_raster)
+        
+        return None
+    
+    @property
+    def tile_drain_raster(self)->Raster:
+        raster = self.get_raster(Names.tileDrainRasName)
+
+        if raster is None and self.inputs.tile_drain_vector is not None:
+            if self.field_raster is not None:
+                logging.info("Creating processed tile drain raster and vector ...")
+
+                #rasterize the vector first
+                original_tile_drain_raster = self.wbe.vector_polygons_to_raster(input = self.inputs.tile_drain_vector, 
+                                                            base_raster = self.field_raster)
+
+                #overlay with subarea raster
+                raster, raster1_max = RasterExtension.get_overlay_raster(original_tile_drain_raster, self.subarea_raster)
+                
+                #re-order the id and return the old id to new id dict
+                old_id_to_new_id_dict = Delineation.reorder_raster_id(raster)
+                raster = self.save_raster(raster, Names.tileDrainRasName, True, True)
+
+                #convert to vector and assign field and subbasin id
+                vector = RasterExtension.raster_to_vector(raster)
+                vector = VectorExtension.decompsite_overlay_id(vector, old_id_to_new_id_dict, "id_user", "subarea", raster1_max)
+                self.save_vector(vector, Names.tileDrainShpName, True, True)
+                               
+                #add field and subbasin from subarea
+                vector = VectorExtension.join_two_vector(vector, self.subarea_vector, "subarea", ["FieldId", "SubbasinId"])
+                
+                #add depth and spacing from orginal vector
+                vector = VectorExtension.join_two_vector(vector, self.inputs.tile_drain_vector, "id_user", StructureBMPTileDrain.fields_tile_drain)
+
+                #save to file
+                raster = self.save_raster(raster, Names.tileDrainRasName, True, True)
+                self.save_vector(vector, Names.tileDrainShpName, True, True)
+        return raster
+    
+    @property 
+    def tile_drain_vector(self)->Raster:
+        vector = self.get_vector(Names.tileDrainShpName)
+
+        if vector is None and self.inputs.tile_drain_vector is not None:
+            raster = self.tile_drain_raster
+            vector = self.get_vector(Names.tileDrainShpName)
+        return vector
 
     @property
     def structures(self)->dict[str, Structure]:
@@ -108,7 +160,7 @@ class Outputs(FolderBase):
                         output_folder=self.folder,
                         dem_raster=self.dem_clipped_burned_filled_raster,
                         structure_polygon_vector = boundary_vector, 
-                        structure_outlet_point_vector = getattr(self.inputs, f"{type}_outlet_vector"),
+                        structure_outlet_point_vector = None if type == "wascob" else getattr(self.inputs, f"{type}_outlet_vector"), # wascob outlets are not located on the boundary so we don't need to snap to it.
                         structure_area_threshold_ha = self.wetland_min_area_ha if type == "wetland" else 0)     
                     
         return self.__structures
@@ -851,8 +903,9 @@ class Outputs(FolderBase):
                 threshold = self.stream_threshold_area_ha / self.inputs.cellsize_ha)
             
             #fix it as some of the structure streams may be below the threshold 
-            logger.info("Fixing stream network so the structure stream segment that is below threashold will be added back ...")
-            raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.structure_combined_outlet_raster)
+            if len(self.structures) > 0:
+                logger.info("Fixing stream network so the structure stream segment that is below threashold will be added back ...")
+                raster = Delineation.build_stream_network_link_to_outlets(raster, self.flow_direction_raster,self.structure_combined_outlet_raster)
 
             #save it
             raster = self.save_raster(raster, Names.streamNetworkRasName, True, True)
@@ -922,6 +975,13 @@ class Outputs(FolderBase):
                         pour_pts = reach_bmp,
                         streams = self.stream_network_raster,
                         snap_dist = 2000))
+                    
+            #add user-defined wascob outlets
+            if self.inputs.wascob_outlet_vector is not None:
+                outlet_vectors.append(self.wbe.jenson_snap_pour_points(
+                    pour_pts = self.inputs.wascob_outlet_vector,
+                    streams = self.stream_network_raster,
+                    snap_dist = 2000))
 
             #add structure outlets
             #there is no need to snap as the outlet has been processed with the network
@@ -1585,8 +1645,5 @@ class Outputs(FolderBase):
         wetland = self.wetland_raster
         usle_p = self.uslep_raster
         offsite_watering = self.offsite_watering_raster
-    
-
-
-
-
+        tile_drain = self.tile_drain_raster
+        wascob = self.wascob_drainage_area_raster

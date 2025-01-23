@@ -1,6 +1,12 @@
 # imWEBs: create imWEBs models with Python
 
+## Prerequisite
+
+[.NET Runtime 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) is required to run the integrated imWEBsInputTool. The basic runtime for console app should be sufficient.
+
 ## Installation
+
+It's recommended to install in a separate Python environment.
 
 `pip install imwebs`
 
@@ -12,4 +18,21 @@ from imWEBs.imwebs import imWEBs
 #The first the is the model config file and the second is the scenario config file.
 imwebs = imWEBs("imwebs_config_model_stc.ini","imwebs_config_scenario_stc.ini")
 #imwebs.generate_all()
+```
+
+## Two Configuration Files
+
+imWEBs reads model input files and scenario settings from two configuration files. Users should first get familiar with the configuration file content and compile the files before running imWEBs.
+
+-   [Model Configuration File](user-guide/model_config.qmd)
+
+-   [Scenario Configuration File](user-guide/scenario_config.qmd)
+
+## Logging
+
+imWEBs uses Python logging system to output running info for debugging purpose. It's recommended to setup the logging before running imWEBs.
+
+``` python
+import logging.config
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 ```

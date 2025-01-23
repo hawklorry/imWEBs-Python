@@ -34,6 +34,9 @@ class ScenarioConfig(Config):
         load the config file, validate and copy the input files
         """
 
+        if self.config_file is None or not os.path.exists(self.config_file):
+            raise ValueError(f"Couldn't find {self.config_file}.")
+
         self.data_type_station_ids = {}
         if self.config_file is not None and os.path.exists(self.config_file):           
             logger.info(f"Loading scenario configuration file {self.config_file} ...")
@@ -238,6 +241,7 @@ class ScenarioConfig(Config):
         """
         generate parameter h5 file
         """
+        logger.info(f"Creating parameter.h5 ...")
         ParameterH5.generate_parameter_h5(self.scenario_folder, self.model.model_output_folder)
 
     def __generate_reach_parameter(self):

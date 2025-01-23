@@ -60,6 +60,9 @@ class ReachBMPReservoir(ReachBMP):
                  flow_method:str = None, 
                  flow_data_folder:str = None):
 
+        if reservoir_vector is None:
+            return
+
         #make sure the shapefile has required columns
         VectorExtension.check_fields_in_vector(reservoir_vector, ReachBMPReservoir.fields_reservoir)
 

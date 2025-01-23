@@ -3,6 +3,9 @@ from io import StringIO
 import pandas as pd
 import geopandas as gpd
 from .names import Names
+import os
+import shutil
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -23,7 +26,7 @@ class VectorExtension:
             raise ValueError(f"Wrong shape type with {vector.file_name}.")
 
     @staticmethod
-    def add_id_for_raster_value(vector:Vector)->Vector:
+    def add_id_for_raster_value(vector:Vector, use_fid = False)->Vector:
         if len([field.name for field in vector.get_attribute_fields() if field.name == Names.field_name_raster_value]) <= 0:
             return vector
 
@@ -31,10 +34,48 @@ class VectorExtension:
         vector.add_attribute_field(id_field)
 
         for i in range(vector.num_records):
-            value = vector.get_attribute_value(i, Names.field_name_raster_value).get_value_as_f64()
-            vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(int(value)))
+            if use_fid:
+                vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(i+1))
+            else:
+                value = vector.get_attribute_value(i, Names.field_name_raster_value).get_value_as_f64()
+                vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(int(value)))
         return vector
     
+    @staticmethod
+    def join_two_vector(vector1:Vector, vector2:Vector, foreign_key1:int, copied_fields_from_vector2:list[str])->Vector:
+        """
+        Join vector1 and vector2 over foreign_key1 in vector1 and id in vector2 and copy the fields from vector2
+        """
+        vector2_fields = vector2.get_attribute_fields()
+        vector2_fields = {field.name:field for field in vector2_fields}
+        vector2_values = {}
+        for col in copied_fields_from_vector2:
+            if col not in vector2_fields:
+                raise ValueError(f"Coundn't find column {col} in {vector2.file_name}")
+            values = VectorExtension.get_unique_field_value(vector2, col, int if vector2_fields[col].field_type == FieldDataType.Int else float)
+            vector2_values[col] = values
+
+        #add the columns
+        for col in copied_fields_from_vector2:
+            field = None
+            if vector2_fields[col].field_type == FieldDataType.Int:
+                field = AttributeField(col, FieldDataType.Int, 10, 0)
+            else:
+                field = AttributeField(col, FieldDataType.Real, 8, 3)
+            vector1.add_attribute_field(field)
+
+        #assign the values
+        for i in range(vector1.num_records):
+            foreign_key = int(vector1.get_attribute_value(i, foreign_key1).get_value_as_f64())
+
+            for col in copied_fields_from_vector2:
+                if vector2_fields[col].field_type == FieldDataType.Int:
+                    vector1.set_attribute_value(i,col,FieldData.new_int(vector2_values[col][foreign_key]))
+                else:
+                    vector1.set_attribute_value(i,col,FieldData.new_real(vector2_values[col][foreign_key]))
+        return vector1            
+
+
     @staticmethod
     def decompsite_overlay_id(vector:Vector, old_id_to_new_id_dict:dict[int, int], name1:str, name2:str, raster1_max:int)->Vector:
         field1 = AttributeField(name1, FieldDataType.Int, 10, 0)
@@ -63,6 +104,7 @@ class VectorExtension:
             return ids
         return []
     
+
     @staticmethod
     def get_unique_field_value(vector:Vector, field_name:str, type:type = int)->dict:
         exist, name = VectorExtension.check_field_in_vector(vector, field_name)
@@ -83,6 +125,8 @@ class VectorExtension:
                 elif type is str:
                     if(len(field_value.get_as_string()) > 0):
                         field_values[id] = field_value.get_as_string()
+                elif type is float:
+                    field_values[id] = field_value.get_value_as_f64()
 
         return field_values
 
@@ -151,6 +195,7 @@ class VectorExtension:
     
     @staticmethod
     def merge_vectors(vectors:list)->Vector:
+        
         if vectors is None or len(vectors) == 0:
             raise ValueError("There is non vectors to merge.")
         
@@ -173,18 +218,25 @@ class VectorExtension:
 
     @staticmethod
     def save_vector(vector:Vector, destination_file:str):
-        wbe = WbEnvironment()
-        out_vector = wbe.new_vector(vector.header.shape_type, vector.get_attribute_fields(), proj=vector.projection)
+        if os.path.exists(vector.file_name):
+            shutil.copyfile(vector.file_name, destination_file)
+            shutil.copyfile(vector.file_name.lower().replace(".shp",".prj"), destination_file.lower().replace(".shp",".prj"))
+            shutil.copyfile(vector.file_name.lower().replace(".shp",".dbf"), destination_file.lower().replace(".shp",".dbf"))
+            shutil.copyfile(vector.file_name.lower().replace(".shp",".shx"), destination_file.lower().replace(".shp",".shx"))
+        else:
+            wbe = WbEnvironment()
+            out_vector = wbe.new_vector(vector.header.shape_type, vector.get_attribute_fields(), proj=vector.projection)
 
-        # Now fill it with the input data
-        for i in range(vector.num_records):
-            geom = vector[i]
-            out_vector.add_record(geom) # Add the record to the output Vector
-            out_vector.add_attribute_record(vector.get_attribute_record(i), deleted=False)
-        # Finally, save the output file
-        wbe.write_vector(out_vector, destination_file)
+            # Now fill it with the input data
+            for i in range(vector.num_records):
+                geom = vector[i]
+                out_vector.add_record(geom) # Add the record to the output Vector
+                out_vector.add_attribute_record(vector.get_attribute_record(i), deleted=False)
 
-        #gpd.read_file(vector.file_name).to_file(destination_file)
+            # Finally, save the output file
+            wbe.write_vector(out_vector, destination_file)
+
+            #gpd.read_file(vector.file_name).to_file(destination_file)
 
     @staticmethod
     def check_field_in_vector(vector:Vector, field_name:str):

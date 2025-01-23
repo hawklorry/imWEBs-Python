@@ -9,7 +9,7 @@ website:
   repo-actions: [edit]
   repo-subdir: docs
   page-navigation: true
-  bread-crumbs: false # I can\'t get this to work properly, disabled for now
+  bread-crumbs: false 
     
   sidebar:
     style: docked
@@ -20,6 +20,8 @@ website:
         contents:
         - user-guide/model_config.qmd 
         - user-guide/scenario_config.qmd     
+      - section: "BMPs"
+        - bmps/wascob_tiledrain.qmd
    
 format:
   html:

@@ -7,7 +7,7 @@ exclude = ["notebooks", "references", "tests", "docs", ".github", ".devcontainer
 
 [project]
 name="imWEBs"
-version="0.0.1"
+version="0.0.4"
 dependencies = [
     "whitebox_workflows==1.3.2",
     "sqlalchemy",

@@ -8,6 +8,8 @@ import logging
 import numpy as np
 from .bmp.bmp_type import BMPType
 from .bmp.bmp_reach_reservoir import ReachBMPReservoir
+from .bmp.bmp_structure_wascob import StructureBMPWascob
+from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 
 logger = logging.getLogger(__name__)
 
@@ -148,7 +150,7 @@ class Inputs(FolderBase):
     
     @property
     def wascob_outlet_vector(self)->Vector:
-        return None
+        return self.get_vector(Names.get_standard_file_name("wascob_outlet_shapefile"))
     
     @property
     def raparian_buffer_vector(self)->Vector:
@@ -212,7 +214,7 @@ class Inputs(FolderBase):
         if self.wascob_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_WASCOB)
         if self.tile_drain_vector is not None:
-            bmps.append(BMPType.BMP_TYPE_FILTERSTRIP)
+            bmps.append(BMPType.BMP_TYPE_TILEDRAIN)
         if self.raparian_buffer_vector is not None:
             bmps.append(BMPType.BMP_TYPE_RIPARIANBUFFER)
         if self.filter_strip_vector is not None:
@@ -268,20 +270,16 @@ class Inputs(FolderBase):
         if not RasterExtension.compare_raster_extent(self.dem_raster, self.landuse_raster):
             raise ValueError("The landuse raster doesn't have same dimension as dem.")
         
-        #check manure feedlot, catch basin and storage
+        #valiate bmp inputs to make sure attributes are setup correctly
         self.__check_manure_feedlot_catchbasin_storage()
-        self.__check_reservoir()
-        
+        ReachBMPReservoir.validate(self.reservoir_vector)
+        StructureBMPWascob.validate(self.wascob_boundary_vector, self.wascob_outlet_vector)
+        StructureBMPTileDrain.validate(self.tile_drain_vector)
+
         #check if the soil/lookup raster ids are included in corresponding lookup csv files
         logger.info("Loading lookup tables ...")
         self.lookup_soil =  Lookup(self.soil_lookup_csv, self.soil_raster)
         self.lookup_landuse  = Lookup(self.landuse_lookup_csv, self.landuse_raster)
-
-    def __check_reservoir(self):
-        if self.reservoir_vector is None:
-            return 
-
-        ReachBMPReservoir.validate(self.reservoir_vector)
 
 
     def __check_manure_feedlot_catchbasin_storage(self):

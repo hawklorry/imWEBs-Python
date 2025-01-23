@@ -1,32 +1,41 @@
 from ...delineation.structure_attribute import StructureAttribute
+from ...bmp.bmp_type import DefaultScenarioId
+from sqlalchemy import INT, TEXT, REAL
 
 class Wascob:
     """Parameter Table for BMP: WASCob (41)"""
-    def __init__(self,attribute:StructureAttribute = None):
-        self.Scenario = -1
-        self.ID = attribute.id
+    def __init__(self,id:int, contribution_area:float, year:int, field_id:int, subbasin_id:int, outlet_reach_id:int, berm_elevation:float, max_volume:float, max_area:float, capacity:float):
+        self.Scenario = DefaultScenarioId
+        self.ID = id 
 
-        self.StartYear = 1900
+        self.StartYear = year   #from shapefile
         self.StartMon = 1
         self.StartDay = 1
 
-        self.FieldId = -1
-        self.OutletReachId = -1
+        self.FieldId = field_id                 #get from spatial
+        self.SubbasinId = subbasin_id
+        self.OutletReachId = outlet_reach_id    #wascob has an atribute for outlet id, if the outlet is set to 
+                                                #outlet of subbasin, then outlet reach id will be the downstream reach id.
         
-        self.BermElevation = 0
+		#BermElevation = avg(subarea with WASCoB elevation) + 2m (IF Height IS NULL)
+        #BermElevation = avg(subarea with WASCOB elevation) + WASCoB.Height IF Height IS NOT NULL
+        self.BermElevation = berm_elevation  
 
-        self.DeadVolume = 0
-        self.DeadArea = 0
+        self.DeadVolume = 0    
+        self.DeadArea = 0      
 
-        self.NormalVolume = 0
-        self.NormalArea = 0
+        #normal volume = maxvolume *2 /3
+        #normal area = max area / 1.31
+        self.NormalVolume = max_volume * 2 / 3.0   
+        self.NormalArea = max_area / 1.31     
 
-        self.MaxVolume = 0
-        self.MaxArea = 0
+        self.MaxVolume = max_volume      #from shapefile
+        self.MaxArea = max_area        #from shapefile
 
-        self.ContributionArea = attribute.contribution_area
-        self.DischargeCapacity = 0
+        self.ContributionArea = contribution_area
+        self.DischargeCapacity = capacity  #from shapefile
 
+        #below paramter use default values
         self.TileOutflowCoefficient = 1
         self.SpillwayDecay = 1
 
@@ -51,4 +60,7 @@ class Wascob:
         self.InitialNO2Conc = 0.1
         self.InitialNH3Conc = 0.1
 
-        self.BermType = ''
+    @staticmethod 
+    def column_types()->dict:
+        wascob = Wascob(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+        return {col:(INT if col in ["Scenario","ID", "StartYear","StartMon","StartDay","FieldId","SubbasinId","OutletReachId"] else REAL) for col in dir(wascob) if "__" not in col}

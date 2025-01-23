@@ -505,7 +505,7 @@ class Delineation:
         return id_map
 
     @staticmethod
-    def create_drainage_area_raster(structure_raster:Raster, flow_direction_raster:Raster, subbasin_raster:Raster)->Raster:
+    def create_parts_drainage_area_raster(structure_raster:Raster, flow_direction_raster:Raster, subbasin_raster:Raster, create_new_id:bool = False)->tuple[Raster,Raster]:
         """
         Borrow from VFSandRBS
         """
@@ -527,6 +527,7 @@ class Delineation:
         subbasin_nodata = subbasin_raster.configs.nodata
 
         drainage_area_raster = wbe.new_raster(subbasin_raster.configs)
+        parts_raster = wbe.new_raster(subbasin_raster.configs)
 
         #flag if the cells has been traced
         flag2D = np.zeros((rows, cols), dtype=bool)
@@ -604,12 +605,16 @@ class Delineation:
                     for loc in path:
                         flag2D[loc[0], loc[1]] = True
 
-     
+        new_id = 0
         for outLoc in vfsOrRbsDrain.keys():
+            new_id += 1
             structure_id = int(structure_raster[outLoc[0], outLoc[1]])
 
             for loc in vfsOrRbsDrain[outLoc]:
-                drainage_area_raster[loc[0], loc[1]] = structure_id
+                drainage_area_raster[loc[0], loc[1]] = new_id if create_new_id else structure_id
 
-        return drainage_area_raster
+            for loc in vfsOrRbsInside[outLoc]:
+                parts_raster[loc[0], loc[1]] = new_id if create_new_id else structure_id
+
+        return (parts_raster, drainage_area_raster)
 

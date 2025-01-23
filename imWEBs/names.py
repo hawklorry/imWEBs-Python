@@ -25,6 +25,7 @@ class Names:
     bmp_table_name_filter_strip = "structure_bmp_filter_strip"    
     bmp_table_name_tile_drain = "structure_bmp_tile_drain"
     bmp_table_name_wascob = "structure_bmp_wascob"
+    bmp_table_name_outlet_drainage = "outlet_drainage" #fixed name
 
     #areal non-structure
     bmp_table_name_crop_management = "non_structure_bmp_crop_management"
@@ -112,7 +113,7 @@ class Names:
     field_name_feedlot_storage_ids = "stoid"
     field_name_feedlot_storage_ratios = "storatio"
     fields_feedlot = [
-           field_name_feedlot_catch_basin,
+            field_name_feedlot_catch_basin,
             field_name_feedlot_animal_id,
             field_name_feedlot_adult,
             field_name_feedlot_non_adult,
@@ -313,6 +314,8 @@ class Names:
     # wascob
     wascobShpName = "wascob" + shapefile_extension
     wascobRasName = wascobShpName.replace(shapefile_extension, raster_extension)
+    wascobOutletShpName = "wascob_outlet" + shapefile_extension
+
 
     #Riparian Buffer
     riparianBufferShpName = "riparian_buffer" + shapefile_extension
@@ -492,6 +495,7 @@ class Names:
         #structure_bmp
         "dugout_boundary_shapefile":dugoutShpName,
         "wascob_boundary_shapefile":wascobShpName,
+        "wascob_outlet_shapefile":wascobOutletShpName,
         "riparian_buffer_shapefile":riparianBufferRasterName,
         "filter_strip_shapefile":filterStripRasterName,
         "tile_drain_shapefile":tileDrainShpName,
