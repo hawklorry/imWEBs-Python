@@ -496,7 +496,7 @@ class Names:
         "dugout_boundary_shapefile":dugoutShpName,
         "wascob_boundary_shapefile":wascobShpName,
         "wascob_outlet_shapefile":wascobOutletShpName,
-        "riparian_buffer_shapefile":riparianBufferRasterName,
+        "riparian_buffer_shapefile":riparianBufferShpName,
         "filter_strip_shapefile":filterStripRasterName,
         "tile_drain_shapefile":tileDrainShpName,
 
