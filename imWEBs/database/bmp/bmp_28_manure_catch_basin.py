@@ -31,6 +31,7 @@ class ManureCatchBasinParameter(BMPTable):
     InitialSolP_mgL = Column(REAL)
     InitialOrgN_mgL = Column(REAL)
     InitialOrgP_mgL = Column(REAL)
+    D50 = Column(REAL)
 
     def __init__(self, id, subbasin, receive_reach):
         
@@ -60,3 +61,4 @@ class ManureCatchBasinParameter(BMPTable):
         self.InitialSolP_mgL = 0.05
         self.InitialOrgN_mgL = 0.5
         self.InitialOrgP_mgL = 0.05
+        self.D50 = 10
