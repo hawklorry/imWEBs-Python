@@ -13,6 +13,7 @@ class LinearTriangle(Interpolation):
         cols = mask_raster.configs.columns
         numShapes = len(station_coordinates)
         rowCount = RasterExtension.get_number_of_valid_cell(mask_raster)
+        no_data = mask_raster.configs.nodata
 
         sb = []
         sep = os.linesep
@@ -35,7 +36,7 @@ class LinearTriangle(Interpolation):
         finalValue = [[""] * cols for _ in range(rows)]
         for row in range(rows):
             for col in range(cols):
-                if mask_raster[row, col] > 0:
+                if mask_raster[row, col] != no_data:
                     d123[:] = np.inf
                     stationsNum[:] = 0
                     x[:] = 0

@@ -13,6 +13,7 @@ class AverageUniform(Interpolation):
         cols = mask_raster.configs.columns
         numShapes = len(station_coordinates)
         rowCount = RasterExtension.get_number_of_valid_cell(mask_raster)
+        no_data = mask_raster.configs.nodata
 
         sb = []
         sb.append(str(rowCount))
@@ -24,7 +25,7 @@ class AverageUniform(Interpolation):
 
             for row in range(rows):
                 for col in range(cols):
-                    if mask_raster[row, col] > 0:
+                    if mask_raster[row, col] != no_data:
                         finalValue = str(weight)
                         if numShapes > 1:
                             finalValue += "\t" + "\t".join([str(weight)] * (numShapes - 1)) + "\t" + str(weightf)

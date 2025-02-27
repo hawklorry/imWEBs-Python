@@ -2,7 +2,7 @@ from .folder_base import FolderBase
 from .names import Names
 from .raster_extension import RasterExtension
 from .vector_extension import VectorExtension
-from whitebox_workflows import Raster, Vector
+from whitebox_workflows import Raster, Vector, VectorGeometryType
 from .lookup import Lookup
 import logging
 import numpy as np
@@ -143,15 +143,7 @@ class Inputs(FolderBase):
     @property
     def dugout_outlet_vector(self)->Vector:
         return None
-    
-    @property
-    def wascob_boundary_vector(self)->Vector:
-        return self.get_vector(Names.get_standard_file_name("wascob_boundary_shapefile"))
-    
-    @property
-    def wascob_outlet_vector(self)->Vector:
-        return self.get_vector(Names.get_standard_file_name("wascob_outlet_shapefile"))
-    
+
     @property
     def raparian_buffer_vector(self)->Vector:
         return self.get_vector(Names.get_standard_file_name("riparian_buffer_shapefile"))    
@@ -161,8 +153,16 @@ class Inputs(FolderBase):
         return self.get_vector(Names.get_standard_file_name("filter_strip_shapefile"))    
     
     @property
-    def tile_drain_vector(self)->Vector:
-        return self.get_vector(Names.get_standard_file_name("tile_drain_shapefile"))    
+    def wascob_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("wascob_shapefile"))
+    
+    @property
+    def tile_drain_boundary_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("tile_drain_boundary_shapefile"))    
+    
+    @property
+    def tile_drain_outlet_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("tile_drain_outlet_shapefile"))    
 
 #endregion
 
@@ -211,9 +211,9 @@ class Inputs(FolderBase):
         #structure bmp
         if self.dugout_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_DUGOUT)
-        if self.wascob_boundary_vector is not None:
+        if self.wascob_vector is not None:
             bmps.append(BMPType.BMP_TYPE_WASCOB)
-        if self.tile_drain_vector is not None:
+        if self.tile_drain_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_TILEDRAIN)
         if self.raparian_buffer_vector is not None:
             bmps.append(BMPType.BMP_TYPE_RIPARIANBUFFER)
@@ -240,21 +240,28 @@ class Inputs(FolderBase):
         #check mandatary files
         if self.dem_raster is None:
             raise ValueError("Can't find DEM")
+        if self.dem_raster.configs.nodata > -32768:
+            raise ValueError("The no data value of dem raster is not valid. Use -32768.")
         
         if self.stream_network_user_vector is None:
             raise ValueError("Can't find user stream network shapefile.")
         
         if self.soil_raster is None:
             raise ValueError("Can't find soil raster")
+        if self.soil_raster.configs.nodata > -32768:
+            raise ValueError("The no data value of soil raster is not valid. Use -32768.")
         
         if self.landuse_raster is None:
-            raise ValueError("Can't find landuse raster")       
+            raise ValueError("Can't find landuse raster")     
+        if self.landuse_raster.configs.nodata > -32768:
+            raise ValueError("The no data value of landuse raster is not valid. Use -32768.")  
         
         if self.farm_vector is None:
             raise ValueError("Can't find farm shapefile")       
         
         if self.field_vector is None:
             raise ValueError("Can't find field shapefile")   
+        VectorExtension.validate_vector_shape_type(self.field_vector, VectorGeometryType.Polygon)
         
         if self.soil_lookup_csv is None:
             raise ValueError("Can't find soil lookup")
@@ -273,8 +280,8 @@ class Inputs(FolderBase):
         #valiate bmp inputs to make sure attributes are setup correctly
         self.__check_manure_feedlot_catchbasin_storage()
         ReachBMPReservoir.validate(self.reservoir_vector)
-        StructureBMPWascob.validate(self.wascob_boundary_vector, self.wascob_outlet_vector)
-        StructureBMPTileDrain.validate(self.tile_drain_vector)
+        StructureBMPWascob.validate(self.wascob_vector)
+        StructureBMPTileDrain.validate(self.tile_drain_boundary_vector, self.tile_drain_outlet_vector)
 
         #check if the soil/lookup raster ids are included in corresponding lookup csv files
         logger.info("Loading lookup tables ...")

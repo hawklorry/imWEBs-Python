@@ -24,7 +24,7 @@ class Structure(FolderBase):
     """
 
     #catchbasin and manure storage is not included here as they don't impact the flow direction
-    structure_types_affection_flow_direction = ["wetland","feedlot","wascob","dugout"]
+    structure_types_affection_flow_direction = ["wetland","feedlot","dugout"]
 
     def __init__(self, structure_type:str, 
                  output_folder:str, 

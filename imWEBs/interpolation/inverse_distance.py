@@ -17,6 +17,7 @@ class InverseDistance(Interpolation):
         aValues = np.zeros(numShapes)
         aValuesInt = np.zeros(numShapes)
         rowCount = RasterExtension.get_number_of_valid_cell(mask_raster)
+        no_data = mask_raster.configs.nodata
 
         sb = []
         sb.append(str(rowCount))
@@ -28,7 +29,7 @@ class InverseDistance(Interpolation):
 
         for row in range(rows):
             for col in range(cols):
-                if mask_raster[row, col] > 0:
+                if mask_raster[row, col] != no_data:
                     tempDenom = 0
                     aValuesIntSum = 0
                     raster_x = mask_raster.get_x_from_column(col)

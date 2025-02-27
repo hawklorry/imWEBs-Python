@@ -159,12 +159,12 @@ class ModelConfig(Config):
                           ],
 
             #wasco will be the outlet of the subbasin
-            "structure_bmp":["dugout_boundary_shapefile",
-                             "wascob_boundary_shapefile",
-                             "wascob_outlet_shapefile",
+            "structure_bmp":["dugout_boundary_shapefile",                             
                              "riparian_buffer_shapefile",
                              "filter_strip_shapefile",
-                             "tile_drain_shapefile"],
+                             "tile_drain_boundary_shapefile",
+                             "tile_drain_outlet_shapefile",
+                             "wascob_shapefile"],
 
             #feedlot will be delineated in a single subbasin, the catch basin will function as the outlet.
             "non_structure_bmp":["manure_feedlot_boundary_shapefile",
@@ -188,7 +188,8 @@ class ModelConfig(Config):
             "crop_rotation":["method",
                               "AAFC_crop_inventory_folder",
                               "first_year",
-                              "last_year"],
+                              "last_year",
+                              "include_grazing"],
 
             #model folder
             "model":["model_folder"]
@@ -200,13 +201,14 @@ class ModelConfig(Config):
 
     def generate_parameters(self):
         """watershed delineation""" 
-        self.model.generate_parameters(getattr(self,"reservoir_flow_routing"), 
-                                       getattr(self,"reservoir_flow_data_folder"))
+        self.model.generate_parameters(self.get_config_value("reservoir_flow_routing"), 
+                                       self.get_config_value("reservoir_flow_data_folder"))
 
     def update_crop_rotation(self):
-        if getattr(self,"method") == "crop_inventory":
+        if self.get_config_value("method") == "crop_inventory":
             self.model.update_crop_rotation(
-                getattr(self,"AAFC_crop_inventory_folder"),
-                int(getattr(self,"first_year")),
-                int(getattr(self,"last_year"))
+                self.get_config_value("AAFC_crop_inventory_folder"),
+                int(self.get_config_value("first_year")),
+                int(self.get_config_value("last_year")),                
+                bool(self.get_config_value("include_grazing", False))
             )

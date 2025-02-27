@@ -64,9 +64,11 @@ class Model:
         self.bmp_databaes.create_bmp_tables(self.outputs,reservoir_flow_routing, reservoir_flow_data_folder)
 
 
-    def update_crop_rotation(self,crop_inventory_folder:str, first_year:int, last_year:int):
+    def update_crop_rotation(self,crop_inventory_folder:str, first_year:int, last_year:int, include_grazing:bool):
         """update crop rotation"""
-        self.bmp_databaes.update_crop_rotation_AAFC_crop_inventory(crop_inventory_folder, first_year, last_year, self.outputs)
+        if include_grazing and self.outputs.inputs.offsite_watering_vector is None:
+            raise ValueError("Grazing requires offsite watering shapefile. Please add an offiste watering shapefile or turn off grazing in crop rotation.")
+        self.bmp_databaes.update_crop_rotation_AAFC_crop_inventory(crop_inventory_folder, first_year, last_year, self.outputs, include_grazing)
 
     def generate_subarea(self)->int:
         """generate subarea, subareasoil and subarealanduse"""

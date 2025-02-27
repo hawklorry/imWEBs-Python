@@ -102,7 +102,7 @@ BMPDistributions = {
     BMPType.BMP_TYPE_RIPARIANBUFFER: f"{Names.remove_extension_from_raster_file(Names.riparianBufferPartRasterName)}/{Names.remove_extension_from_raster_file(Names.riparianBufferDrainageRasterName)}",  
     BMPType.BMP_TYPE_FILTERSTRIP: f"{Names.remove_extension_from_raster_file(Names.filterStripPartRasterName)}/{Names.remove_extension_from_raster_file(Names.filterStripDrainageRasterName)}", 
     BMPType.BMP_TYPE_DUGOUT:Names.remove_extension_from_raster_file(Names.dugoutRasName),
-    BMPType.BMP_TYPE_WASCOB:"wascobdrainagearea",
+    BMPType.BMP_TYPE_WASCOB:Names.remove_extension_from_raster_file(Names.wascobDrainageAreaRasName),
     BMPType.BMP_TYPE_TILEDRAIN:Names.remove_extension_from_raster_file(Names.tileDrainRasName),
 
 

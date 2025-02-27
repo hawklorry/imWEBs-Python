@@ -95,11 +95,11 @@ class VectorExtension:
         return vector       
 
     @staticmethod
-    def get_unique_ids(vector:Vector)->list:
+    def get_unique_ids(vector:Vector, allow_duplication = False)->list:
         if vector is None:
             return []
         
-        exist, _, ids = VectorExtension.check_unique_id(vector)
+        exist, _, ids = VectorExtension.check_unique_id(vector, allow_duplication)
         if exist:
             return ids
         return []
@@ -145,7 +145,7 @@ class VectorExtension:
         return True, field_name
 
     @staticmethod
-    def check_unique_id(vector:Vector):
+    def check_unique_id(vector:Vector, allow_duplication = False):
         """check if the the vector has the ID column and values are unique"""        
         exist,field_name = VectorExtension.check_id(vector)
         if not exist:
@@ -157,9 +157,11 @@ class VectorExtension:
             if field_data.is_null():
                 raise ValueError(f"The id in {vector.file_name} can't be null.")
             id = int(field_data.get_value_as_f64())
-            if id in ids:
-                return False, "", []
-            ids.append(id)
+            if id in ids and not allow_duplication:
+                raise ValueError(f"The ids in {vector.file_name} are not unique: id = {id}. ")
+            
+            if id not in ids:
+                ids.append(id)
 
         return True, field_name, ids
 
@@ -358,4 +360,15 @@ class VectorExtension:
 
         return boarder_raster
 
+    @staticmethod
+    def validate_vector_shape_type(vector:Vector, shape_type:VectorGeometryType):
+        shape_type_ok = vector.header.shape_type == shape_type
+        if not shape_type_ok:
+            raise ValueError(f"Vector {vector.file_name} is not {shape_type}.")
+
+        # if shape_type == VectorGeometryType.Polygon:
+        #     for i in range(vector.num_records):
+        #         if vector[i].num_parts > 1:
+        #             raise ValueError(f"Multiparts polygons are not supported: {vector.file_name}.")
+        
 

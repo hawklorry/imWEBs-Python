@@ -4,30 +4,43 @@ from sqlalchemy import INT, TEXT, REAL
 
 class Wascob:
     """Parameter Table for BMP: WASCob (41)"""
-    def __init__(self,id:int, contribution_area:float, year:int, field_id:int, subbasin_id:int, outlet_reach_id:int, berm_elevation:float, max_volume:float, max_area:float, capacity:float):
+    def __init__(self,
+                 id:int, 
+                 field_id:int,
+                 subbasin_id:int, 
+                 outlet_reach_id:int,
+                 start_year:int = 1900, 
+                 start_month:int = 1,
+                 start_day:int = 1,
+                 berm_elevation:float = 0, 
+                 dead_volume:float = 0,
+                 dead_area:float = 0,
+                 normal_volumne:float = 0,
+                 normal_area:float = 0,
+                 max_volume:float = 0, 
+                 max_area:float = 0, 
+                 capacity:float = 0,
+                 contribution_area:float = 0):
+        
         self.Scenario = DefaultScenarioId
         self.ID = id 
 
-        self.StartYear = year   #from shapefile
-        self.StartMon = 1
-        self.StartDay = 1
+        self.StartYear = start_year  
+        self.StartMon = start_month
+        self.StartDay = start_day
 
         self.FieldId = field_id                 #get from spatial
         self.SubbasinId = subbasin_id
         self.OutletReachId = outlet_reach_id    #wascob has an atribute for outlet id, if the outlet is set to 
                                                 #outlet of subbasin, then outlet reach id will be the downstream reach id.
-        
-		#BermElevation = avg(subarea with WASCoB elevation) + 2m (IF Height IS NULL)
-        #BermElevation = avg(subarea with WASCOB elevation) + WASCoB.Height IF Height IS NOT NULL
+
         self.BermElevation = berm_elevation  
 
-        self.DeadVolume = 0    
-        self.DeadArea = 0      
+        self.DeadVolume = dead_volume
+        self.DeadArea = dead_area
 
-        #normal volume = maxvolume *2 /3
-        #normal area = max area / 1.31
-        self.NormalVolume = max_volume * 2 / 3.0   
-        self.NormalArea = max_area / 1.31     
+        self.NormalVolume = normal_volumne 
+        self.NormalArea = normal_area    
 
         self.MaxVolume = max_volume      #from shapefile
         self.MaxArea = max_area        #from shapefile
@@ -62,5 +75,5 @@ class Wascob:
 
     @staticmethod 
     def column_types()->dict:
-        wascob = Wascob(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+        wascob = Wascob(-1,-1,-1,-1)
         return {col:(INT if col in ["Scenario","ID", "StartYear","StartMon","StartDay","FieldId","SubbasinId","OutletReachId"] else REAL) for col in dir(wascob) if "__" not in col}

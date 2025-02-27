@@ -116,11 +116,11 @@ class BMPDatabase(DatabaseBase):
 
         self.__create_bmp_reservoir(outputs,reservoir_flow_routing, reservoir_flow_data_folder)
         self.__create_bmp_wetland(outputs)
-        self.__create_bmp_dugout(outputs)
-        self.__create_bmp_wascob(outputs)
-        self.__create_bmp_tile_drain(outputs)
+        self.__create_bmp_dugout(outputs)        
         self.__create_bmp_riparian_buffer(outputs)
-        self.__create_outlet_drainage(outputs)
+
+        tile_drain = self.__create_bmp_tile_drain(outputs)
+        self.__create_bmp_wascob(outputs, tile_drain)
 
         self.__create_bmp_offsite_wintering(outputs)
 
@@ -199,7 +199,7 @@ class BMPDatabase(DatabaseBase):
                          raster1_area_df:pd.DataFrame, raster2_area_df:pd.DataFrame, 
                          table_name:str,
                          fraction_name1:str = None, fraction_name2:str = None, include_id_in_column_name:bool = False):
-        overlay_area_df = self.__get_overlay_area(spatial1_ras, spatial2_ras, name1, name2)
+        overlay_area_df = RasterExtension.get_overlay_area(spatial1_ras, spatial2_ras, name1, name2, BMPDatabase.COL_NAME_AREA_HA)
         
         merged_df = overlay_area_df.merge(raster1_area_df, left_on= name1, right_index=True, how="left")
         merged_df = merged_df.merge(raster2_area_df, left_on= name2, right_index=True, how="left")
@@ -228,15 +228,6 @@ class BMPDatabase(DatabaseBase):
 
         merged_df = merged_df[[col_name1, col_name2, BMPDatabase.COL_NAME_AREA_HA, fraction_name1, fraction_name2]]     
         self.save_table(table_name, merged_df)   
-    
-    def __get_overlay_area(self, spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str, area_column_name = "")->pd.DataFrame:
-        merged_raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
-        area_col = area_column_name if len(area_column_name) > 0 else BMPDatabase.COL_NAME_AREA_HA
-        df = RasterExtension.get_category_area_ha_dataframe(merged_raster,area_col)
-        df[name1] = df.index % raster1_max
-        df[name2] = (df.index - df[name1]) / raster1_max
-
-        return df
     
     def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
         """populate default subbasin-muliplier"""
@@ -284,56 +275,40 @@ class BMPDatabase(DatabaseBase):
         dugout = StructureBMPDugout(outputs.inputs.dugout_boundary_vector, outputs.subbasin_raster, outputs.structures["dugout"])
         self.save_table(Names.bmp_table_name_dugout, dugout.dugout_df)
 
-    def __create_bmp_wascob(self, outputs:Outputs):
-        if "wascob" not in outputs.structures:
+    def __create_bmp_wascob(self, outputs:Outputs, tile_drain:StructureBMPTileDrain):
+        if outputs.inputs.wascob_vector is None:
             return
+        
+        if tile_drain is None:
+            raise ValueError("Tile drains were not found. Wasobs need tile drain.")
         
         logger.info("Creating wascob ... ")
-        wascob = StructureBMPWascob(outputs.inputs.wascob_boundary_vector, outputs.subbasin_raster, outputs.structures["wascob"],
-                                    outputs.field_raster, outputs.dem_clipped_raster_for_model, outputs.inputs.wascob_outlet_vector)
+        wascob = StructureBMPWascob(outputs.inputs.wascob_vector, 
+                                    outputs.subbasin_raster, 
+                                    outputs.field_clipped_vector, 
+                                    tile_drain, outputs.reach_parameter_df)
         self.save_table(Names.bmp_table_name_wascob, wascob.wascob_df, Wascob.column_types())
 
-    def __create_bmp_tile_drain(self, outputs:Outputs):
-        if outputs.inputs.tile_drain_vector is None:
-            return
+    def __create_bmp_tile_drain(self, outputs:Outputs)->StructureBMPTileDrain:        
+        if outputs.inputs.tile_drain_boundary_vector is None:
+            return None
         
-        logger.info("Creating tile drain ... ")
-        tile_drain = StructureBMPTileDrain(outputs.tile_drain_vector, outputs.tile_drain_raster, outputs.subbasin_raster,
-                                    outputs.field_raster, outputs.dem_clipped_raster_for_model)
+        logger.info("Creating tile drain and outlet_drainage ... ")
+        tile_drain = StructureBMPTileDrain( outputs.inputs.tile_drain_boundary_vector, 
+                                            outputs.inputs.tile_drain_outlet_vector,
+                                            outputs.tile_drain_raster, 
+                                            outputs.subbasin_raster,
+                                            outputs.reach_parameter_df,
+                                            outputs.field_raster, 
+                                            outputs.dem_clipped_raster_for_model)
+        #tile drain table
         self.save_table(Names.bmp_table_name_tile_drain, tile_drain.tile_drain_df, TileDrainParameter.column_types())
 
-    def __create_outlet_drainage(self, outputs:Outputs): 
-        df_reach_tile_drain = None
-        df_reach_wascob = None
-        if self.check_table_exist(Names.bmp_table_name_tile_drain):
-            df_reach_tile_drain = self.read_distinct_list(Names.bmp_table_name_tile_drain, "OutletReachId")
-            df_reach_tile_drain["tile_drain"] = 3800
-            df_reach_tile_drain.set_index("OutletReachId", inplace=True)
+        #outlet_drainage table
+        self.save_table(Names.bmp_table_name_outlet_drainage, tile_drain.tile_drain_outlet_drainage_df)
 
-        if self.check_table_exist(Names.bmp_table_name_wascob):
-            df_reach_wascob = self.read_distinct_list(Names.bmp_table_name_wascob, "OutletReachId")
-            df_reach_wascob["wascob"] = 10368
-            df_reach_wascob.set_index("OutletReachId", inplace=True)
-
-        if df_reach_wascob is None and df_reach_tile_drain is None:
-            return
-
-        logger.info("Creating outlet_drainage ... ")
-        if df_reach_wascob is None:
-            df_outlet_drainage = df_reach_tile_drain
-            df_outlet_drainage["wascob"] = 0
-        else:
-            df_outlet_drainage = pd.concat([df_reach_tile_drain,df_reach_wascob],axis=1)
-            df_outlet_drainage.fillna(0, inplace=True)        
-
-        df_outlet_drainage["DrainageCapacity"] = df_outlet_drainage["wascob"] + df_outlet_drainage["tile_drain"]
-        df_outlet_drainage["Reach"] = df_outlet_drainage.index
-        df_outlet_drainage.sort_index(inplace=True)
-        df_outlet_drainage.reset_index(inplace=True)
-        df_outlet_drainage["Id"] = df_outlet_drainage.index + 1
-
-        self.save_table(Names.bmp_table_name_outlet_drainage, df_outlet_drainage[["Id","Reach","DrainageCapacity"]])
-
+        return tile_drain
+    
     def __create_bmp_riparian_buffer(self, outputs:Outputs):
         df = outputs.riparian_buffer_parameter_df
         if df is not None:
@@ -488,7 +463,7 @@ class BMPDatabase(DatabaseBase):
             session.add_all(bmp.offsite_wintering_parameters)
             session.commit()      
   
-    def __create_bmp_scenarios(self, outputs:Outputs, include_crop_rotation:bool = False):
+    def __create_bmp_scenarios(self, outputs:Outputs, include_crop_rotation:bool = False, include_grazing:bool = False):
         """create bmp scenarios table"""
         
         logger.info("Creating bmp_secenarios table ... ")
@@ -498,14 +473,15 @@ class BMPDatabase(DatabaseBase):
             bmp_types.append(BMPType.BMP_TYPE_CROP)
             bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
             bmp_types.append(BMPType.BMP_TYPE_TILLAGE)
-            bmp_types.append(BMPType.BMP_TYPE_GRAZING)
+            if include_grazing:
+                bmp_types.append(BMPType.BMP_TYPE_GRAZING)
 
         df = BMP.generate_bmp_scenarios_df(bmp_types)
         self.save_table(Names.bmp_table_name_scenarios, df)
 
 #region Crop Rotation
 
-    def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs):        
+    def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs, include_grazing:bool = False):        
         logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
 
         rotation = CropRotation(outputs.field_clipped_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
@@ -519,14 +495,15 @@ class BMPDatabase(DatabaseBase):
         logger.info("Tillage Management ... ")
         self.save_table(Names.bmp_table_name_tillage_management, rotation.tillage_management_df)
 
-        logger.info("Grazing Management ... ")
-        self.save_table(Names.bmp_table_name_grazing_management, rotation.grazing_management_df)
+        if include_grazing:
+            logger.info("Grazing Management ... ")
+            self.save_table(Names.bmp_table_name_grazing_management, rotation.grazing_management_df)
 
         logger.info("Grazing reach deposit ... ")
         self.__create_grazing_reach_deposit(first_year)
 
         logger.info("Updating scenarios ...")
-        self.__create_bmp_scenarios(outputs, True)
+        self.__create_bmp_scenarios(outputs, True, include_grazing)
 
     def __create_grazing_reach_deposit(self, start_year:int):
         """

@@ -15,6 +15,7 @@ class GridInterpolation(Interpolation):
         cols = mask_raster.configs.columns
         numShapes = len(station_coordinates)
         rowCount = RasterExtension.get_number_of_valid_cell(mask_raster)
+        no_data = mask_raster.configs.nodata
 
         if numShapes <= 2:
             raise ValueError("Grid Interpolation need at least three stations. ")
@@ -33,7 +34,7 @@ class GridInterpolation(Interpolation):
 
         for row in range(rows):
             for col in range(cols):
-                if mask_raster[row, col] > 0:
+                if mask_raster[row, col] != no_data:
                     xMax = max(xMax, mask_raster[row, col])
                     xMin = min(xMin, mask_raster[row, col])
                     yMax = max(yMax, mask_raster[row, col])
@@ -78,7 +79,7 @@ class GridInterpolation(Interpolation):
 
         for row in range(rows):
             for col in range(cols):
-                if mask_raster[row, col] > 0:
+                if mask_raster[row, col] != no_data:
                     raster_x = mask_raster.get_x_from_column(col)
                     raster_y = mask_raster.get_y_from_row(row)
                 

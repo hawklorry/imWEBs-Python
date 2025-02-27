@@ -314,8 +314,7 @@ class Names:
     # wascob
     wascobShpName = "wascob" + shapefile_extension
     wascobRasName = wascobShpName.replace(shapefile_extension, raster_extension)
-    wascobOutletShpName = "wascob_outlet" + shapefile_extension
-
+    wascobDrainageAreaRasName = "wascob_drainage_area" + raster_extension
 
     #Riparian Buffer
     riparianBufferShpName = "riparian_buffer" + shapefile_extension
@@ -341,6 +340,7 @@ class Names:
 
     #tile drain
     tileDrainShpName = "tile_drain" + shapefile_extension
+    tileDrainOutletShpName = "tile_drain_outlet" + shapefile_extension
     tileDrainRasName = tileDrainShpName.replace(shapefile_extension, raster_extension)
 
     # Cattle Feedlot
@@ -493,12 +493,12 @@ class Names:
         "water_use_shapefile": waterUseShpName,
 
         #structure_bmp
-        "dugout_boundary_shapefile":dugoutShpName,
-        "wascob_boundary_shapefile":wascobShpName,
-        "wascob_outlet_shapefile":wascobOutletShpName,
+        "dugout_boundary_shapefile":dugoutShpName,        
         "riparian_buffer_shapefile":riparianBufferShpName,
         "filter_strip_shapefile":filterStripRasterName,
-        "tile_drain_shapefile":tileDrainShpName,
+        "wascob_shapefile":wascobShpName,
+        "tile_drain_boundary_shapefile":tileDrainShpName,
+        "tile_drain_outlet_shapefile":tileDrainOutletShpName,
 
         #areal non-structure bmp
         "manure_feedlot_boundary_shapefile": feedlotShpName,

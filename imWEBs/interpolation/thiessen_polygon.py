@@ -14,13 +14,14 @@ class ThiessenPolygon(Interpolation):
         numShapes = len(station_coordinates)
         
         station_id_raster = wbe.new_raster(mask_raster.configs)
-        
+        no_data = mask_raster.configs.nodata
+
         dist = [0.0] * numShapes
         rowCount = 0
         
         for row in range(rows):
             for col in range(cols):
-                if mask_raster[row, col] > 0:
+                if mask_raster[row, col] != no_data:
                     raster_x = mask_raster.get_x_from_column(col)
                     raster_y = mask_raster.get_y_from_row(row)
 
