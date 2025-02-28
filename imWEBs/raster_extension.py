@@ -167,7 +167,7 @@ class RasterExtension:
             df[name] = df[stat_type]
             return df[name].to_frame()
         
-        return df[stat_type]    
+        return df[stat_type] if isinstance(stat_type, list) else df[stat_type].to_frame()    
     
     @staticmethod
     def get_majority_count(input_data_raster:Raster, feature_definition_raster:Raster)->dict[int, int]:

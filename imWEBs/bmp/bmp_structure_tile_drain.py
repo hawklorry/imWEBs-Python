@@ -43,6 +43,24 @@ class StructureBMPTileDrain(BMP):
         
         self.tile_drain_outlet_vector = tile_drain_outlet_vector
         self.__dict_tile_drain_reach = None
+        self.__dict_tile_drain_subbasin = None
+
+    @property
+    def dict_tile_drain_subbasin(self)->dict:
+        """Get subbasin for each tile drain with the lowest average elevation. Only the portion inside the tile drain will be accounted."""
+        if self.__dict_tile_drain_subbasin is None:
+            #overlay tile drain and subbasin to get the area of the each unique combination.
+            tiledrain_subbasin_raster, tile_drain_max_id = RasterExtension.get_overlay_raster(self.bmp_raster, self.subbasin_raster)
+            df_tile_drain_subbasin_overlay_mean_elevation = RasterExtension.get_zonal_statistics(self.dem_raster, tiledrain_subbasin_raster,"mean")        
+            df_tile_drain_subbasin_overlay_mean_elevation["tile_drain"] = df_tile_drain_subbasin_overlay_mean_elevation.index % tile_drain_max_id
+            df_tile_drain_subbasin_overlay_mean_elevation["subbasin"] = (df_tile_drain_subbasin_overlay_mean_elevation.index - df_tile_drain_subbasin_overlay_mean_elevation["tile_drain"]) / tile_drain_max_id
+            
+            #get the rows with max area for each ids in raster 1
+            min_elevation_idx = df_tile_drain_subbasin_overlay_mean_elevation.groupby("tile_drain")["mean"].idxmin()        
+            df_tile_drain_subbasin_overlay_mean_elevation = df_tile_drain_subbasin_overlay_mean_elevation.loc[min_elevation_idx,["tile_drain","subbasin"]].astype({"tile_drain":"int","subbasin":"int"})
+            self.__dict_tile_drain_subbasin = df_tile_drain_subbasin_overlay_mean_elevation.set_index("tile_drain")["subbasin"].to_dict()
+
+        return self.__dict_tile_drain_subbasin
 
     @property
     def tile_drain_outlet_reach(self)->dict:
@@ -61,20 +79,19 @@ class StructureBMPTileDrain(BMP):
         tile_drain_ids = VectorExtension.get_unique_ids(self.bmp_vector)
         self.__dict_tile_drain_reach = {}
 
-        #overlay tile drain and subbasin to get the area of the each unique combination.
-        dict_tile_drain_subbasin = RasterExtension.get_dict_with_max_area_in_another_raster(self.bmp_raster, self.subbasin_raster)
-
+ 
+    
         #use tile drain outlet vector first
         if self.tile_drain_outlet_vector is not None:
             tile_drain_outlet_raster = VectorExtension.vector_to_raster(self.tile_drain_outlet_vector, self.dem_raster)
             dict_tile_drain_outlet_subbasin = RasterExtension.get_zonal_statistics(self.subbasin_raster, tile_drain_outlet_raster,"mean","subbasin")["subbasin"].to_dict()
 
             for tile_drain_id in tile_drain_ids:
-                if tile_drain_id not in dict_tile_drain_subbasin:
+                if tile_drain_id not in self.dict_tile_drain_subbasin:
                     continue
 
                 #loop through current reach and all downstream reaches to find the tile drain outlet
-                reach = dict_tile_drain_subbasin[tile_drain_id]
+                reach = self.dict_tile_drain_subbasin[tile_drain_id]
                 while reach not in dict_tile_drain_outlet_subbasin.values():
                     reach = self.reach_receive_reach_dict[reach]
                     if reach == 0:
@@ -91,11 +108,11 @@ class StructureBMPTileDrain(BMP):
         for tile_drain_id in tile_drain_ids:
             if tile_drain_id in self.__dict_tile_drain_reach:
                 continue
-            if tile_drain_id not in dict_tile_drain_subbasin:
+            if tile_drain_id not in self.dict_tile_drain_subbasin:
                 continue
             
             #the first reach
-            reach = dict_tile_drain_subbasin[tile_drain_id]
+            reach = self.dict_tile_drain_subbasin[tile_drain_id]
 
             #check reach drainage area, if < 10ha, search downstream until find one that > 10ha
             while self.reach_contribution_area_dict[reach] < 10:
@@ -112,8 +129,7 @@ class StructureBMPTileDrain(BMP):
     @property
     def tile_drain_outlet_drainage_df(self)->pd.DataFrame:
         #get unique reaches
-        #reaches = set(self.tile_drain_outlet_reach.values())
-        reaches = set(self.reach_receive_reach_dict.keys())
+        reaches = set(self.tile_drain_outlet_reach.values())
 
         #create the df
         df = pd.DataFrame(list(reaches), columns=["Reach"])

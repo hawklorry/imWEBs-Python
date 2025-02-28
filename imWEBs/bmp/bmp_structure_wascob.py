@@ -42,14 +42,11 @@ class StructureBMPWascob(BMP):
                  bmp_vector:Vector, 
                  subbasin_raster:Raster, 
                  field_vector:Vector,
-                 tile_drain: StructureBMPTileDrain,
-                 reach_parameter_df:pd.DataFrame):
+                 tile_drain: StructureBMPTileDrain):
         super().__init__(bmp_vector, subbasin_raster)
 
         self.tile_drain = tile_drain
-        self.field_vector = field_vector
-        self.reach_receive_reach_dict = reach_parameter_df[["reach_id","receive_reach_id"]].astype({"reach_id":"int","receive_reach_id":"int"}).set_index("reach_id")["receive_reach_id"].to_dict()
-       
+        self.field_vector = field_vector     
 
     @property
     def wascob_df(self)->pd.DataFrame:
@@ -87,8 +84,7 @@ class StructureBMPWascob(BMP):
             wascobs.append(Wascob(id, 
                                   dict_field[id],
                                   self.subbasins[id],
-                                  #self.tile_drain.tile_drain_outlet_reach[dict_tile_drain[id]],
-                                  self.reach_receive_reach_dict[self.subbasins[id]],
+                                  self.tile_drain.tile_drain_outlet_reach[dict_tile_drain[id]],
                                   dict_start_year[id],
                                   dict_start_month[id],
                                   dict_start_day[id],

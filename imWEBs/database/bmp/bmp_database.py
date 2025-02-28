@@ -286,7 +286,7 @@ class BMPDatabase(DatabaseBase):
         wascob = StructureBMPWascob(outputs.inputs.wascob_vector, 
                                     outputs.subbasin_raster, 
                                     outputs.field_clipped_vector, 
-                                    tile_drain, outputs.reach_parameter_df)
+                                    tile_drain)
         self.save_table(Names.bmp_table_name_wascob, wascob.wascob_df, Wascob.column_types())
 
     def __create_bmp_tile_drain(self, outputs:Outputs)->StructureBMPTileDrain:        
