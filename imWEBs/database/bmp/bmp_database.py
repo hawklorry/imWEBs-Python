@@ -606,13 +606,13 @@ class BMPDatabase(DatabaseBase):
 
         #SubAreaSoilType
         logger.info("Creating SubAreaSoilType ...")
-        subarea_soil_df = self.__get_overlay_area(outputs.subarea_raster, outputs.mapped_soil_raster, 
+        subarea_soil_df = RasterExtension.get_overlay_area(outputs.subarea_raster, outputs.mapped_soil_raster, 
                               "SubareaId", "SoilTypeId", "Area")[["SubareaId", "SoilTypeId", "Area"]]
         self.save_table(Names.bmp_table_name_subarea_soil, subarea_soil_df)
 
         #SubAreaLandUseType
         logger.info("Creating SubAreaLandUseType ...")
-        subarea_landuse_df = self.__get_overlay_area(outputs.subarea_raster, outputs.mapped_landuse_raster, 
+        subarea_landuse_df = RasterExtension.get_overlay_area(outputs.subarea_raster, outputs.mapped_landuse_raster, 
                               "SubareaId", "LanduseTypeId", "Area")[["SubareaId", "LanduseTypeId", "Area"]]
         self.save_table(Names.bmp_table_name_subarea_landuse, subarea_landuse_df)     
 

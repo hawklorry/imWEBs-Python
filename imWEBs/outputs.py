@@ -1600,7 +1600,7 @@ class Outputs(FolderBase):
         
         #calculate wetland fraction
         subarea_df["WetlandFraction"] = subarea_df["wetland_area_ha"] / subarea_df["Area"]
-        subarea_df["WetlandFraction"] = subarea_df["WetlandFraction"].fillna(0)
+        subarea_df["WetlandFraction"] = subarea_df["WetlandFraction"].fillna(0).infer_objects(copy=False)
 
         #1 for topography weight
         subarea_df["TopographyWeight"] = 1

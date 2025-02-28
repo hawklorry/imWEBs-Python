@@ -103,7 +103,7 @@ BMPDistributions = {
     BMPType.BMP_TYPE_FILTERSTRIP: f"{Names.remove_extension_from_raster_file(Names.filterStripPartRasterName)}/{Names.remove_extension_from_raster_file(Names.filterStripDrainageRasterName)}", 
     BMPType.BMP_TYPE_DUGOUT:Names.remove_extension_from_raster_file(Names.dugoutRasName),
     BMPType.BMP_TYPE_WASCOB:Names.remove_extension_from_raster_file(Names.wascobDrainageAreaRasName),
-    BMPType.BMP_TYPE_TILEDRAIN:Names.remove_extension_from_raster_file(Names.tileDrainRasName),
+    BMPType.BMP_TYPE_TILEDRAIN:Names.remove_extension_from_raster_file(f"{Names.tileDrainRasName}/{Names.bmp_table_name_subarea_tile_drain_drainage_lookup}"),
 
 
     #manure application adjustment:[distribution_raster_name_in_hdf5]/[management_table_name]
