@@ -127,6 +127,31 @@ class Outputs(FolderBase):
             self.save_raster(raster, Names.tileDrainRasName)
 
         return raster
+    
+    @property
+    def tile_drain_outlet_pour_points_vector(self)->Vector:
+        vector = self.get_vector(Names.tileDrainOutletPourPointShpName)
+
+        if vector is None and self.inputs.tile_drain_outlet_vector is not None:        
+            vector = self.wbe.jenson_snap_pour_points(
+                        pour_pts = self.inputs.tile_drain_outlet_vector,
+                        streams = self.stream_network_raster,
+                        snap_dist = 2000)
+
+            self.save_vector(vector, Names.tileDrainOutletPourPointShpName)
+
+        return vector
+    
+    @property
+    def tile_drain_outlet_pour_points_raster(self)->Vector:
+        raster = self.get_raster(Names.tileDrainOutletPourPointRasName)
+
+        if raster is None and self.tile_drain_outlet_pour_points_vector is not None:        
+            raster = self.wbe.vector_points_to_raster(self.tile_drain_outlet_pour_points_vector, base_raster = self.dem_clipped_raster_for_model)
+
+            self.save_raster(raster, Names.tileDrainOutletPourPointRasName)
+
+        return raster
 
     @property
     def structures(self)->dict[str, Structure]:
@@ -963,11 +988,8 @@ class Outputs(FolderBase):
                         snap_dist = 2000))
                     
             #add user-defined tile drain outlets
-            if self.inputs.tile_drain_outlet_vector is not None:
-                outlet_vectors.append(self.wbe.jenson_snap_pour_points(
-                    pour_pts = self.inputs.tile_drain_outlet_vector,
-                    streams = self.stream_network_raster,
-                    snap_dist = 2000))
+            if self.tile_drain_outlet_pour_points_vector is not None:
+                outlet_vectors.append(self.tile_drain_outlet_pour_points_vector)
                 
             #add wascob points
             if self.inputs.wascob_vector is not None:

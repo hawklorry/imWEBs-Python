@@ -27,7 +27,7 @@ class StructureBMPTileDrain(BMP):
     ]
 
     def __init__(self, tile_drain_vector:Vector, 
-                 tile_drain_outlet_vector:Vector, 
+                 tile_drain_outlet_pour_points_raster:Raster, 
                  tile_drain_raster:Raster, 
                  subbasin_raster:Raster, 
                  reach_parameter_df:pd.DataFrame, 
@@ -41,7 +41,7 @@ class StructureBMPTileDrain(BMP):
         self.reach_contribution_area_dict = reach_parameter_df[["reach_id","contribution_area"]].astype({"reach_id":"int","contribution_area":"float"}).set_index("reach_id")["contribution_area"].to_dict()
         self.reach_receive_reach_dict = reach_parameter_df[["reach_id","receive_reach_id"]].astype({"reach_id":"int","receive_reach_id":"int"}).set_index("reach_id")["receive_reach_id"].to_dict()
         
-        self.tile_drain_outlet_vector = tile_drain_outlet_vector
+        self.tile_drain_outlet_raster = tile_drain_outlet_pour_points_raster
         self.__dict_tile_drain_reach = None
         self.__dict_tile_drain_subbasin = None
 
@@ -76,21 +76,19 @@ class StructureBMPTileDrain(BMP):
         if self.__dict_tile_drain_reach is not None:
             return self.__dict_tile_drain_reach
         
-        tile_drain_ids = VectorExtension.get_unique_ids(self.bmp_vector)
-        self.__dict_tile_drain_reach = {}
-
- 
+        tile_drain_ids = list(self.dict_tile_drain_subbasin.keys())
+        tile_drain_ids.sort()
+        self.__dict_tile_drain_reach = {} 
     
         #use tile drain outlet vector first
-        if self.tile_drain_outlet_vector is not None:
-            tile_drain_outlet_raster = VectorExtension.vector_to_raster(self.tile_drain_outlet_vector, self.dem_raster)
-            dict_tile_drain_outlet_subbasin = RasterExtension.get_zonal_statistics(self.subbasin_raster, tile_drain_outlet_raster,"mean","subbasin")["subbasin"].to_dict()
+        if self.tile_drain_outlet_raster is not None:
+            #find the subbasin for each tile drain outlet
+            dict_tile_drain_outlet_subbasin = RasterExtension.get_zonal_statistics(self.subbasin_raster, self.tile_drain_outlet_raster,"mean","subbasin")["subbasin"].to_dict()
 
+            #loop through all tile drains
             for tile_drain_id in tile_drain_ids:
-                if tile_drain_id not in self.dict_tile_drain_subbasin:
-                    continue
-
                 #loop through current reach and all downstream reaches to find the tile drain outlet
+                #we will use the reach when there is an outlet on it.
                 reach = self.dict_tile_drain_subbasin[tile_drain_id]
                 while reach not in dict_tile_drain_outlet_subbasin.values():
                     reach = self.reach_receive_reach_dict[reach]
@@ -101,14 +99,13 @@ class StructureBMPTileDrain(BMP):
                     self.__dict_tile_drain_reach[tile_drain_id] = reach
                
             #if all tile drain field already have outlets, return
-            if np.array_equal(tile_drain_ids.sort(), list(self.__dict_tile_drain_reach.keys()).sort()):
+            if len(tile_drain_ids) == len(list(self.__dict_tile_drain_reach.keys())):
                 return self.__dict_tile_drain_reach  
 
-        #add tile drains that doesn't have outlet yet
+        #add tile drains that doesn't have outlet yet or the outlets are not found in the outlet shapefile
         for tile_drain_id in tile_drain_ids:
+            #skip tile drains that already have an reach outlet
             if tile_drain_id in self.__dict_tile_drain_reach:
-                continue
-            if tile_drain_id not in self.dict_tile_drain_subbasin:
                 continue
             
             #the first reach
@@ -122,6 +119,13 @@ class StructureBMPTileDrain(BMP):
 
             #use it
             self.__dict_tile_drain_reach[tile_drain_id] = reach
+
+        #if all tile drain field already have outlets, return
+        tile_drains_having_reach = list(self.__dict_tile_drain_reach.keys())
+        tile_drains_having_reach.sort()
+        if not np.array_equal(tile_drain_ids, tile_drains_having_reach):
+            missing_tile_drains = [tile_drain for tile_drain in tile_drain_ids if tile_drain not in tile_drains_having_reach]
+            raise ValueError(f"Reaches were not found for following tile drains: {missing_tile_drains}.")
 
         #return
         return self.__dict_tile_drain_reach
@@ -180,4 +184,4 @@ class StructureBMPTileDrain(BMP):
             VectorExtension.validate_vector_shape_type(tile_drain_boundary_vector, VectorGeometryType.Polygon)
         
         if tile_drain_outlet_vector is not None:
-            VectorExtension.validate_vector_shape_type(tile_drain_outlet_vector, VectorGeometryType.point)
+            VectorExtension.validate_vector_shape_type(tile_drain_outlet_vector, VectorGeometryType.Point)

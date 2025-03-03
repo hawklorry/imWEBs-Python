@@ -295,7 +295,7 @@ class BMPDatabase(DatabaseBase):
         
         logger.info("Creating tile drain and outlet_drainage ... ")
         tile_drain = StructureBMPTileDrain( outputs.inputs.tile_drain_boundary_vector, 
-                                            outputs.inputs.tile_drain_outlet_vector,
+                                            outputs.tile_drain_outlet_pour_points_raster,
                                             outputs.tile_drain_raster, 
                                             outputs.subbasin_raster,
                                             outputs.reach_parameter_df,

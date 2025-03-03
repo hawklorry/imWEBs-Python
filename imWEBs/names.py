@@ -342,6 +342,8 @@ class Names:
     tileDrainShpName = "tile_drain" + shapefile_extension
     tileDrainOutletShpName = "tile_drain_outlet" + shapefile_extension
     tileDrainRasName = tileDrainShpName.replace(shapefile_extension, raster_extension)
+    tileDrainOutletPourPointShpName = "tile_drain_outlet_pour_point" + shapefile_extension
+    tileDrainOutletPourPointRasName = tileDrainOutletPourPointShpName.replace(shapefile_extension, raster_extension)
 
     # Cattle Feedlot
     feedlotShpName = "feedlot" + shapefile_extension    
