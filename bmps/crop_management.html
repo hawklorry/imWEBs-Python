@@ -180,12 +180,21 @@ ul.task-list li input[type="checkbox"] {
 <section id="crop-management" class="level1">
 <h1>Crop Management</h1>
 <p>Crop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it’s usually prepared manually and imported to bmp database.</p>
-<p>AAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it’s possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file. One example is given below.</p>
+<p>AAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it’s possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file in crop_rotation section. The setting items are given below.</p>
+<ul>
+<li><p><strong>method</strong> - the only option now is crop_inventory.</p></li>
+<li><p><strong>AAFC_crop_inventory_folder</strong> - the folder the crop inventory GeoTIFF files reside. The file name must be the year, e.g.&nbsp;2025.tif.</p></li>
+<li><p><strong>first_year</strong> - the starting year of inventory data to read.</p></li>
+<li><p><strong>last_year</strong> - the ending year of inventory data to read.</p></li>
+<li><p><strong>include_grazing</strong> - the flag for grazing generation. By default it’s false.</p></li>
+</ul>
+<p>One example is given below.</p>
 <pre><code>[crop_rotation]
 method = crop_inventory
 AAFC_crop_inventory_folder = C:\Work\Git\imWEBs\imWEBs-Python\notebooks\stc\data\crop_inventory 
 first_year = 1991
-last_year = 2010</code></pre>
+last_year = 2010
+include_grazing = False</code></pre>
 <p>Users will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It’s also required to have same coordination system as other input files.</p>
 
 
