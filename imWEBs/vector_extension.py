@@ -256,7 +256,7 @@ class VectorExtension:
         """check if vector has list of fields"""
         for field in field_names:
             if not VectorExtension.check_field_in_vector(vector, field)[0]:
-                raise ValueError(f"Couldn't find column {field} in {vector.file_name}. It should have following columns: {", ".join(list)}.")
+                raise ValueError(f"Couldn't find column {field} in {vector.file_name}. It should have following columns: {", ".join(field_names)}.")
         
     @staticmethod
     def vector_polygons_to_raster_with_boarder(polygon_vector:Vector, field_name:str, base_raster:Raster)->Raster:

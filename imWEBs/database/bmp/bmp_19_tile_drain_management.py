@@ -36,9 +36,9 @@ class TileDrainParameter:
         self.LagCoefficient = 0.9
         self.DepthToImperviableLayer = 1500
         self.LateralKScale = 1.0
-        self.SedimentCon = 100
-        self.OrgNConc = 0.008
-        self.OrgPConc = 0.0016
+        self.SedimentCoef = 100
+        self.OrgNCoef = 0.008
+        self.OrgPCoef = 0.0016
         self.PRCTile = 0.75
         self.CNTile = 0.75
         self.GWT0 = 1000

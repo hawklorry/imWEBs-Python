@@ -204,9 +204,10 @@ class BMPDatabase(DatabaseBase):
         merged_df = overlay_area_df.merge(raster1_area_df, left_on= name1, right_index=True, how="left")
         merged_df = merged_df.merge(raster2_area_df, left_on= name2, right_index=True, how="left")
 
-        #calculate the ratio
+        #sort by location and subarea and add RowId
+        merged_df = merged_df.sort_values(by = [name2, name1])
         merged_df.reset_index(inplace=True)
-        merged_df["ID"] = merged_df.index + 1
+        merged_df["RowId"] = merged_df.index + 1
 
         #get fraction column name
         if fraction_name1 is None:
@@ -226,7 +227,8 @@ class BMPDatabase(DatabaseBase):
             merged_df[col_name1] = merged_df[name1]
             merged_df[col_name2] = merged_df[name2]
 
-        merged_df = merged_df[[col_name1, col_name2, BMPDatabase.COL_NAME_AREA_HA, fraction_name1, fraction_name2]]     
+
+        merged_df = merged_df[['RowId', col_name1, col_name2, BMPDatabase.COL_NAME_AREA_HA, fraction_name1, fraction_name2]]     
         self.save_table(table_name, merged_df)   
     
     def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
