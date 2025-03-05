@@ -8,31 +8,37 @@ Two shapefiles are required:
 
 1.  Tile drain polygon shapefile to specify the location and attributes of the tile drain fields
 
-2.  ***Optional*** tile drain outlet shapefile to appoint outlet for tile drain fields
+2.  ***Optional*** tile drain outlet shapefile
 
-It's assumed that the tile drain polygon has 1-1 relationship with the field polygon as field id is required for the tile drain parameter table. The system doesn't check this relationship. It's modellers' responsibility to check and pre-process the polygons.
-
-The polygon shapefile must have four data fields as shown below.
+The tile drain polygon shapefile must have eight data fields as shown below.
 
 1.  id - unique ids
 
-2.  outlet - outlet id pointing to outlets in tile drain outlet shapefile
+2.  Depth - drain pipe invert depth in mm
 
-3.  depth - drain pipe invert depth in mm
+3.  Spacing - drain pipe spacing in mm
 
-4.  spacing - drain pipe spacing in mm
+4.  Radius - drain pipe radius in mm
 
-The tile drain outlet shapefile will be used as subbasin outlet. It must have an id column with values consistent with the one used in the outlet column in the tile drain polygon shapefile.
+5.  Eleation - field elevation in m
+
+6.  StartYear - the start year of operation
+
+7.  StartMon - the start month of operation
+
+8.  StartDay - the start day of operation
+
+The tile drain outlet shapefile will be used as subbasin outlet. It must have an id column with unique ids.
 
 ## Configuration Setup
 
 In the model configuration file,
 
--   set tile_drain_shapefile to the name of the tile drain polygon shapefile.
+-   set tile_drain_boundary_shapefile to the name of the tile drain polygon shapefile.
 
 -   set tile_drain_outlet_shapefile to the name of the tile drain outlet shapefile.
 
-```
+```         
 tile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_outlet.shp
 ```
 
@@ -44,9 +50,7 @@ tile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_out
 
 2.  id column is included in the shapefile and has unique values.
 
-3.  outlet column is included in the shapefile and the id could be found in tile drain outlet shapefile. The value could be empty.
-
-4.  depth and spacing column are included in the shapefile and the values are not empty
+3.  all required columns are included in the shapefile and the values are not empty
 
 ### Tile Drain Outlet Point Shapefile
 
@@ -58,8 +62,8 @@ tile_drain_shapefile = tiledrain.shp tile_drain_outlet_shapefile = tiledrain_out
 
 2.  Generate tile drain parameter table. To determine the outlet reach id:
 
-    1.  If the tile drain outlet shapefile is defined and the outlet data field is not empty, use the reach that corresponds to the outlet
+    1.  If the tile drain outlet shapefile is defined, find the reach for each outlet and trace from each tile drain field from upstream to downstream. The first outlet is assigned to the tile drain field.
 
-    2.  Else find the lowest subbasin included in the tile drain polygon. ***There is a problem here as not all part of subbasin is in the polygon, we may need to use the subarea to get this, i.e. tile drain at the subarea level.***
+    2.  Else find the lowest subbasin included in the tile drain polygon. If the drainage area is smaller than 10 ha, trace downstream until the drainage area is larger than 10 ha.
 
 3.  Add tile drain polygon to parameter.h5
