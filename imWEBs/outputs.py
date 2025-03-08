@@ -354,7 +354,9 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.farmRasName)
     
         if raster is None:
-            if self.inputs.farm_vector is not None:
+            if self.inputs.is_farm_same_as_field:
+                raster = self.save_raster(self.field_raster, Names.farmRasName, True, True)
+            elif self.inputs.farm_vector is not None:
                 exist, id_field_name = VectorExtension.check_id(self.inputs.farm_vector)
                 if not exist:
                     raise ValueError(f"Couldn't find ID column in {self.inputs.farm_vector.file_name} ...")

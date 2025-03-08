@@ -142,7 +142,11 @@ class BMPDatabase(DatabaseBase):
         field_area_df.columns = ["FieldArea"]
 
         logger.info("Creating farm_info ...")
-        farm_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.farm_raster, BMPDatabase.COL_NAME_AREA_HA)
+        if outputs.inputs.is_farm_same_as_field:
+            farm_area_df = field_area_df.copy()
+            farm_area_df.columns = ["Area_Ha"]
+        else:
+            farm_area_df = RasterExtension.get_category_area_ha_dataframe(outputs.farm_raster, BMPDatabase.COL_NAME_AREA_HA)
         self.save_table(Names.bmp_table_name_farm_info, farm_area_df, None, True)
         farm_area_df.columns = ["FarmArea"]
 
@@ -159,16 +163,28 @@ class BMPDatabase(DatabaseBase):
         subbasin_area_df.columns = ["SubbasinArea"]
 
         logger.info("Creating field_subbasin ...")
-        self.__create_overlay(outputs.field_raster, outputs.subbasin_raster, 
+        field_subbasin_df = self.__create_overlay(outputs.field_raster, outputs.subbasin_raster, 
                               "Field", "Subbasin", field_area_df, subbasin_area_df, Names.bmp_table_name_field_subbasin)
 
         logger.info("Creating farm_subbasin ...")
-        self.__create_overlay(outputs.farm_raster, outputs.subbasin_raster, 
+        if outputs.inputs.is_farm_same_as_field:
+            self.save_table(Names.bmp_table_name_farm_subbasin, field_subbasin_df.rename(columns={"Field":"Farm","ToField":"ToFarm"}))
+        else:
+            self.__create_overlay(outputs.farm_raster, outputs.subbasin_raster, 
                               "Farm", "Subbasin", farm_area_df, subbasin_area_df, Names.bmp_table_name_farm_subbasin)
 
         logger.info("Creating field_farm ...")
-        self.__create_overlay(outputs.field_raster, outputs.farm_raster, 
-                              "Field", "Farm", field_area_df, farm_area_df, Names.bmp_table_name_field_farm) 
+        if outputs.inputs.is_farm_same_as_field:
+            field_area_df.columns = ["Area_Ha"]
+            field_area_df.index.name = "RowId"
+            field_area_df["Field"] = field_area_df.index
+            field_area_df["Farm"] = field_area_df.index
+            field_area_df["ToField"] = 1
+            field_area_df["ToFarm"] = 1
+            self.save_table(Names.bmp_table_name_field_farm, field_area_df[["Field","Farm","Area_Ha","ToField","ToFarm"]], None, True)
+        else:
+            self.__create_overlay(outputs.field_raster, outputs.farm_raster, 
+                                "Field", "Farm", field_area_df, farm_area_df, Names.bmp_table_name_field_farm) 
         
         self.__create_subbasin_multiplier(subbasin_ids)        
 
@@ -198,7 +214,7 @@ class BMPDatabase(DatabaseBase):
                          name1:str, name2:str, 
                          raster1_area_df:pd.DataFrame, raster2_area_df:pd.DataFrame, 
                          table_name:str,
-                         fraction_name1:str = None, fraction_name2:str = None, include_id_in_column_name:bool = False):
+                         fraction_name1:str = None, fraction_name2:str = None, include_id_in_column_name:bool = False)->pd.DataFrame:
         overlay_area_df = RasterExtension.get_overlay_area(spatial1_ras, spatial2_ras, name1, name2, BMPDatabase.COL_NAME_AREA_HA)
         
         merged_df = overlay_area_df.merge(raster1_area_df, left_on= name1, right_index=True, how="left")
@@ -230,6 +246,7 @@ class BMPDatabase(DatabaseBase):
 
         merged_df = merged_df[['RowId', col_name1, col_name2, BMPDatabase.COL_NAME_AREA_HA, fraction_name1, fraction_name2]]     
         self.save_table(table_name, merged_df)   
+        return merged_df
     
     def __create_subbasin_multiplier(self, subbasin_ids:list)->None:
         """populate default subbasin-muliplier"""

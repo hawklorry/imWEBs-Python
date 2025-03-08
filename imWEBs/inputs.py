@@ -70,6 +70,10 @@ class Inputs(FolderBase):
     def field_vector(self)->Vector:
         return self.get_vector(Names.get_standard_file_name("field_shapefile")) 
 
+    @property
+    def is_farm_same_as_field(self)->bool:
+        return self.field_vector is not None and (self.farm_vector is None or Names.get_standard_file_name("farm_shapefile") == Names.get_standard_file_name("field_shapefile"))
+
 #endregion
 
 #region Lookup
@@ -254,14 +258,14 @@ class Inputs(FolderBase):
         if self.landuse_raster is None:
             raise ValueError("Can't find landuse raster")     
         if self.landuse_raster.configs.nodata > -32768:
-            raise ValueError("The no data value of landuse raster is not valid. Use -32768.")  
-        
-        if self.farm_vector is None:
-            raise ValueError("Can't find farm shapefile")       
+            raise ValueError("The no data value of landuse raster is not valid. Use -32768.")        
         
         if self.field_vector is None:
             raise ValueError("Can't find field shapefile")   
         VectorExtension.validate_vector_shape_type(self.field_vector, VectorGeometryType.Polygon)
+
+        if self.is_farm_same_as_field:
+            logger.info("Farm shapefile is not provided. The field shapefile will be used as the farm field.")
         
         if self.soil_lookup_csv is None:
             raise ValueError("Can't find soil lookup")
