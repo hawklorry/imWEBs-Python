@@ -971,15 +971,12 @@ class Outputs(FolderBase):
                 [structure.boundary_raster for structure in self.structures.values()])
             outlet_vectors.append(pour_points_vector)
             
-            #add user-defined watershed outlets and snap it to the stream network
-            #this is basically is the one user selected on the map
-            #this should be the outlet of the whole watershed.
-            #we will check if the shapefile only has one point.
-            # if self.inputs.outlet_vector is not None:
-            #     outlet_vectors.append(self.wbe.jenson_snap_pour_points(
-            #         pour_pts = self.inputs.outlet_vector,
-            #         streams = self.stream_network_raster,
-            #         snap_dist = 2000))
+            #add user-defined subbasin outlets and snap it to the stream network
+            if self.inputs.outlet_vector is not None:
+                outlet_vectors.append(self.wbe.jenson_snap_pour_points(
+                    pour_pts = self.inputs.outlet_vector,
+                    streams = self.stream_network_raster,
+                    snap_dist = 2000))
 
             #add reach bmp points but exclude wetland
             for reach_bmp in self.inputs.reach_bmp_vectors:
