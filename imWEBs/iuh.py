@@ -97,6 +97,9 @@ class IUH:
         #initilzating
         for row in range(rows):
             for col in range(cols):
+                if self.dem_raster[row,col] == noData:
+                    continue
+
                 flag_s_raster[row,col] = 0
                 t_s_raster[row,col] = 0
                 delta_s_raster[row,col] = 0
@@ -164,7 +167,13 @@ class IUH:
 
         for row in range(rows):
             for col in range(cols):
+                if self.dem_raster[row,col] == noData:
+                    continue
                 t_s_raster[row, col] = t_s_raster[row, col] * cont3
-                delta_s_raster[row, col] = pow(delta_s_raster[row, col], 0.5) * cont4
+
+                if delta_s_raster[row, col] < 0:
+                    delta_s_raster[row, col] = 0
+                else:
+                    delta_s_raster[row, col] = pow(delta_s_raster[row, col], 0.5) * cont4
 
         return (t_s_raster, delta_s_raster)

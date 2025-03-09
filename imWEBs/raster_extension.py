@@ -5,6 +5,7 @@ import logging
 import math
 from .vector_extension import VectorExtension
 from .names import Names
+import numpy as np
 logger = logging.getLogger(__name__)
 
 
@@ -216,11 +217,17 @@ class RasterExtension:
         configs.data_type = RasterDataType.I64
         overlay_raster = wbe.new_raster(configs)
 
+        temp = np.zeros((rows, cols), dtype = int)
         for row in range(rows):
             for col in range(cols):
                 if spatial1_ras[row, col] != no_data1 and spatial2_ras[row, col] != no_data2:
                     id = spatial1_ras[row, col] + spatial2_ras[row, col] * raster1_max
-                    overlay_raster[row, col] = int(id)
+                    temp[row,col]  = int(id)
+        
+        for row in range(rows):
+            for col in range(cols):
+                if temp[row,col] > 0:
+                    overlay_raster[row, col] = temp[row,col]                 
  
         return overlay_raster, raster1_max
     
