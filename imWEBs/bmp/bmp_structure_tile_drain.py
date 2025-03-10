@@ -112,10 +112,8 @@ class StructureBMPTileDrain(BMP):
             reach = self.dict_tile_drain_subbasin[tile_drain_id]
 
             #check reach drainage area, if < 10ha, search downstream until find one that > 10ha
-            while self.reach_contribution_area_dict[reach] < 10:
+            while self.reach_contribution_area_dict[reach] < 10 and self.reach_receive_reach_dict[reach] > 0:
                 reach = self.reach_receive_reach_dict[reach]
-                if reach == 0:
-                    break
 
             #use it
             self.__dict_tile_drain_reach[tile_drain_id] = reach
@@ -140,7 +138,7 @@ class StructureBMPTileDrain(BMP):
         df["Id"] = df.index + 1
         df["DrainageCapacity"] = 3800
 
-        return df
+        return df[["Id","Reach","DrainageCapacity"]]
 
     @property
     def tile_drain_df(self)->pd.DataFrame:
