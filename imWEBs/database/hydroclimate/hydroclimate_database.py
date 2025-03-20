@@ -9,11 +9,17 @@ class HydroClimateDatabase(DatabaseBase):
     """
     Hydroclimate database
     """
+
+    columns_measured_data = ["DATE", "FLOW","SEDIMENT","ORGANICN","ORGANICP","NO3","NH3","NO2","MINERALP"]
+
     def __init__(self, database_file):
         super().__init__(database_file)    
 
         self.__station_coordinates = {}
         self.__data_type_station_ids_dictionary = {}
+
+    def validate_measured_data_table(self,table_name:str):
+        self.check_table(table_name, HydroClimateDatabase.columns_measured_data)
 
     @property
     def station_coordinates(self)->dict:

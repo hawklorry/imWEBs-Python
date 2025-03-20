@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import os
 import logging
+import numpy as np
 logger = logging.getLogger(__name__)
 
 
@@ -41,8 +42,27 @@ class DatabaseBase:
             return
         table_df.to_sql(table_name, con = self.engine, if_exists='replace',index=index, dtype=dtype,chunksize=1000)
 
+    def check_table(self, table_name:str, table_columns:list):
+        #first make sure the table exists
+        if not self.check_table_exist(table_name):
+            raise ValueError(f"Couldn't find table {table_name} in {self.database_file}.")
+        
+        #then make sure the table columns exists case-insensitive
+        columns = self.get_columns(table_name)
+        columns = np.char.lower(columns)
+        columns.sort()
+        table_columns = np.char.lower(table_columns)
+        table_columns.sort()
+        if not np.array_equal(columns, table_columns):
+            raise ValueError(f"Table {table_name} in {self.database_file} has following columns {columns} but it should have these columns {table_columns}.")
+
     def check_table_exist(self, table_name:str)->bool:
-        return len(pd.read_sql(f"SELECT tbl_name FROM sqlite_master where type='table' and tbl_name ='{table_name}'",self.engine)) > 0 
+        return len(pd.read_sql(f"SELECT tbl_name FROM sqlite_master where type='table' and lower(tbl_name) ='{table_name.lower()}'",self.engine)) > 0 
+
+    def get_columns(self, table_name:str)->list:
+        query = f"PRAGMA table_info({table_name})" 
+        df = pd.read_sql(query,self.engine)
+        return df['name'].to_list()
 
     def populate_defaults(self, table_name:str):
         """

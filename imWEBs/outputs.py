@@ -17,6 +17,7 @@ from .bmp.bmp_type import DefaultScenarioId
 from .iuh import IUH
 from .database.bmp.subarea import SubArea
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
+from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 
 import logging
 logger = logging.getLogger(__name__)
@@ -34,9 +35,10 @@ class Outputs(FolderBase):
                  design_storm_return_period = 2         #design storm return period for reach width and depth
                  ) -> None:
         super().__init__(output_folder)
-
-        self.inputs = Inputs(input_folder)       
+        
         self.database_folder = database_folder 
+        self.__hydroclimate_database = HydroClimateDatabase(os.path.join(self.database_folder,Names.hydroclimateDatabasename))
+        self.inputs = Inputs(input_folder, self.__hydroclimate_database)       
 
         self.stream_threshold_area_ha = stream_threshold_area_ha
         self.main_stream_threshold_area_ha = 200            #threshold for main stream in ha
@@ -55,6 +57,13 @@ class Outputs(FolderBase):
     def number_of_subbasin(self)->int:
         return int(RasterExtension.get_max_value(self.subbasin_raster))
     
+    @property
+    def hydroclimate_database(self)->HydroClimateDatabase:
+        if self.__hydroclimate_database is None:
+            self.__hydroclimate_database = HydroClimateDatabase(os.path.join(self.database_folder,Names.hydroclimateDatabasename))
+
+        return self.__hydroclimate_database
+
     @property
     def parameter(self)->Parameters:
         if self.__parameters is None:

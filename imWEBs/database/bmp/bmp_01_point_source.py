@@ -13,7 +13,8 @@ class PointSource(BMPTable):
     OPERATION = Column(TEXT)
     TABLENAME = Column(TEXT)
 
-    def __init__(self):
+    def __init__(self, id:int):
+        self.ID = id
         self.XLL = 0
         self.YLL = 0
         self.OPERATION = "1900-01-01"

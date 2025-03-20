@@ -17,6 +17,7 @@ from ...names import Names
 from ...bmp.bmp_areal_manure_feedlot import ArealBMPManureFeedlot
 from ...bmp.bmp_areal_manure_storage import ArealBMPManureStorage
 from ...bmp.bmp_reach_manure_catch_basin import ReachBMPManureCatchBasin
+from ...bmp.bmp_reach_point_source import ReachBMPPointSource
 from ...bmp.bmp_reach_reservoir import ReachBMPReservoir
 from ...bmp.bmp_reach_wetland import ReachBMPWetland
 from ...bmp.bmp_type import BMPType
@@ -114,6 +115,7 @@ class BMPDatabase(DatabaseBase):
         self.__create_bmp_manure_catchbasin(outputs)
         self.__create_bmp_manure_storage(outputs)
 
+        self.__create_bmp_point_source(outputs)
         self.__create_bmp_reservoir(outputs,reservoir_flow_routing, reservoir_flow_data_folder)
         self.__create_bmp_wetland(outputs)
         self.__create_bmp_dugout(outputs)        
@@ -409,6 +411,11 @@ class BMPDatabase(DatabaseBase):
         if "wetland" in outputs.structures:
             reach_bmps[BMPType.BMP_TYPE_WETLAND] = ReachBMPWetland(outputs.structures["wetland"].boundary_processed_vector, outputs.subbasin_raster).subbasins
         
+        #point source
+        if outputs.inputs.point_source_vector is not None:
+            reach_bmps[BMPType.BMP_TYPE_POINTSOURCE] = ReachBMPPointSource(outputs.inputs.point_source_vector, outputs.subbasin_raster).subbasins
+
+
         #reservoir
         if outputs.inputs.reservoir_vector is not None:
             reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster).subbasins
@@ -439,6 +446,22 @@ class BMPDatabase(DatabaseBase):
         with Session() as session:
             session.add_all([Wetland(struc_attribute) for struc_attribute in outputs.structures["wetland"].attributes.values()])
             session.commit()
+
+    def __create_bmp_point_source(self, outputs:Outputs):
+        """
+        populate point source parameter table
+        """
+
+        if outputs.inputs.point_source_vector is None:
+            return {}
+        
+        logger.info("Creating point source parameter table ... ")
+        point_source = ReachBMPPointSource(outputs.inputs.point_source_vector, outputs.subbasin_raster)
+
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(point_source.point_sources)
+            session.commit()  
 
     def __create_bmp_reservoir(self, outputs:Outputs, 
                            flow_method:str, 

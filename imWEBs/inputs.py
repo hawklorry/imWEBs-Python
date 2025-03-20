@@ -8,8 +8,10 @@ import logging
 import numpy as np
 from .bmp.bmp_type import BMPType
 from .bmp.bmp_reach_reservoir import ReachBMPReservoir
+from .bmp.bmp_reach_point_source import ReachBMPPointSource
 from .bmp.bmp_structure_wascob import StructureBMPWascob
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
+from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +19,8 @@ class Inputs(FolderBase):
     """
     Info from input folder, these are the original input file with standard name
     """
-    def __init__(self, input_folder:str) -> None:
-        super().__init__(input_folder)
-
-        self.__validate()
+    def __init__(self, input_folder:str, hydroclimate_database:HydroClimateDatabase = None) -> None:
+        super().__init__(input_folder)        
 
         self.cell_size = self.dem_raster.configs.resolution_x        
         self.cellsize_m2 = self.dem_raster.configs.resolution_x * self.dem_raster.configs.resolution_y
@@ -29,6 +29,8 @@ class Inputs(FolderBase):
         self.nodata = self.dem_raster.configs.nodata
         self.rows = self.dem_raster.configs.rows
         self.columns = self.dem_raster.configs.columns
+        self.hydroclimate_database = hydroclimate_database
+        self.__validate()
 
     def create_new_raster(self)->Raster:
         return self.wbe.new_raster(self.dem_raster.configs)
@@ -284,6 +286,7 @@ class Inputs(FolderBase):
         #valiate bmp inputs to make sure attributes are setup correctly
         self.__check_manure_feedlot_catchbasin_storage()
         ReachBMPReservoir.validate(self.reservoir_vector)
+        ReachBMPPointSource.validate(self.point_source_vector, self.hydroclimate_database)
         StructureBMPWascob.validate(self.wascob_vector)
         StructureBMPTileDrain.validate(self.tile_drain_boundary_vector, self.tile_drain_outlet_vector)
 
