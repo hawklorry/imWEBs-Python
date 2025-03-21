@@ -22,6 +22,8 @@ class VectorExtension:
             return wbe.vector_polygons_to_raster(input = vector, field_name = id_field_name, base_raster = base_raster)
         elif vector.header.shape_type == VectorGeometryType.Point or vector.header.shape_type == VectorGeometryType.PointM or vector.header.shape_type == VectorGeometryType.PointZ:
             return wbe.vector_points_to_raster(input = vector, field_name = id_field_name, base_raster = base_raster)
+        elif vector.header.shape_type == VectorGeometryType.PolyLine or vector.header.shape_type == VectorGeometryType.PolyLineM or vector.header.shape_type == VectorGeometryType.PolyLineZ:
+            return wbe.vector_lines_to_raster(input = vector, field_name = id_field_name, base_raster = base_raster)
         else:
             raise ValueError(f"Wrong shape type with {vector.file_name}.")
 

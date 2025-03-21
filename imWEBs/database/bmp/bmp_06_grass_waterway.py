@@ -34,11 +34,11 @@ class GrassWaterWay(BMPTable):
     """GWW cover factor, default is 0"""
     Cover = Column(REAL)
 
-    def __init__(self):
-        self.ID = 0
-        self.Year = 0
-        self.Subbasin = 0
-        self.Length = 0
+    def __init__(self, id:int, subbasin:int, length: float):
+        self.ID = id
+        self.Year = 1900
+        self.Subbasin = subbasin
+        self.Length = length
         self.BFwidth = 10
         self.BFdepth = 0.5
         self.SideSlope = 0.25

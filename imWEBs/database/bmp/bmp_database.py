@@ -18,6 +18,7 @@ from ...bmp.bmp_areal_manure_feedlot import ArealBMPManureFeedlot
 from ...bmp.bmp_areal_manure_storage import ArealBMPManureStorage
 from ...bmp.bmp_reach_manure_catch_basin import ReachBMPManureCatchBasin
 from ...bmp.bmp_reach_point_source import ReachBMPPointSource
+from ...bmp.bmp_reach_grass_waterway import ReachBMPGrassWaterWay
 from ...bmp.bmp_reach_reservoir import ReachBMPReservoir
 from ...bmp.bmp_reach_wetland import ReachBMPWetland
 from ...bmp.bmp_type import BMPType
@@ -115,9 +116,13 @@ class BMPDatabase(DatabaseBase):
         self.__create_bmp_manure_catchbasin(outputs)
         self.__create_bmp_manure_storage(outputs)
 
-        self.__create_bmp_point_source(outputs)
-        self.__create_bmp_reservoir(outputs,reservoir_flow_routing, reservoir_flow_data_folder)
-        self.__create_bmp_wetland(outputs)
+        reach_bmps_subbasins = {}
+        reach_bmps_subbasins[BMPType.BMP_TYPE_POINTSOURCE] = self.__create_bmp_point_source(outputs)
+        reach_bmps_subbasins[BMPType.BMP_TYPE_RESERVOIR] = self.__create_bmp_reservoir(outputs,reservoir_flow_routing, reservoir_flow_data_folder)
+        reach_bmps_subbasins[BMPType.BMP_TYPE_GRASSWATERWAY] = self.__create_bmp_grass_waterway(outputs)
+        reach_bmps_subbasins[BMPType.BMP_TYPE_WETLAND] = self.__create_bmp_wetland(outputs)
+        
+        
         self.__create_bmp_dugout(outputs)        
         self.__create_bmp_riparian_buffer(outputs)
 
@@ -130,7 +135,7 @@ class BMPDatabase(DatabaseBase):
         #all reach bmps should be added before this
         self.__create_reach_parameter(outputs)
         self.__create_reach_lookup()
-        self.__create_bmp_reach_bmp(outputs)
+        self.__create_bmp_reach_bmp(outputs, reach_bmps_subbasins)
 
         #create bmp_scenarios table
         self.__create_bmp_scenarios(outputs)
@@ -400,54 +405,52 @@ class BMPDatabase(DatabaseBase):
 
 #region Reach BMPs
 
-    def __create_bmp_reach_bmp(self, outputs:Outputs):
+    def __create_bmp_reach_bmp(self, outputs:Outputs, reach_bmp_subbasins:dict):
         """create reach_bmp table"""
 
         logger.info("Creating reach_bmp table ... ")
-
-        reach_bmps = {} 
-
-        #wetland      
-        if "wetland" in outputs.structures:
-            reach_bmps[BMPType.BMP_TYPE_WETLAND] = ReachBMPWetland(outputs.structures["wetland"].boundary_processed_vector, outputs.subbasin_raster).subbasins
-        
-        #point source
-        if outputs.inputs.point_source_vector is not None:
-            reach_bmps[BMPType.BMP_TYPE_POINTSOURCE] = ReachBMPPointSource(outputs.inputs.point_source_vector, outputs.subbasin_raster).subbasins
-
-
-        #reservoir
-        if outputs.inputs.reservoir_vector is not None:
-            reach_bmps[BMPType.BMP_TYPE_RESERVOIR] = ReachBMPReservoir(outputs.inputs.reservoir_vector, outputs.subbasin_raster).subbasins
-        
-        #catch basin
-        if outputs.inputs.catchbasin_vector is not None:
-            reach_bmps[BMPType.BMP_TYPE_MANURE_CATCHBASIN] = ReachBMPManureCatchBasin(outputs.inputs.catchbasin_vector,
-                                    outputs.subbasin_raster,
-                                    outputs.reach_parameter_df).subbasins
-
-        if len(reach_bmps) <= 0:
-            logger.info("There is no reach bmp, existing ... ")
-            return
 
         #get all subbasins
         subbasin_ids = range(1, int(RasterExtension.get_max_value(outputs.subbasin_raster)) + 1)
 
         #save the table
-        df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmps)
+        df = ReachBMP.create_reach_bmp_df(subbasin_ids, reach_bmp_subbasins)
         self.save_table(Names.bmp_table_name_reach_bmp, df)
 
-    def __create_bmp_wetland(self, outputs:Outputs):
+    def __create_bmp_wetland(self, outputs:Outputs)->dict:
         if "wetland" not in outputs.structures:
-            return
+            return {}
         
-        logger.info("Creating wetland ... ")
+        logger.info("Creating wetland parameter table ... ")
         Session = sessionmaker(bind=self.engine)
         with Session() as session:
             session.add_all([Wetland(struc_attribute) for struc_attribute in outputs.structures["wetland"].attributes.values()])
             session.commit()
 
-    def __create_bmp_point_source(self, outputs:Outputs):
+        return ReachBMPWetland(outputs.structures["wetland"].boundary_processed_vector, outputs.subbasin_raster).subbasins
+
+    def __create_bmp_grass_waterway(self, outputs:Outputs)->dict:
+        """
+        populate grass waterway parameter table
+        """
+
+        if outputs.inputs.grass_waterway_vector is None:
+            return {}
+        
+        logger.info("Creating grass waterway parameter table ... ")
+        grass_waterway = ReachBMPGrassWaterWay(outputs.inputs.grass_waterway_vector, 
+                                             outputs.subbasin_raster,
+                                             outputs.flow_direction_raster,
+                                             outputs.reach_parameter_df)
+
+        Session = sessionmaker(bind=self.engine)
+        with Session() as session:
+            session.add_all(grass_waterway.grass_waterways)
+            session.commit()  
+        
+        return grass_waterway.id_subbasins
+
+    def __create_bmp_point_source(self, outputs:Outputs)->dict:
         """
         populate point source parameter table
         """
@@ -463,9 +466,11 @@ class BMPDatabase(DatabaseBase):
             session.add_all(point_source.point_sources)
             session.commit()  
 
+        return point_source.subbasins
+
     def __create_bmp_reservoir(self, outputs:Outputs, 
                            flow_method:str, 
-                           flow_data_folder:str):
+                           flow_data_folder:str)->dict:
         """
         populate reservoir parameter table
         """

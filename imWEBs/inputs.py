@@ -9,6 +9,7 @@ import numpy as np
 from .bmp.bmp_type import BMPType
 from .bmp.bmp_reach_reservoir import ReachBMPReservoir
 from .bmp.bmp_reach_point_source import ReachBMPPointSource
+from .bmp.bmp_reach_grass_waterway import ReachBMPGrassWaterWay
 from .bmp.bmp_structure_wascob import StructureBMPWascob
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
@@ -95,7 +96,7 @@ class Inputs(FolderBase):
     @property
     def reach_bmp_vectors(self)->list:
         return [self.point_source_vector, self.flow_diversion_vector, self.reservoir_vector, 
-                self.catchbasin_vector, self.grass_waterway_vector, self.access_management_vector,
+                self.catchbasin_vector, self.access_management_vector,
                 self.water_use_vector]
 
     @property
@@ -287,6 +288,7 @@ class Inputs(FolderBase):
         self.__check_manure_feedlot_catchbasin_storage()
         ReachBMPReservoir.validate(self.reservoir_vector)
         ReachBMPPointSource.validate(self.point_source_vector, self.hydroclimate_database)
+        ReachBMPGrassWaterWay.validate(self.grass_waterway_vector)
         StructureBMPWascob.validate(self.wascob_vector)
         StructureBMPTileDrain.validate(self.tile_drain_boundary_vector, self.tile_drain_outlet_vector)
 
