@@ -23,16 +23,20 @@ website:
       - section: "BMPs"
         href: bmps/bmps.qmd
         contents: 
-        - bmps/02_point_source.qmd
+        - bmps/01_point_source.qmd
         - bmps/03_reservoir.qmd
+        - bmps/05_riparian_buffer.qmd
         - bmps/06_grassed_waterway.qmd
+        - bmps/07_vegetation_filter_strip.qmd
+        - bmps/09_wetland.qmd
         - bmps/19_tiledrain.qmd
         - bmps/27_manure_storage.qmd
         - bmps/28_manure_catch_basin.qmd
         - bmps/29_manure_feedlot.qmd
+        - bmps/39_offsite_watering.qmd
         - bmps/41_wascob.qmd        
         - bmps/crop_management.qmd
-           
+
 format:
   html:
     theme: cosmo
