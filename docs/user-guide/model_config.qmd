@@ -47,12 +47,12 @@ watershed section contains the basic spatial files for the watershed.
 -   **boundary_shapefile** - The boundary shapefile to limit the watershed boundary.
 -   **farm_shapefile** - The farm shapefile.
 -   **field_shapefile** - The filed shapefile.
--   **outlet_shapefile** - The output shapefile. Currently not used.
+-   **outlet_shapefile** - The output shapefile.
 
 ::: callout-important
 ## Mandatory Files
 
-dem, soil, landuse, stream, farm, field
+dem, soil, landuse, stream, field
 :::
 
 ## lookup
@@ -118,23 +118,11 @@ Only riparian buffer is working in current version. Others will be supported lat
 :::
 
 -   **dugout_boundary_shapefile** - The dugout shapefile.
--   **wascob_boundary_shapefile** - The WSCOB shapefile.
--   **wascob_outlet_shapefile** - The WSCOB outlet shapefile.
 -   **riparian_buffer_shapefile** - The riparian buffer shapefile.
 -   **filter_strip_shapefile** - The filter strip shapefile.
--   **tile_drain_shapefile** - The tile drain shapefile.
-
-### Attribute
-
--   **wascob_boundary_shapefile**
-
-    -   id - The WASCOB id
-
-    -   outlet - The outlet id. It must exists in **wascob_outlet_shapefile**
-
--   **wascob_outlet_shapefile**
-
-    -   id - The wascob id which should be unique.
+-   **tile_drain_boundary_shapefile** - The tile drain shapefile.
+-   **tile_drain_outlet_shapefile** - The tile drain outlet shapefile.
+-   **wascob_shapefile** - The WSCOB shapefile.
 
 ## non_structure_bmp
 

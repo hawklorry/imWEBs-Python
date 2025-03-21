@@ -1,0 +1,14 @@
+# 27. Manure Storage
+
+## Location
+
+The location of manure storage is defined in **\[non_structure_bmp\]** section using **manure_storage_boundary_shapefile**. One example is given below.
+
+*\[non_structure_bmp\]*
+
+*manure_storage_boundary_shapefile = storage.shp*
+
+## Attributes
+
+-   **id** - The manure storage id
+-   **feedlot** - The contributing [feedlot](29_manure_feedlot.qmd)id

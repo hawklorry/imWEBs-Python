@@ -1,0 +1,7 @@
+# 28. Manure Catch Basin
+
+The location of manure catch basins is defined in **\[reach_bmp\]** section specified using **manure_catch_basin_shapefile**. The shapefile should be point and have unique ids. One example is given below.
+
+*\[reach_bmp\]*
+
+*manure_catch_basin_shapefile = catchbasin.shp*

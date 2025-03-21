@@ -1,0 +1,14 @@
+# 02. Point Source
+
+## Location
+
+The location of point source is defined in **\[reach_bmp\]** section using **point_source_shapefile**. One example is given below.
+
+*\[reach_bmp\]*
+
+*point_source_shapefile = PointSource.shp*
+
+## Attributes
+
+-   **Operation** - The operation date in YYYY-MM-DD format
+-   **TableName** - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.

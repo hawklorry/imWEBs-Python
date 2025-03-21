@@ -1,0 +1,36 @@
+# 03. Reservoir
+
+## Location
+
+The location of reservoirs is defined by a point shapefile. The name of the shapefile is defined in the **reach_bmp** section of the model configuration file. An example is given below.
+
+***\[reach_bmp\]***
+
+***reservoir_shapefile** = reservoir.shp*
+
+## Attributes
+
+The reservoir shapefile should have following attributes.
+
+-   **id** - The reservoir id
+-   **op** - operation date in yyyy-mm-dd format
+-   **sa_em** - Emergency surface area
+-   **v_em** - Emergency volume
+-   **sa_pr** - Principal surface area
+-   **v_pr** - Principal volume
+-   **file** - The external file name used for rating curve or outflow time series. File extension is not included.
+
+## Routing Method
+
+The routing method is defined in a separate section **\[reservoir\]**. This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It's assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database. There are two settings in this section.
+
+-   **reservoir_flow_routing** - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.
+-   **reservoir_flow_data_folder** - The folder where the external flow data is saved.
+
+An example is given below.
+
+*\[reservoir\]*
+
+*reservoir_flow_routing = RAT_RES*
+
+*reservoir_flow_data_folder = C:*\\stc\\data\\reservoir

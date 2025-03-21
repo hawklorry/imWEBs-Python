@@ -1,0 +1,32 @@
+# 29. Manure Feedlot
+
+## Location
+
+The location of manure feedlots is defined in **non_structure_bmp** section with two settings:
+
+-   **manure_feedlot_boundary_shapefile** - The feedlot boundary shapefile.
+-   **manure_feedlot_outlet_shapefile** - The feedlot outlet shapefile.
+
+One example is given below.
+
+*\[non_structure_bmp\]*
+
+*manure_feedlot_boundary_shapefile = cattle_yard_projected.shp*
+
+*manure_feedlot_outlet_shapefile = cattle_yard_outlet.shp*
+
+## Attributes
+
+-   feedlot
+
+    -   **id** - The feedlot id
+    -   **cb** - The catch basin id which must exist in the catch basin shapefile
+    -   **ani_id** - The animal id in the livestock parameter table
+    -   **adult** - Number of the adult animals
+    -   **nonadult** - Number of non-adult animals
+    -   **stoid** - The manure storage ids separated with comma
+    -   **storatio** - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.
+
+-   Feedlot outlet
+
+    -   **id** - The outlet id should be the same as the corresponding feedlot

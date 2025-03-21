@@ -1,0 +1,14 @@
+# 06 Grassed Waterway
+
+## Location
+
+The location of the grassed waterway is defined in **\[reach_bmp\]** section using **grass_waterway_shapefile**. One example is given below. The shapefile must be **polyline** type.
+
+*\[reach_bmp\]*
+
+*grass_waterway_shapefile = GWW.shp*
+
+## Attributes
+
+-   **Operation** - The operation date in YYYY-MM-DD format
+-   **TableName** - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.
