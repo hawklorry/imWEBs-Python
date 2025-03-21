@@ -39,13 +39,13 @@ class GrassWaterWay(BMPTable):
         self.Year = 1900
         self.Subbasin = subbasin
         self.Length = length
-        self.BFwidth = 10
+        self.BFwidth = 2
         self.BFdepth = 0.5
         self.SideSlope = 0.25
-        self.Slope_perc = 0
+        self.Slope_perc = 0.1
         self.Manning = 0.25
-        self.BFvelocity = 0
+        self.BFvelocity = 0.1
         self.Conductivity = 10
-        self.Erodibility = 0
-        self.Cover = 0
+        self.Erodibility = 1
+        self.Cover = 1
 
