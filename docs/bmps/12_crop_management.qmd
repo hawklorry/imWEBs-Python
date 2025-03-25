@@ -1,4 +1,4 @@
-# Crop Management
+# 12. Crop Management
 
 Crop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it's usually prepared manually and imported to bmp database.
 

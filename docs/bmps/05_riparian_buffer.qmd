@@ -1,0 +1,9 @@
+# 05. Riparian Buffer
+
+## Location
+
+Riparian buffers are defined using a **polygon** shapefile in **structure_bmp** section. One example is given below.
+
+*\[structure_bmp\]*
+
+*riparian_buffer_shapefile* *= buffer.shp*

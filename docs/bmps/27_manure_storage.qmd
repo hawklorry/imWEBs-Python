@@ -11,4 +11,4 @@ The location of manure storage is defined in **\[non_structure_bmp\]** section u
 ## Attributes
 
 -   **id** - The manure storage id
--   **feedlot** - The contributing [feedlot](29_manure_feedlot.qmd)id
+-   **feedlot** - The contributing [feedlot](29_manure_feedlot.qmd) id

@@ -11,4 +11,13 @@ The location of point source is defined in **\[reach_bmp\]** section using **poi
 ## Attributes
 
 -   **Operation** - The operation date in YYYY-MM-DD format
--   **TableName** - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.
+-   **TableName** - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients. The table must have following columns. The columns are case-insensitive and could be in any sequence.
+    -   DATE
+    -   FLOW
+    -   SEDIMENT
+    -   ORGANICN
+    -   ORGANICP
+    -   NO3
+    -   NH3
+    -   NO2
+    -   MINERALP

@@ -1,6 +1,6 @@
 # 19. Tile Drain
 
-Tile drain improve the drainage of fields with poor drainage capacity. It uses underground perforated drain pipes to direct water to an outlet. It may work together with wascobs.
+Tile drain improve the drainage of fields with poor drainage capacity. It uses underground perforated drain pipes to direct water to an outlet. It may work together with [wascobs](41_wascob.qmd).
 
 ## Required Inputs
 

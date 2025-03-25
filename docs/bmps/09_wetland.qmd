@@ -1,0 +1,19 @@
+# 09. Isolated Wetland
+
+## Location
+
+Isolated wetland is a reach bmp. Use defines the boundary and **optional** outlet using two shapefiles in **reach_bmp** section. One example is given below. Note that the wetland_outlet_shapefile is empty so the interface will delineate the outlet automatically.
+
+*\[reach_bmp\]*
+
+*wetland_boundary_shapefile = wetland.shp*
+
+*wetland_outlet_shapefile =*
+
+## Size Filter
+
+It's possible to filter the wetlands using a minimum area. This is done by **wetland_min_area_ha** in **delineation** section. The following example would skip all wetlands whose area is smaller than 0.1 ha.
+
+*\[delineation\]*
+
+*wetland_min_area_ha = 0.1*

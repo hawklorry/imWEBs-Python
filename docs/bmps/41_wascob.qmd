@@ -62,7 +62,7 @@ wascob_shapefile = wascob.shp
 
 3.  Generate wascob parameter table. To determine the outlet reach id:
 
-    1.  Find the corresponding tile drain field based on tile drain id.
+    1.  Find the corresponding [tile drain](19_tiledrain.qmd) field based on tile drain id.
 
     2.  Find the outlet reach for the identified tile drain field and use it for the wacob.
 

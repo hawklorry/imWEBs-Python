@@ -113,10 +113,6 @@ The underline library whitebox-workflow has issues coping REAL attribute values.
 
 This section defines the location and attributes of structure bmps.
 
-::: callout-warning
-Only riparian buffer is working in current version. Others will be supported later.
-:::
-
 -   **dugout_boundary_shapefile** - The dugout shapefile.
 -   **riparian_buffer_shapefile** - The riparian buffer shapefile.
 -   **filter_strip_shapefile** - The filter strip shapefile.
@@ -127,10 +123,6 @@ Only riparian buffer is working in current version. Others will be supported lat
 ## non_structure_bmp
 
 This section defines the location and attributes of structure bmps.
-
-::: callout-warning
-Only riparian buffer is working in current version. Others will be supported later.
-:::
 
 -   **manure_feedlot_boundary_shapefile** - The feedlot boundary shapefile.
 -   **manure_feedlot_outlet_shapefile** - The feedlot outlet shapefile.
@@ -179,8 +171,8 @@ The settings for watershed delineation.
 The settings for marginal crop land charactorization. **Not used**.
 
 -   **non_agriculture_landuse_ids** - The landuse ids that are not agriculture.
--   **buffer_size_m** - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.
--   **slope_threshold_percentage** - The threshold contribution area of riparian wetland in ha.
+-   **buffer_size_m** - The buffer size from the landuse with a default value of 100m
+-   **slope_threshold_percentage** - The threshold slope percentage of marginal crop land with default value of 7%
 
 ## pasture_land
 

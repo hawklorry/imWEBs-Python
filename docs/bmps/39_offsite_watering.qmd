@@ -1,0 +1,9 @@
+# 39. Offsite Watering
+
+## Location
+
+The location offsite watering is defined in **non_structure_bmp** section using **offsite_watering_shapefile**. The shapefile must be a point type. This BMP must be used when grazing management is used. One example is given below.
+
+*\[non_structure_bmp\]*
+
+*offsite_watering_shapefile = offsite_watering.shp*
