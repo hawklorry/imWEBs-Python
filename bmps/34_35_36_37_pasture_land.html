@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>model_config – imWEBs</title>
+<title>pasture_land – imWEBs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/scenario_config.html" rel="next">
-<link href="../index.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -117,7 +115,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/model_config.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/model_config.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Model Configuration File</span></a>
   </div>
 </li>
@@ -230,323 +228,16 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#model-configuration-file" id="toc-model-configuration-file" class="nav-link active" data-scroll-target="#model-configuration-file">Model Configuration File</a>
-  <ul class="collapse">
-  <li><a href="#default" id="toc-default" class="nav-link" data-scroll-target="#default">default</a></li>
-  <li><a href="#watershed" id="toc-watershed" class="nav-link" data-scroll-target="#watershed">watershed</a></li>
-  <li><a href="#lookup" id="toc-lookup" class="nav-link" data-scroll-target="#lookup">lookup</a></li>
-  <li><a href="#database" id="toc-database" class="nav-link" data-scroll-target="#database">database</a></li>
-  <li><a href="#reach_bmp" id="toc-reach_bmp" class="nav-link" data-scroll-target="#reach_bmp">reach_bmp</a></li>
-  <li><a href="#structure_bmp" id="toc-structure_bmp" class="nav-link" data-scroll-target="#structure_bmp">structure_bmp</a></li>
-  <li><a href="#non_structure_bmp" id="toc-non_structure_bmp" class="nav-link" data-scroll-target="#non_structure_bmp">non_structure_bmp</a>
-  <ul class="collapse">
-  <li><a href="#attributes-1" id="toc-attributes-1" class="nav-link" data-scroll-target="#attributes-1">Attributes</a></li>
-  </ul></li>
-  <li><a href="#reservoir" id="toc-reservoir" class="nav-link" data-scroll-target="#reservoir">reservoir</a></li>
-  <li><a href="#delineation" id="toc-delineation" class="nav-link" data-scroll-target="#delineation">delineation</a></li>
-  <li><a href="#marginal_crop_land" id="toc-marginal_crop_land" class="nav-link" data-scroll-target="#marginal_crop_land">marginal_crop_land</a></li>
-  <li><a href="#pasture_land" id="toc-pasture_land" class="nav-link" data-scroll-target="#pasture_land">pasture_land</a></li>
-  <li><a href="#crop_rotation" id="toc-crop_rotation" class="nav-link" data-scroll-target="#crop_rotation">crop_rotation</a></li>
-  <li><a href="#model" id="toc-model" class="nav-link" data-scroll-target="#model">model</a></li>
-  </ul></li>
-  </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/user-guide/model_config.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="model_config.ipynb" download="model_config.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
-    </div>
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="34_35_36_37_pasture_land.ipynb" download="34_35_36_37_pasture_land.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
 
-<section id="model-configuration-file" class="level1">
-<h1>Model Configuration File</h1>
-<p>Model configure file is a Microsoft Windows INI file used to specify the file source for watershed delineation, bmps and crop rotations. The sections and configures are list below.</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Coordination System
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>All the shapefiles and geotiff files must have the same coordination system.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Raster Format
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>All raster files must be in GeoTIFF format and have the same resolution and covers same area.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Shapefile ID
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>All shapefiles must have an id column and have unique values. It’s not case-sensitive so it could id or ID.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Empty Files
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If a file is not applicable to the watershed, just leave it empty.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Section and Variable Name
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Don’t change the section and variable name.</p>
-</div>
-</div>
-<section id="default" class="level2">
-<h2 class="anchored" data-anchor-id="default">default</h2>
-<ul>
-<li><strong>input_folder</strong> - The folder location where all the input files will be read from. All the input files will be in the same folder.</li>
-</ul>
-</section>
-<section id="watershed" class="level2">
-<h2 class="anchored" data-anchor-id="watershed">watershed</h2>
-<p>watershed section contains the basic spatial files for the watershed.</p>
-<ul>
-<li><strong>dem_raster</strong> - The dem raster file.</li>
-<li><strong>soil_raster</strong> - The soil raster file.</li>
-<li><strong>landuse_raster</strong> - The landuse raster file.</li>
-<li><strong>stream_shapefile</strong> - The stream shapefile to burn stream.</li>
-<li><strong>boundary_shapefile</strong> - The boundary shapefile to limit the watershed boundary.</li>
-<li><strong>farm_shapefile</strong> - The farm shapefile.</li>
-<li><strong>field_shapefile</strong> - The filed shapefile.</li>
-<li><strong>outlet_shapefile</strong> - The output shapefile.</li>
-</ul>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Mandatory Files
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>dem, soil, landuse, stream, field</p>
-</div>
-</div>
-</section>
-<section id="lookup" class="level2">
-<h2 class="anchored" data-anchor-id="lookup">lookup</h2>
-<p>Lookup files are csv files that project ids to imWEBs internal ids. The first row is header and the two ids columns are in the first and second column.</p>
-<ul>
-<li><strong>soil_lookup</strong> - soil lookup csv file to convert the soil id in soil raster to imWEBs soil id.</li>
-<li><strong>landuse_lookup</strong> - landse lookup csv file to convert the landuse id in landuse raster to imWEBs landuse id.</li>
-</ul>
-</section>
-<section id="database" class="level2">
-<h2 class="anchored" data-anchor-id="database">database</h2>
-<ul>
-<li><strong>hydroclimate</strong> - The hydroclimate sqlite database.</li>
-</ul>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Hydroclimate Database Format
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Only the latest hydroclimate database format is supports. The new format has a STATIONS table and one table each climate data type. If the database is not in this format, use the static method: <em>imWEBs.database.hydroclimate.HydroClimateDatabase.migrate</em>. The input is the file path to the database. The database will be modified directly so backup the old database before running this utility.</p>
-</div>
-</div>
-</section>
-<section id="reach_bmp" class="level2">
-<h2 class="anchored" data-anchor-id="reach_bmp">reach_bmp</h2>
-<p>This section defines the location and attributes of reach BMPs including point source, flow diversion, reservoir, wetland, manure catch basin, grass waterway, access management and water use.</p>
-<ul>
-<li><strong>point_source_shapefile</strong> - The point source point shapefile.</li>
-<li><strong>flow_diversion_shapefile</strong> - The flow diversion point shapefile.</li>
-<li><strong>reservoir_shapefile</strong> - The reservoir point shapefile.</li>
-<li><strong>wetland_boundary_shapefile</strong> - The wetland boundary polygon shapefile.</li>
-<li><strong>wetland_outlet_shapefile</strong> - The optional wetland outlet point shapefile which is not used in most of the time.</li>
-<li><strong>manure_catch_basin_shapefile</strong> - The manure catch basin point shapefile.</li>
-<li><strong>grass_waterway_shapefile</strong> - The grass waterway shapefile.</li>
-<li><strong>access_management_shapefile</strong> - The access management shapefile</li>
-<li><strong>water_use_shapefile</strong> - The water use shapefile.</li>
-</ul>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Attributes
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The attributes of each reach BMP are read from the shapefiles. Depending one the BMP type, the required attributes are different. The system will check these columns and error will happen if the columns are missing.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Known Bug in Copying REAL Attribute Values
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The underline library whitebox-workflow has issues coping REAL attribute values. This will be fixed soon in later versions.</p>
-</div>
-</div>
-<ul>
-<li>reservoir
-<ul>
-<li>id - The reservoir id</li>
-<li><strong>op</strong> - operation date in yyyy-mm-dd format</li>
-<li><strong>sa_em</strong> - Emergency surface area</li>
-<li><strong>v_em</strong> - Emergency volume</li>
-<li><strong>sa_pr</strong> - Principal surface area</li>
-<li><strong>v_pr</strong> - Principal volume</li>
-<li><strong>file</strong> - The external file name used for rating curve or outflow time series. File extension is not included.</li>
-</ul></li>
-<li>Manure Catch basin
-<ul>
-<li><strong>id</strong> - The catch basin id</li>
-</ul></li>
-</ul>
-</section>
-<section id="structure_bmp" class="level2">
-<h2 class="anchored" data-anchor-id="structure_bmp">structure_bmp</h2>
-<p>This section defines the location and attributes of structure bmps.</p>
-<ul>
-<li><strong>dugout_boundary_shapefile</strong> - The dugout shapefile.</li>
-<li><strong>riparian_buffer_shapefile</strong> - The riparian buffer shapefile.</li>
-<li><strong>filter_strip_shapefile</strong> - The filter strip shapefile.</li>
-<li><strong>tile_drain_boundary_shapefile</strong> - The tile drain shapefile.</li>
-<li><strong>tile_drain_outlet_shapefile</strong> - The tile drain outlet shapefile.</li>
-<li><strong>wascob_shapefile</strong> - The WSCOB shapefile.</li>
-</ul>
-</section>
-<section id="non_structure_bmp" class="level2">
-<h2 class="anchored" data-anchor-id="non_structure_bmp">non_structure_bmp</h2>
-<p>This section defines the location and attributes of structure bmps.</p>
-<ul>
-<li><strong>manure_feedlot_boundary_shapefile</strong> - The feedlot boundary shapefile.</li>
-<li><strong>manure_feedlot_outlet_shapefile</strong> - The feedlot outlet shapefile.</li>
-<li><strong>manure_storage_boundary_shapefile</strong> - The manure storage boundary shapefile.</li>
-<li><strong>offsite_watering_shapefile</strong> - The offsite watering shapefile.</li>
-</ul>
-<section id="attributes-1" class="level3">
-<h3 class="anchored" data-anchor-id="attributes-1">Attributes</h3>
-<ul>
-<li><p>feedlot</p>
-<ul>
-<li><strong>id</strong> - The feedlot id</li>
-<li><strong>cb</strong> - The catch basin id which must exist in the catch basin shapefile</li>
-<li><strong>ani_id</strong> - The animal id in the livestock parameter table</li>
-<li><strong>adult</strong> - Number of the adult animals</li>
-<li><strong>nonadult</strong> - Number of non-adult animals</li>
-<li><strong>stoid</strong> - The manure storage ids separated with comma</li>
-<li><strong>storatio</strong> - The ratio to each manure storage specified in stodi separated with comma. The total ratio should be 1.</li>
-</ul></li>
-<li><p>Feedlot outlet</p>
-<ul>
-<li><strong>id</strong> - The outlet id should be the same as the corresponding feedlot</li>
-</ul></li>
-<li><p>Manure Storage</p>
-<ul>
-<li><strong>id</strong> - The manure storage id</li>
-<li><strong>feedlot</strong> - The contributing feedlot id</li>
-</ul></li>
-</ul>
-</section>
-</section>
-<section id="reservoir" class="level2">
-<h2 class="anchored" data-anchor-id="reservoir">reservoir</h2>
-<p>This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database.</p>
-<ul>
-<li><strong>reservoir_flow_routing</strong> - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.</li>
-<li><strong>reservoir_flow_data_folder</strong> - The folder where the external flow data is saved.</li>
-</ul>
-</section>
-<section id="delineation" class="level2">
-<h2 class="anchored" data-anchor-id="delineation">delineation</h2>
-<p>The settings for watershed delineation.</p>
-<ul>
-<li><strong>stream_threshold_area_ha</strong> - The threshold area for stream delineation in ha.</li>
-<li><strong>wetland_min_area_ha</strong> - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.</li>
-<li><strong>wetland_riparian_contribution_area_ha</strong> - The threshold contribution area of riparian wetland in ha. <strong>Not used</strong>.</li>
-<li><strong>wetland_stream_buffer_distance_m</strong> - The wetland stream buffer distance in m. <strong>Not used</strong>.</li>
-</ul>
-</section>
-<section id="marginal_crop_land" class="level2">
-<h2 class="anchored" data-anchor-id="marginal_crop_land">marginal_crop_land</h2>
-<p>The settings for marginal crop land charactorization. <strong>Not used</strong>.</p>
-<ul>
-<li><strong>non_agriculture_landuse_ids</strong> - The landuse ids that are not agriculture.</li>
-<li><strong>buffer_size_m</strong> - The buffer size from the landuse with a default value of 100m</li>
-<li><strong>slope_threshold_percentage</strong> - The threshold slope percentage of marginal crop land with default value of 7%</li>
-</ul>
-</section>
-<section id="pasture_land" class="level2">
-<h2 class="anchored" data-anchor-id="pasture_land">pasture_land</h2>
-<p>The settings for pasture land. <strong>Not used</strong>.</p>
-<ul>
-<li><strong>non_agriculture_landuse_ids</strong> - The landuse ids that are charactoraized as pasture</li>
-</ul>
-</section>
-<section id="crop_rotation" class="level2">
-<h2 class="anchored" data-anchor-id="crop_rotation">crop_rotation</h2>
-<p>The settings for crop rotation generation. It automatically generate the management tables for crop, fertilizer, tillage and grazing.</p>
-<ul>
-<li><strong>method</strong> - The method to create the crop rotation. Only crop_inventory is supported now which use the AAFC crop inventory raster to create the crop rotation.</li>
-<li><strong>AAFC_crop_inventory_folder</strong> - The folder where AAFC crop rotation rasters are saved preferrablely cliped to the waterhsed and have same coordination system as other raster file. The tif files should be named with the year, e.g.&nbsp;1991.tif.</li>
-<li><strong>first_year</strong> - The first year to start the crop rotation</li>
-<li><strong>last_year</strong> - The year to end the crop rotation</li>
-</ul>
-</section>
-<section id="model" class="level2">
-<h2 class="anchored" data-anchor-id="model">model</h2>
-<p>The settings for model</p>
-<ul>
-<li><strong>model_folder</strong> - The folder where the model files will be created.</li>
-</ul>
 
 
-</section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -969,18 +660,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../index.html" class="pagination-link" aria-label="User Guide">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">User Guide</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../user-guide/scenario_config.html" class="pagination-link" aria-label="Scenario Configuration File">
-        <span class="nav-page-text">Scenario Configuration File</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -989,7 +668,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2025 University of Guelph</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/user-guide/model_config.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/34_35_36_37_pasture_land.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
