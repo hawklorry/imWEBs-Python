@@ -361,7 +361,7 @@
     "href": "bmps/06_grassed_waterway.html",
     "title": "06 Grassed Waterway",
     "section": "",
-    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp\n\n\n\n\nOperation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.",
+    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
     "crumbs": [
       "BMPs",
       "06 Grassed Waterway"
@@ -373,17 +373,6 @@
     "title": "06 Grassed Waterway",
     "section": "",
     "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
-    "crumbs": [
-      "BMPs",
-      "06 Grassed Waterway"
-    ]
-  },
-  {
-    "objectID": "bmps/06_grassed_waterway.html#attributes",
-    "href": "bmps/06_grassed_waterway.html#attributes",
-    "title": "06 Grassed Waterway",
-    "section": "",
-    "text": "Operation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.",
     "crumbs": [
       "BMPs",
       "06 Grassed Waterway"
