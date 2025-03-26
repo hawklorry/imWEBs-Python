@@ -1,0 +1,8 @@
+OrigLU,IMWEBs ID,IMWEBs Code,IMWEBs Description
+1,1,AGRL,Agricultural Land-Generic
+6,6,FRST,Forest-Mixed
+15,15,RNGE,Range-Grasses
+98,98,BARE,Bare Soil
+104,104,URLD,Residential-Low Density
+106,106,UIDU,Industrial
+107,107,UTRN,Transportation
