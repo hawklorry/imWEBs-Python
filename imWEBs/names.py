@@ -45,6 +45,9 @@ class Names:
     bmp_table_name_manure_feed_lot_management = "non_structure_bmp_manure_feed_lot_management"
     bmp_table_name_wintering_site_parameter = "non_structure_bmp_wintering_site_parameter"
     bmp_table_name_wintering_site_management = "non_structure_bmp_wintering_site_management"
+    bmp_table_name_marginal_crop_management = "non_structure_bmp_marginal_crop_management"
+    bmp_table_name_marginal_fertilizer_management = "non_structure_bmp_marginal_fertilizer_management"
+    bmp_table_name_marginal_tillage_management = "non_structure_bmp_marginal_tillage_management"    
     bmp_table_name_pasture_crop_management = "non_structure_bmp_pasture_crop_management"
     bmp_table_name_pasture_fertilizer_management = "non_structure_bmp_pasture_fertilizer_management"
     bmp_table_name_pasture_tillage_management = "non_structure_bmp_pasture_tillage_management"    
@@ -245,7 +248,7 @@ class Names:
 
     # Landuse
     landuseName = "landuse" + raster_extension
-    landuseMappedName = "landuseMapped" + raster_extension
+    landuseMappedOriginalName = "landuseMappedOriginal" + raster_extension
 
     # Farm
     farmShpName = "farm" + shapefile_extension
@@ -255,6 +258,7 @@ class Names:
     # Field
     fieldShpName = "field" + shapefile_extension
     fieldRasName = fieldShpName.replace(shapefile_extension, raster_extension)
+    fieldOriginalRasName = "fieldOriginal" + raster_extension
     fieldClippedShpName = "fieldClipped" + shapefile_extension
     fiedWithOnlyAgricultureRasName = "fiedWithOnlyAgriCulture" + raster_extension
 
@@ -419,8 +423,8 @@ class Names:
     winteringSiteRasterName = winteringSiteShpName.replace(shapefile_extension,raster_extension)
 
     #Pasture
-    pastureLandRasName = "PasCropland" + raster_extension
-    # pastureLandShpName = "PasCropland" + shapefile_extension
+    pastureCropLandRasName = "PastureCropland" + raster_extension
+    pastureCropLandShpName = "PastureCropland" + shapefile_extension
     # pastureLandH5RasterName = "PasCropland_H5" + raster_extension
 
     #Pasture grazing
@@ -460,9 +464,9 @@ class Names:
     # grazingOffsiteWateringRasterName = "GrazingOffsiteWatering" + raster_extension
 
     #Marginal Crop Land
-    marCroplandRasName = "MarCropland" + raster_extension
-    # marCroplandShpName = "MarCropland" + shapefile_extension
-    # marCroplandH5RasterName = "MarCropland_H5" + raster_extension
+    marginalCroplandShpName = "marginal_crop_land" + shapefile_extension
+    marginalCroplandOriginalFieldRasName = "marginal_crop_land_original_field" + raster_extension
+    marginalCroplandSeparatedFieldRasName = "marginal_crop_land_separated_field" + raster_extension
 
     #standard names
     config_item_standard_name_lookup = {
@@ -506,7 +510,11 @@ class Names:
         "manure_feedlot_boundary_shapefile": feedlotShpName,
         "manure_feedlot_outlet_shapefile": feedlotOutletShpName,
         "manure_storage_boundary_shapefile": manureStorageShpName,
-        "offsite_watering_shapefile": offsiteWinteringShpName
+        "offsite_watering_shapefile": offsiteWinteringShpName,
+
+        #margnial and pasture crop land
+        "marginal_crop_land_shapefile": marginalCroplandShpName,
+        "pasture_crop_land_shapefile": pastureCropLandShpName
     }
 
     @staticmethod

@@ -193,6 +193,18 @@ class Inputs(FolderBase):
 
 #endregion
 
+#region Marginal & Pasture crop land
+
+    @property
+    def marginal_crop_land_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("marginal_crop_land_shapefile"))
+    
+    @property
+    def pasture_crop_land_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("pasture_crop_land_shapefile"))
+
+#endregion
+
     @property
     def bmp_types(self):
         bmps = []

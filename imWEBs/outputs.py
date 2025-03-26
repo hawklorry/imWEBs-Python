@@ -18,6 +18,7 @@ from .iuh import IUH
 from .database.bmp.subarea import SubArea
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
+import geopandas as gpd
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,10 +30,7 @@ class Outputs(FolderBase):
     def __init__(self, 
                  output_folder:str, 
                  input_folder:str,
-                 database_folder:str, 
-                 stream_threshold_area_ha:float = 10,   #stream thrshold area
-                 wetland_min_area_ha:float = 0.1,       #min wetland area
-                 design_storm_return_period = 2         #design storm return period for reach width and depth
+                 database_folder:str 
                  ) -> None:
         super().__init__(output_folder)
         
@@ -40,15 +38,24 @@ class Outputs(FolderBase):
         self.__hydroclimate_database = HydroClimateDatabase(os.path.join(self.database_folder,Names.hydroclimateDatabasename))
         self.inputs = Inputs(input_folder, self.__hydroclimate_database)       
 
-        self.stream_threshold_area_ha = stream_threshold_area_ha
-        self.main_stream_threshold_area_ha = 200            #threshold for main stream in ha
-        self.design_storm_return_period = design_storm_return_period
 
-        self.wetland_min_area_ha = wetland_min_area_ha
         self.__structures = None
         self.__structure_combined = None
         self.__parameters = None
 
+        #delineation parameters
+        self.stream_threshold_area_ha = 10
+        self.main_stream_threshold_area_ha = 200            #threshold for main stream in ha
+        self.design_storm_return_period = 2
+        self.wetland_min_area_ha = 0.1
+
+        #margnial crop land parameters
+        self.marginal_crop_land_simulation = False
+        self.marginal_crop_land_non_agriculture_landuse_ids = None
+        self.marginal_crop_land_buffer_size_m = 100
+        self.marginal_crop_land_slope_threshold_percentage = 7
+        self.marginal_crop_land_grass_type = 36
+ 
     @property
     def number_of_valid_cell(self)->int:
         return RasterExtension.get_number_of_valid_cell(self.mask_refined_with_subbasin_raster)
@@ -388,38 +395,50 @@ class Outputs(FolderBase):
 
     #     return raster
 
+    @property 
+    def field_original_raster(self)->Raster:
+        raster = self.get_raster(Names.fieldOriginalRasName)
     
+        if raster is None:
+            if self.inputs.field_vector is not None:
+                raster = VectorExtension.vector_to_raster(self.inputs.field_vector, self.dem_clipped_raster)
+                raster = self.save_raster(raster, Names.fieldOriginalRasName, True, True)
+
+        return raster      
+
     @property
     def field_raster(self)->Raster:
         raster = self.get_raster(Names.fieldRasName)
     
         if raster is None:
-            if self.inputs.field_vector is not None:
-                exist, id_field_name = VectorExtension.check_id(self.inputs.field_vector)
-                if not exist:
-                    raise ValueError(f"Couldn't find ID column in {self.inputs.field_vector.file_name} ...")
-                raster = self.wbe.vector_polygons_to_raster(
-                    input = self.inputs.field_vector, 
-                    field_name = id_field_name,
-                    base_raster = self.inputs.dem_raster)
-                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
+            if self.field_original_raster is not None:
+                raster = self.field_original_raster
+                #separate marginal crop lands as separate fields to make sure these two areas are separeted in subarea
+                if self.marginal_crop_land_orginal_field_raster is not None:
+                    max_field_id = int(RasterExtension.get_max_value(raster))
+
+                    max = int(math.pow(10, int(math.log10(max_field_id)) + 2))
+                    raster = self.marginal_crop_land_orginal_field_raster.con(
+                        f"value == {self.marginal_crop_land_orginal_field_raster.configs.nodata}", 
+                        raster, 
+                        self.marginal_crop_land_orginal_field_raster + max)
+                    
+                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, self.field_original_raster)
                 raster = self.save_raster(raster, Names.fieldRasName, True, True)
 
         return raster
     
-    @property
-    def field_clipped_vector(self)->Vector:
-        """Clipped field vector by subbasin"""
-        vector = self.get_vector(Names.fieldClippedShpName)
+    # @property
+    # def field_clipped_vector(self)->Vector:
+    #     """Clipped field vector by subbasin"""
+    #     vector = self.get_vector(Names.fieldClippedShpName)
 
-        if vector is None:
-            if self.field_raster is not None:
-                vector = RasterExtension.raster_to_vector(self.field_raster)
-                self.save_vector(vector, Names.fieldClippedShpName)
+    #     if vector is None:
+    #         if self.field_raster is not None:
+    #             vector = RasterExtension.raster_to_vector(self.field_raster)
+    #             self.save_vector(vector, Names.fieldClippedShpName)
 
-        return vector
-
-        
+    #     return vector        
     
     # @property
     # def field_without_agriculture_raster(self)->Raster:
@@ -433,6 +452,98 @@ class Outputs(FolderBase):
     #     return raster
 
 #endregion    
+
+
+#region Marginal Crop Land
+
+    @property
+    def marginal_crop_land_separated_field_raster(self):
+        """Marginal crop land raster with new field id after marginal crop land is re-ided."""
+        raster = self.get_raster(Names.marginalCroplandSeparatedFieldRasName)
+
+        if raster is None and self.marginal_crop_land_orginal_field_raster is not None:
+            raster = self.marginal_crop_land_orginal_field_raster.con(
+                "value > 0", 
+                self.field_raster, 
+                self.marginal_crop_land_orginal_field_raster.configs.nodata)
+            
+            #remove the areas outside subbasin
+            raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
+            
+            #save
+            raster = self.save_raster(raster, Names.marginalCroplandSeparatedFieldRasName, True, True)
+
+        return raster
+
+    @property
+    def marginal_crop_land_orginal_field_raster(self):
+        """
+        Marginal crop land raster with new original field id.
+
+        generate marginal crop land where the landuse is in the given list, with a given buffer and with slope larger than slope threshold
+
+        replace MarginalCropland
+        """
+        raster = self.get_raster(Names.marginalCroplandOriginalFieldRasName) 
+    
+        if raster is None:
+            if self.marginal_crop_land_simulation:
+                if self.inputs.marginal_crop_land_vector is not None:
+                    raster = VectorExtension.vector_to_raster(self.inputs.marginal_crop_land_vector, self.dem_clipped_raster)
+                else:
+                    logger.info("Creating marginal crop land ...")
+                    landuse_ids = self.marginal_crop_land_non_agriculture_landuse_ids
+                    if landuse_ids is None:
+                        #we will use all the non-agricultral landuse ids
+                        landuse_ids = self.parameter.parameter_database.non_agricultural_landuse_ids
+
+                    #remove the landuses that are not included in the landuse distribution
+                    watershed_landuse_ids = RasterExtension.get_unique_values(self.mapped_landuse_original_raster)
+
+                    #get non-crop landuses that are included in the watershed
+                    non_crop_landuse_ids = [lu for lu in landuse_ids if lu in watershed_landuse_ids]
+
+                    #there is no location f or marginal crop lands
+                    if len(non_crop_landuse_ids) == 0:
+                        logger.info("Couldn't find non-agricultral landuses for marginal crop lands.")
+                    else:                          
+                        #find the locations having the marginal crop landuse ids
+                        non_crop_land_raster = RasterExtension.filter_by_values(self.mapped_landuse_original_raster, non_crop_landuse_ids)
+                        non_crop_land_vector = RasterExtension.raster_to_vector(non_crop_land_raster, use_fid = True)
+                        self.save_raster(non_crop_land_raster, "marginal_non_crop_land.tif", True, True)
+                        self.save_vector(non_crop_land_vector, "marginal_non_crop_land.shp", True, True)
+
+                        #do a buffer
+                        shapefile = gpd.read_file(os.path.join(self.folder, "marginal_non_crop_land.shp"))
+                        buffered_shapefile = shapefile.geometry.buffer(self.marginal_crop_land_buffer_size_m)
+                        shapefile["geometry"] = buffered_shapefile
+                        shapefile.to_file(os.path.join(self.folder, "marginal_non_crop_land_buffer.shp"))
+
+                        non_crop_land_buffer_vector = self.get_vector("marginal_non_crop_land_buffer.shp")
+                        non_crop_land_buffer_raster = VectorExtension.vector_to_raster(non_crop_land_buffer_vector, self.dem_clipped_raster)
+                        self.save_raster(non_crop_land_buffer_raster, "marginal_non_crop_land_buffer.tif", True, True)
+
+                        #find areas in crop land but in the buffer of the non-crop land
+                        no_data = non_crop_land_raster.configs.nodata
+                        raster = self.inputs.create_new_raster()
+                        for row in range(non_crop_land_raster.configs.rows):
+                            for col in range(non_crop_land_raster.configs.columns):
+                                #in the buffer, crop land and larger than slope threshold
+                                if non_crop_land_buffer_raster[row, col] > 0 and non_crop_land_raster[row, col] == no_data and self.slope_percent_raster > self.marginal_crop_land_slope_threshold_percentage:
+                                    raster[row, col] = 1
+                        
+                        self.save_raster(raster, "marginal_without_field_id.tif", True, True)
+                #save
+                if raster is not None:
+                    #assign original field id
+                    raster = raster.con("value > 0", self.field_original_raster, self.field_original_raster.configs.nodata)
+
+                    #save
+                    raster = self.save_raster(raster, Names.marginalCroplandOriginalFieldRasName, True, True)
+                    
+        return raster 
+    
+#endregion
 
 #region parameters
 
@@ -460,10 +571,24 @@ class Outputs(FolderBase):
 
     @property
     def landuse_rootdepth_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_landuse_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+        return RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
 
     @property
-    def mapped_landuse_raster(self)->Raster:
+    def mapped_landuse_original_raster(self)->Raster:
+        """
+        mapped landuse raster based on lookup table. 
+        The name must be landuse as specified in the engine
+        """
+        raster = self.get_raster(Names.landuseMappedOriginalName)
+
+        if raster is None:
+            raster = self.inputs.lookup_landuse.mapped_raster
+            raster = self.save_raster(raster, Names.landuseMappedOriginalName, True, True)
+
+        return raster
+
+    @property
+    def mapped_landuse_final_raster(self)->Raster:
         """
         mapped landuse raster based on lookup table. 
         The name must be landuse as specified in the engine
@@ -471,7 +596,18 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.landuseName)
 
         if raster is None:
-            raster = self.inputs.lookup_landuse.mapped_raster
+            raster = self.mapped_landuse_original_raster
+            
+            #use the specified grass type for marginal crop land
+            if self.marginal_crop_land_orginal_field_raster is not None:
+                raster = self.inputs.create_new_raster()
+                for row in range(self.marginal_crop_land_orginal_field_raster.configs.rows):
+                    for col in range(self.marginal_crop_land_orginal_field_raster.configs.columns):
+                        if self.marginal_crop_land_orginal_field_raster[row, col] > 0:
+                            raster[row, col] = self.marginal_crop_land_grass_type
+                        else:
+                            raster[row, col] = self.mapped_landuse_original_raster[row, col]
+            
             raster = self.save_raster(raster, Names.landuseName, True, True)
 
         return raster
@@ -508,7 +644,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.manningName)
         if raster is None:
-            raster = RasterExtension.reclassify(self.mapped_landuse_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster)
+            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster)
             raster = self.save_raster(raster, Names.manningName, True, True)
 
         return raster
@@ -578,7 +714,7 @@ class Outputs(FolderBase):
         if raster is None:
             slope_raster = self.slope_degree_raster
             soil_raster = self.mapped_soil_raster
-            landuse_raster = self.mapped_landuse_raster
+            landuse_raster = self.mapped_landuse_final_raster
             flow_dir_raster = self.flow_direction_raster
             reach_raster = self.reach_raster
             reach_width_raster = self.reach_width_raster
@@ -628,7 +764,7 @@ class Outputs(FolderBase):
         if raster is None:
             slope_raster = self.slope_degree_raster
             soil_raster = self.mapped_soil_raster
-            landuse_raster = self.mapped_landuse_raster
+            landuse_raster = self.mapped_landuse_final_raster
             flow_dir_raster = self.flow_direction_raster
             reach_raster = self.reach_raster
             reach_width_raster = self.reach_width_raster
@@ -678,7 +814,7 @@ class Outputs(FolderBase):
         if raster is None:
             slope_raster = self.slope_degree_raster
             soil_raster = self.mapped_soil_raster
-            landuse_raster = self.mapped_landuse_raster
+            landuse_raster = self.mapped_landuse_final_raster
             flow_dir_raster = self.flow_direction_raster
             reach_raster = self.reach_raster
             reach_width_raster = self.reach_width_raster
@@ -1183,30 +1319,6 @@ class Outputs(FolderBase):
 #endregion
 
 #region bmps
-
-    @property
-    def marginal_crop_land_raster(self):
-        """
-        generate marginal crop land
-
-        replace MarginalCropland
-        """
-        raster = self.get_raster(Names.marCroplandRasName)  
-
-        if raster is None and self.marginal_crop_land_landuse_ids is not None and len(self.marginal_crop_land_landuse_ids) > 0:
-            filtered_landuse_raster = RasterExtension.filter_by_values(self.mapped_landuse_raster, self.marginal_crop_land_landuse_ids)
-            buffered_landuser_raster = self.wbe.buffer_raster(input = filtered_landuse_raster, buffer_size = self.marginal_crop_land_buffer_size_m) #need test
-
-            slope_threshod_deg = max(math.atan(self.marginal_crop_land_slope_threshod / 100) * 180.0 / math.pi, 0.0)
-            
-            raster = self.field_without_agriculture_raster.deep_copy()
-            raster = buffered_landuser_raster.con("value > 0", raster, raster.configs.nodata)
-            raster = self.slope_degree_raster.con(f"value >= {slope_threshod_deg}", raster, raster.configs.nodata)    
-            raster = self.mask_refined_with_subbasin_raster.con(f"value > 0", raster, raster.configs.nodata)
-
-            raster = self.save_raster(raster, Names.marCroplandRasName, True, True)
-                    
-        return raster
     
     @property
     def pasture_land_raster(self):
@@ -1218,7 +1330,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.pastureLandRasName)  
 
         if raster is None and self.pasture_land_landuse_ids is not None and len(self.pasture_land_landuse_ids) > 0:
-            filtered_landuse_raster = RasterExtension.filter_by_values(self.mapped_landuse_raster, self.pasture_land_landuse_ids)
+            filtered_landuse_raster = RasterExtension.filter_by_values(self.mapped_landuse_original_raster, self.pasture_land_landuse_ids)
             
             raster = self.field_without_agriculture_raster.deep_copy()
             raster = filtered_landuse_raster.con("value > 0", raster, raster.configs.nodata)
@@ -1658,8 +1770,44 @@ class Outputs(FolderBase):
                 self.save_raster(raster, Names.offsiteWinteringRasName)
         return raster
 
-    def delineate_watershed(self):
-        """watershed delineation which basically delineate stream and subbasins"""
+    def delineate_watershed(self,
+                            stream_threshold_area_ha:float = 10,   #stream thrshold area
+                            wetland_min_area_ha:float = 0.1,       #min wetland area
+                            design_storm_return_period = 2,        #design storm return period for reach width and depth
+                            marginal_crop_land_simulation = False,
+                            marginal_crop_land_non_agriculture_landuse_ids = None,
+                            marginal_crop_land_buffer_size_m = 100,
+                            marginal_crop_land_slope_threshold_percentage = 7,
+                            marginal_crop_land_grass_type = 36):
+        """
+        watershed delineation which basically delineate stream and subbasins
+        """
+        
+        #read in delineation parameters
+        self.stream_threshold_area_ha = stream_threshold_area_ha
+        self.wetland_min_area_ha = wetland_min_area_ha
+        self.design_storm_return_period = design_storm_return_period
+        self.marginal_crop_land_buffer_size_m = marginal_crop_land_buffer_size_m
+        self.marginal_crop_land_non_agriculture_landuse_ids = marginal_crop_land_non_agriculture_landuse_ids
+        self.marginal_crop_land_simulation = marginal_crop_land_simulation
+        self.marginal_crop_land_slope_threshold_percentage = marginal_crop_land_slope_threshold_percentage
+        self.marginal_crop_land_grass_type = marginal_crop_land_grass_type
+
+        #ouput for varification
+        logger.info("--- Watershed Delineation Parameters --- ")
+        logger.info(f"Threshold area of stream: {self.stream_threshold_area_ha} ha")
+        logger.info(f"Minimum wetland area: {self.wetland_min_area_ha} ha")
+        logger.info(f"Design storm return period: {self.design_storm_return_period} year")
+        logger.info(f"Marginal crop land BMP: {self.marginal_crop_land_simulation}")
+        logger.info(f"  Grass Type: {self.marginal_crop_land_grass_type}")
+        if self.marginal_crop_land_simulation and self.inputs.marginal_crop_land_vector is None:
+            logger.info("  Marginal crop land generation")
+            logger.info(f"      - Landuse ids: {self.marginal_crop_land_non_agriculture_landuse_ids}")
+            logger.info(f"      - Buffer distance: {self.marginal_crop_land_buffer_size_m} m")
+            logger.info(f"      - Slope threshold: {self.marginal_crop_land_slope_threshold_percentage} %")
+
+        #delineate
+        marginal_crop_land = self.marginal_crop_land_separated_field_raster
         subbasin = self.subbasin_vector
         dem_for_model = self.dem_clipped_raster_for_model
         reach = self.reach_vector

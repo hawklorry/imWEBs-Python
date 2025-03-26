@@ -23,7 +23,22 @@ class RasterExtension:
                 if raster[row, col] != noddata:
                     if max_value < raster[row, col]:
                         max_value = raster[row, col]
-        return max_value         
+        return max_value  
+
+    @staticmethod
+    def get_unique_values(raster:Raster)->list[int]:
+        """get unique int value in a raster"""
+        rows = raster.configs.rows
+        cols = raster.configs.columns
+        noddata = raster.configs.nodata
+        values = []
+        for row in range(rows):
+            for col in range(cols):
+                if raster[row, col] != noddata:
+                    value = int(raster[row, col])
+                    if value not in values:
+                        values.append(value)
+        return values
 
     @staticmethod
     def raster_to_vector(raster:Raster, vector_type:str = "polygon", use_fid = False)->Vector:

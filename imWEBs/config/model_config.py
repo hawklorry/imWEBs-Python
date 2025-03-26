@@ -72,7 +72,7 @@ class ModelConfig(Config):
                         self.model = Model(value)
                         continue
 
-                    if section in ModelConfig.file_sections:
+                    if section in ModelConfig.file_sections or "shapefile" in var:
                         file_path = os.path.join(self.input_folder, value)
                         if os.path.exists(file_path):
                             if "raster" in var:
@@ -87,6 +87,8 @@ class ModelConfig(Config):
                                 lookups[var] = value
                         else:
                             raise ValueError(f"{var} = {value} doesn't exist!")
+                    
+
 
             #check rasters and vectors
             RasterExtension.check_rasters(rasters)
@@ -180,9 +182,13 @@ class ModelConfig(Config):
                         "wetland_riparian_contribution_area_ha",
                         "wetland_stream_buffer_distance_m"],
 
-            "marginal_crop_land":["non_agriculture_landuse_ids","buffer_size_m","slope_threshold_percentage"],
-
-            "pasture_land":["non_agriculture_landuse_ids"],
+            "marginal_crop_land":[
+                "marginal_crop_land_simulation",
+                "marginal_crop_land_shapefile",
+                "marginal_crop_land_non_agriculture_landuse_ids",
+                "marginal_crop_land_buffer_size_m",
+                "marginal_crop_land_slope_threshold_percentage",
+                "marginal_crop_land_grass_type"],
 
             #crop rotation
             "crop_rotation":["method",
@@ -195,9 +201,50 @@ class ModelConfig(Config):
             "model":["model_folder"]
         }
     
+    @property
+    def marginal_crop_land_simulation_property(self)->bool:
+        value = self.get_config_value("marginal_crop_land_simulation", False)
+        
+        if value is None:
+            return False
+        
+        if isinstance(value, str) and (str(value).lower() == "yes" or str(value).lower() == "true"):
+            return True
+        
+        return False
+    
+    @property
+    def marginal_crop_land_non_agriculture_landuse_ids_property(self):
+        value = self.get_config_value("marginal_crop_land_non_agriculture_landuse_ids", optional = True)
+         
+        if isinstance(value, str) and len(value) > 0:
+            return [int(id) for id in value.split(",")]
+        
+        return None
+    
+    @property 
+    def marginal_crop_land_buffer_size_m_property(self)->int:
+        return int(self.get_config_value("marginal_crop_land_buffer_size_m", 100))
+    
+    @property
+    def marginal_crop_land_slope_threshold_percentage_property(self)->int:
+        return int(self.get_config_value("marginal_crop_land_slope_threshold_percentage", 7))
+
+    @property
+    def marginal_crop_land_grass_type_property(self)->int:
+        return int(self.get_config_value("marginal_crop_land_grass_type", 36))
+
     def delineate_watershed(self):
         """watershed delineation""" 
-        self.model.delineate_watershed()
+        self.model.delineate_watershed(
+            stream_threshold_area_ha = float(self.get_config_value("stream_threshold_area_ha", 10)),
+            wetland_min_area_ha = float(self.get_config_value("wetland_min_area_ha", 0.1)),
+            design_storm_return_period = 2,
+            marginal_crop_land_simulation = self.marginal_crop_land_simulation_property,
+            marginal_crop_land_non_agriculture_landuse_ids = self.marginal_crop_land_non_agriculture_landuse_ids_property,
+            marginal_crop_land_buffer_size_m = self.marginal_crop_land_buffer_size_m_property,
+            marginal_crop_land_slope_threshold_percentage = self.marginal_crop_land_slope_threshold_percentage_property,
+            marginal_crop_land_grass_type = self.marginal_crop_land_grass_type_property)
 
     def generate_parameters(self):
         """watershed delineation""" 

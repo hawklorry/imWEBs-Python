@@ -29,6 +29,7 @@ from ...bmp.bmp_structure_wascob import StructureBMPWascob
 from ...bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 from ...bmp.bmp_offsite_wintering import BMPOffsiteWintering
 from ...bmp.crop_rotation.crop_rotation import CropRotation
+from ...bmp.crop_rotation.single_crop import SingleCrop
 from .bmp_01_point_source import PointSource
 from .bmp_02_flow_diversion import FlowDiversion
 from .bmp_03_reservoir import Reservoir
@@ -136,6 +137,9 @@ class BMPDatabase(DatabaseBase):
         self.__create_reach_parameter(outputs)
         self.__create_reach_lookup()
         self.__create_bmp_reach_bmp(outputs, reach_bmps_subbasins)
+
+        #create marginal crop bmps
+        self.__create_bmp_marginal_crop(outputs)
 
         #create bmp_scenarios table
         self.__create_bmp_scenarios(outputs)
@@ -516,6 +520,10 @@ class BMPDatabase(DatabaseBase):
         logger.info("Creating bmp_secenarios table ... ")
 
         bmp_types = outputs.inputs.bmp_types
+        if outputs.marginal_crop_land_separated_field_raster is not None:
+            bmp_types.append(BMPType.BMP_TYPE_CROP_MAR)
+            bmp_types.append(BMPType.BMP_TYPE_FERTILIZER_MAR)
+            bmp_types.append(BMPType.BMP_TYPE_TILLAGE_MAR)
         if include_crop_rotation:
             bmp_types.append(BMPType.BMP_TYPE_CROP)
             bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
@@ -528,18 +536,32 @@ class BMPDatabase(DatabaseBase):
 
 #region Crop Rotation
 
+    def __create_bmp_marginal_crop(self, outputs:Outputs):
+        logger.info("Creating marginal crop bmps ... ")
+
+        crop = SingleCrop(outputs.marginal_crop_land_separated_field_raster, outputs.marginal_crop_land_grass_type)
+
+        logger.info("   Crop Management ... ")
+        self.save_table(Names.bmp_table_name_marginal_crop_management, crop.crop_management_df)
+
+        logger.info("   Fertilizer Management ... ")
+        self.save_table(Names.bmp_table_name_marginal_fertilizer_management, crop.fertilizer_management_df)
+
+        logger.info("   Tillage Management ... ")
+        self.save_table(Names.bmp_table_name_marginal_tillage_management, crop.tillage_management_df)
+
     def update_crop_rotation_AAFC_crop_inventory(self, crop_inventory_folder:str, first_year:int, last_year:int, outputs:Outputs, include_grazing:bool = False):        
         logger.info("Updating crop rotation based on AAFC Crop Inventory ... ")
 
         rotation = CropRotation(outputs.field_clipped_vector, outputs.subbasin_raster,crop_inventory_folder, first_year, last_year)
         
-        logger.info("Crop Management ... ")
+        logger.info("   Crop Management ... ")
         self.save_table(Names.bmp_table_name_crop_management, rotation.crop_management_df)
 
-        logger.info("Fertilizer Management ... ")
+        logger.info("   Fertilizer Management ... ")
         self.save_table(Names.bmp_table_name_fertilizer_management, rotation.fertilizer_management_df)
 
-        logger.info("Tillage Management ... ")
+        logger.info("   Tillage Management ... ")
         self.save_table(Names.bmp_table_name_tillage_management, rotation.tillage_management_df)
 
         if include_grazing:
@@ -659,7 +681,7 @@ class BMPDatabase(DatabaseBase):
 
         #SubAreaLandUseType
         logger.info("Creating SubAreaLandUseType ...")
-        subarea_landuse_df = RasterExtension.get_overlay_area(outputs.subarea_raster, outputs.mapped_landuse_raster, 
+        subarea_landuse_df = RasterExtension.get_overlay_area(outputs.subarea_raster, outputs.mapped_landuse_final_raster, 
                               "SubareaId", "LanduseTypeId", "Area")[["SubareaId", "LanduseTypeId", "Area"]]
         self.save_table(Names.bmp_table_name_subarea_landuse, subarea_landuse_df)     
 

@@ -12,10 +12,13 @@ class Config:
     def config_variables(self)->str:
         return {}
     
-    def get_config_value(self, config_name, default_value = None):
+    def get_config_value(self, config_name, default_value = None, optional = False):
         if not hasattr(self,config_name):
             if default_value is None:
-                raise ValueError(f"{config_name} couldn't be found in the config file.")
+                if optional: 
+                    return None
+                else:
+                    raise ValueError(f"{config_name} couldn't be found in the config file.")
             return default_value
         
         return getattr(self,config_name)

@@ -32,7 +32,7 @@ class ParameterDatabase(DatabaseBase):
         self._lookup_tables = {}
         self._soil_lookup = {}
         self._landuse_lookup = {}
-        self._algricultural_landuses = []
+        self._non_agricultural_landuses = []
 
     def __populate_default_tables(self):
         """populate default parameter tables from csv files"""
@@ -69,10 +69,15 @@ class ParameterDatabase(DatabaseBase):
                 select_stmt = select(LanduseLookup)
                 for row in session.scalars(select_stmt):
                     self._landuse_lookup[row.LANDUSE_ID] = row
-                    if row.is_agricultrual:
-                        self._algricultural_landuses.append(row.LANDUSE_ID)
+                    if not row.is_agricultrual:
+                        self._non_agricultural_landuses.append(row.LANDUSE_ID)
 
         return self._landuse_lookup
+
+    @property
+    def non_agricultural_landuse_ids(self)->dict:
+        landuse = self.landuse_lookup
+        return self._non_agricultural_landuses
 
     def get_parameter_lookup(self, parameter_name, parameter_type):
         """return lookup array to be used in reclass funciton"""
