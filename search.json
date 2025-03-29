@@ -251,7 +251,18 @@
     "href": "bmps/07_vegetation_filter_strip.html",
     "title": "07. Vegetaion Filter Strip",
     "section": "",
-    "text": "07. Vegetaion Filter Strip",
+    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
+    "crumbs": [
+      "BMPs",
+      "07. Vegetaion Filter Strip"
+    ]
+  },
+  {
+    "objectID": "bmps/07_vegetation_filter_strip.html#location",
+    "href": "bmps/07_vegetation_filter_strip.html#location",
+    "title": "07. Vegetaion Filter Strip",
+    "section": "",
+    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
     "crumbs": [
       "BMPs",
       "07. Vegetaion Filter Strip"
