@@ -7,8 +7,3 @@ The location of the grassed waterway is defined in **\[reach_bmp\]** section usi
 *\[reach_bmp\]*
 
 *grass_waterway_shapefile = GWW.shp*
-
-## Attributes
-
--   **Operation** - The operation date in YYYY-MM-DD format
--   **TableName** - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients.

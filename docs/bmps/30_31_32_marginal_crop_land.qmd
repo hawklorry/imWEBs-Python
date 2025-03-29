@@ -24,7 +24,7 @@ The user-defined marginal crop land shapefile could be specified using **margina
 
 If the user doesn't specify the marginal crop land location, the system generates the location using three parameters.
 
--   **marginal_crop_land_non_agriculture_landuse_ids**: the area with specified ids will be used as the base for the marginal crop land. Multiple ids should be separated with comma, e.g. 10, 11, 12.
+-   **marginal_crop_land_non_agriculture_landuse_ids**: the area with specified ids will be used as the base for the marginal crop land. Multiple ids should be separated with comma, e.g. 10, 11, 12. The default value is empty, which means all non-agricultrual landuses will be used. 
 
 -   **marginal_crop_land_buffer_size_m**: a buffer size from the base area with a default value of 100 m.
 

@@ -1,2 +1,9 @@
 # 07. Vegetaion Filter Strip
 
+## Location
+
+Vegetation filter strips are defined using a **polygon** shapefile in **structure_bmp** section. One example is given below.
+
+*\[structure_bmp\]*
+
+*filter_strip_shapefile* *= filter_strip.shp*
