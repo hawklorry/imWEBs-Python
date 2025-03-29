@@ -34,6 +34,7 @@ from .bmp_01_point_source import PointSource
 from .bmp_02_flow_diversion import FlowDiversion
 from .bmp_03_reservoir import Reservoir
 from .bmp_05_riparian_buffer import RiparianBuffer
+from .bmp_07_vegetation_filter_strip import VegetationFilterStrip
 # from .bmp_06_grass_waterway import GrassWaterWay
 # from .bmp_07_vegetation_filter_strip import FilterStrip
 from .bmp_09_isolated_wetland import Wetland
@@ -126,6 +127,7 @@ class BMPDatabase(DatabaseBase):
         
         self.__create_bmp_dugout(outputs)        
         self.__create_bmp_riparian_buffer(outputs)
+        self.__create_bmp_filter_strip(outputs)
 
         tile_drain = self.__create_bmp_tile_drain(outputs)
         self.__create_bmp_wascob(outputs, tile_drain)
@@ -344,6 +346,11 @@ class BMPDatabase(DatabaseBase):
         if df is not None:
             self.save_table(Names.bmp_table_name_riparian_buffer, df, RiparianBuffer.column_types())
 
+    def __create_bmp_filter_strip(self, outputs:Outputs):
+        df = outputs.filter_strip_parameter_df
+        if df is not None:
+            self.save_table(Names.bmp_table_name_filter_strip, df, VegetationFilterStrip.column_types())
+
 #endregion
 
 #region Manure Management BMPs
@@ -537,6 +544,9 @@ class BMPDatabase(DatabaseBase):
 #region Crop Rotation
 
     def __create_bmp_marginal_crop(self, outputs:Outputs):
+        if outputs.marginal_crop_land_separated_field_raster is None:
+            return
+        
         logger.info("Creating marginal crop bmps ... ")
 
         crop = SingleCrop(outputs.marginal_crop_land_separated_field_raster, outputs.marginal_crop_land_grass_type)
@@ -698,6 +708,10 @@ class BMPDatabase(DatabaseBase):
         self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_parts_raster, Names.bmp_table_name_subarea_riparian_buffer_lookup, override)
         self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.riparian_buffer_drainage_area_raster, Names.bmp_table_name_subarea_riparian_buffer_drainage_lookup, override)
         
+        #filter strip
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.filter_strip_parts_raster, Names.bmp_table_name_subarea_vegetative_filter_strip_lookup, override)
+        self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.filter_strip_drainage_area_raster, Names.bmp_table_name_subarea_vegetative_filter_strip_drainage_lookup, override)
+
         #feedlot
         self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_raster, Names.bmp_table_name_subarea_feedlot_lookup, override)
         self.__create_subarea_structure_lookup_table(subarea_area_df, outputs.subarea_raster, outputs.feedlot_drainage_area_raster, Names.bmp_table_name_subarea_feedlot_drainage_lookup, override)

@@ -1340,6 +1340,57 @@ class Outputs(FolderBase):
                     
         return raster
 
+#region Filter Strip
+
+    @property
+    def filter_strip_raster(self)->Raster:
+        raster = self.get_raster(Names.filterStripRasterName)
+    
+        if raster is None:
+            if self.inputs.filter_strip_vector is not None:
+                exist, id_field_name = VectorExtension.check_id(self.inputs.filter_strip_vector)
+                if not exist:
+                    raise ValueError(f"Couldn't find ID column in {self.inputs.filter_strip_vector.file_name} ...")
+                raster = self.wbe.vector_polygons_to_raster(input = self.inputs.filter_strip_vector, 
+                                                            field_name = id_field_name,
+                                                            base_raster = self.inputs.dem_raster)
+                raster = self.mask_refined_with_subbasin_raster.con(f"value == {self.inputs.nodata}", self.inputs.nodata, raster)
+                raster = self.save_raster(raster, Names.filterStripRasterName, True, True)
+
+        return raster
+
+    @property
+    def filter_strip_drainage_area_raster(self)->Raster:
+        raster = self.get_raster(Names.filterStripDrainageRasterName)
+
+        if raster is None:
+            self.__create_riparian_buffer_distribution_paramter(True)
+            raster = self.get_raster(Names.filterStripDrainageRasterName)
+
+        return raster
+
+    @property
+    def filter_strip_parts_raster(self)->Raster:
+        raster = self.get_raster(Names.filterStripPartRasterName)
+
+        if raster is None:
+            self.__create_riparian_buffer_distribution_paramter(True)
+            raster = self.get_raster(Names.filterStripPartRasterName)
+
+        return raster   
+    
+    @property
+    def filter_strip_parameter_df(self)->pd.DataFrame:
+        df = self.get_df(Names.filterStripParameterCSVName)
+
+        if df is None:
+            self.__create_riparian_buffer_distribution_paramter(True)
+            df = self.get_df(Names.filterStripParameterCSVName)
+
+        return df 
+
+#endregion
+
 #region Riparian Buffer
 
     @property
@@ -1364,7 +1415,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.riparianBufferDrainageRasterName)
 
         if raster is None:
-            self.__create_riparian_buffer_distribution_paramter()
+            self.__create_riparian_buffer_distribution_paramter(False)
             raster = self.get_raster(Names.riparianBufferDrainageRasterName)
 
         return raster
@@ -1374,7 +1425,7 @@ class Outputs(FolderBase):
         raster = self.get_raster(Names.riparianBufferPartRasterName)
 
         if raster is None:
-            self.__create_riparian_buffer_distribution_paramter()
+            self.__create_riparian_buffer_distribution_paramter(False)
             raster = self.get_raster(Names.riparianBufferPartRasterName)
 
         return raster   
@@ -1384,12 +1435,12 @@ class Outputs(FolderBase):
         df = self.get_df(Names.riparianBufferParameterCSVName)
 
         if df is None:
-            self.__create_riparian_buffer_distribution_paramter()
+            self.__create_riparian_buffer_distribution_paramter(False)
             df = self.get_df(Names.riparianBufferParameterCSVName)
 
         return df  
 
-    def __create_riparian_buffer_distribution_paramter(self, width = 10):
+    def __create_riparian_buffer_distribution_paramter(self, is_filter_strip:bool):
         """
         create distribution raster and parameter table for riparian buffer. 
         
@@ -1403,15 +1454,21 @@ class Outputs(FolderBase):
         i, c = 0, 0
         flag = False
         flowDir = 0.0
-
-        if self.riparian_buffer_raster is None:
+        
+        distribution_raster = self.filter_strip_raster if is_filter_strip else self.riparian_buffer_raster
+        if distribution_raster is None:
             return
+        width = 10 if is_filter_strip else 30
+        id_column_name = "VFST_ID" if is_filter_strip else "RIBUF_ID" 
 
-        logger.info("Creating riparian buffer distribution and parameters ... ")
+        if is_filter_strip:
+            logger.info("Creating filter strip distribution and parameters ... ")
+        else:
+            logger.info("Creating riparian buffer distribution and parameters ... ")
 
         rows = self.flow_direction_raster.configs.rows
         cols = self.flow_direction_raster.configs.columns
-        riparian_buffer_nodata = self.riparian_buffer_raster.configs.nodata
+        riparian_buffer_nodata = distribution_raster.configs.nodata
         subbasin_nodata = self.subbasin_raster.configs.nodata
 
         riparian_buffer_drainage_area_raster = self.wbe.new_raster(self.subbasin_raster.configs)
@@ -1429,7 +1486,7 @@ class Outputs(FolderBase):
         vfsOrRbsDrain = {}
         vfsOrRbsInside = {}
         vfsOrRbsLength = {}
-        celldist = (self.riparian_buffer_raster.configs.resolution_x + self.riparian_buffer_raster.configs.resolution_y) / 2.0
+        celldist = (distribution_raster.configs.resolution_x + distribution_raster.configs.resolution_y) / 2.0
 
         for row in range(rows):
             for col in range(cols):
@@ -1450,7 +1507,7 @@ class Outputs(FolderBase):
                         if flowDir > 0:
                             c = int(math.log(flowDir) / LnOf2)
 
-                            lastVFSorRBSID = self.riparian_buffer_raster[y, x]
+                            lastVFSorRBSID = distribution_raster[y, x]
                             isVisited = flag2D[y, x]
 
                             if lastVFSorRBSID != riparian_buffer_nodata and not isVisited:
@@ -1462,8 +1519,8 @@ class Outputs(FolderBase):
                             y += dY[c]
 
                             #check to see if the next cell is edge, different riparian buffer. If yes, add it to the list
-                            if (self.riparian_buffer_raster[y, x] == riparian_buffer_nodata 
-                                or self.riparian_buffer_raster[y, x] != lastVFSorRBSID 
+                            if (distribution_raster[y, x] == riparian_buffer_nodata 
+                                or distribution_raster[y, x] != lastVFSorRBSID 
                                 or self.flow_direction_raster[y, x] == 0) and lastVFSorRBSID != riparian_buffer_nodata:
                                 #recalculate the current position
                                 loc = (y - dY[c], x - dX[c])
@@ -1494,20 +1551,20 @@ class Outputs(FolderBase):
                         flag2D[loc[0], loc[1]] = True
 
         #create the resulting parameter dictionary
-        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID','RIBUF_ID','Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
+        riparain_buffer_parameter_df = pd.DataFrame(columns=['ID',id_column_name,'Subbasin','Area_ha','Drainage_Area','Area_Ratio','Length'])
         riparain_buffer_parameter_df.set_index('ID', inplace=True)        
 
-        cellArea = self.riparian_buffer_raster.configs.resolution_x * self.riparian_buffer_raster.configs.resolution_y
+        cellArea = distribution_raster.configs.resolution_x * distribution_raster.configs.resolution_y
         vfsOrRbsPartID = 0
         for outLoc in vfsOrRbsDrain.keys():
             vfsOrRbsPartID += 1
 
-            vfsOrRbsID = int(self.riparian_buffer_raster[outLoc[0], outLoc[1]])
+            vfsOrRbsID = int(distribution_raster[outLoc[0], outLoc[1]])
             subID = int(self.subbasin_raster[outLoc[0], outLoc[1]])
             drainageArea = len(vfsOrRbsDrain[outLoc]) * cellArea / 10000
             length = vfsOrRbsLength[outLoc]
 
-            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'RIBUF_ID'] = vfsOrRbsID
+            riparain_buffer_parameter_df.loc[vfsOrRbsPartID,id_column_name] = vfsOrRbsID
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Subbasin'] = subID
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Drainage_Area'] = drainageArea
             riparain_buffer_parameter_df.loc[vfsOrRbsPartID,'Length'] = length
@@ -1540,12 +1597,17 @@ class Outputs(FolderBase):
 
         #adjust the sequence of the columns
         riparain_buffer_parameter_df.reset_index(inplace=True)
-        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year','RIBUF_ID','Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_K','Sol_porosity','Root_Depth']]
+        riparain_buffer_parameter_df = riparain_buffer_parameter_df[['Scenario','ID','Year',id_column_name,'Subbasin','VegetationID','Length','Width','Area_ha','Drainage_Area','Area_Ratio','Slope','Sol_K','Sol_porosity','Root_Depth']]
 
         #save to bmp database
-        self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferDrainageRasterName)
-        self.save_raster(riparian_buffer_parts_raster, Names.riparianBufferPartRasterName)
-        self.save_df(riparain_buffer_parameter_df, Names.riparianBufferParameterCSVName)
+        if is_filter_strip:
+            self.save_raster(riparian_buffer_drainage_area_raster, Names.filterStripDrainageRasterName)
+            self.save_raster(riparian_buffer_parts_raster, Names.filterStripPartRasterName)
+            self.save_df(riparain_buffer_parameter_df, Names.filterStripParameterCSVName)
+        else:            
+            self.save_raster(riparian_buffer_drainage_area_raster, Names.riparianBufferDrainageRasterName)
+            self.save_raster(riparian_buffer_parts_raster, Names.riparianBufferPartRasterName)
+            self.save_df(riparain_buffer_parameter_df, Names.riparianBufferParameterCSVName)
 
 #endregion
 

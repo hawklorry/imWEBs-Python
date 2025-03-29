@@ -501,7 +501,7 @@ class Names:
         #structure_bmp
         "dugout_boundary_shapefile":dugoutShpName,        
         "riparian_buffer_shapefile":riparianBufferShpName,
-        "filter_strip_shapefile":filterStripRasterName,
+        "filter_strip_shapefile":filterStripShpName,
         "wascob_shapefile":wascobShpName,
         "tile_drain_boundary_shapefile":tileDrainShpName,
         "tile_drain_outlet_shapefile":tileDrainOutletShpName,
