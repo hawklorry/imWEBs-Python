@@ -236,193 +236,6 @@
     ]
   },
   {
-    "objectID": "bmps/12_crop_management.html",
-    "href": "bmps/12_crop_management.html",
-    "title": "12. Crop Management",
-    "section": "",
-    "text": "12. Crop Management\nCrop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it’s usually prepared manually and imported to bmp database.\nAAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it’s possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file in crop_rotation section. The setting items are given below.\n\nmethod - the only option now is crop_inventory.\nAAFC_crop_inventory_folder - the folder the crop inventory GeoTIFF files reside. The file name must be the year, e.g. 2025.tif.\nfirst_year - the starting year of inventory data to read.\nlast_year - the ending year of inventory data to read.\ninclude_grazing - the flag for grazing generation. By default it’s false.\n\nOne example is given below.\n[crop_rotation]\nmethod = crop_inventory\nAAFC_crop_inventory_folder = C:\\Work\\Git\\imWEBs\\imWEBs-Python\\notebooks\\stc\\data\\crop_inventory \nfirst_year = 1991\nlast_year = 2010\ninclude_grazing = False\nUsers will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It’s also required to have same coordination system as other input files.",
-    "crumbs": [
-      "BMPs",
-      "12. Crop Management"
-    ]
-  },
-  {
-    "objectID": "bmps/07_vegetation_filter_strip.html",
-    "href": "bmps/07_vegetation_filter_strip.html",
-    "title": "07. Vegetaion Filter Strip",
-    "section": "",
-    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
-    "crumbs": [
-      "BMPs",
-      "07. Vegetaion Filter Strip"
-    ]
-  },
-  {
-    "objectID": "bmps/07_vegetation_filter_strip.html#location",
-    "href": "bmps/07_vegetation_filter_strip.html#location",
-    "title": "07. Vegetaion Filter Strip",
-    "section": "",
-    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
-    "crumbs": [
-      "BMPs",
-      "07. Vegetaion Filter Strip"
-    ]
-  },
-  {
-    "objectID": "bmps/05_riparian_buffer.html",
-    "href": "bmps/05_riparian_buffer.html",
-    "title": "05. Riparian Buffer",
-    "section": "",
-    "text": "Riparian buffers are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nriparian_buffer_shapefile = buffer.shp",
-    "crumbs": [
-      "BMPs",
-      "05. Riparian Buffer"
-    ]
-  },
-  {
-    "objectID": "bmps/05_riparian_buffer.html#location",
-    "href": "bmps/05_riparian_buffer.html#location",
-    "title": "05. Riparian Buffer",
-    "section": "",
-    "text": "Riparian buffers are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nriparian_buffer_shapefile = buffer.shp",
-    "crumbs": [
-      "BMPs",
-      "05. Riparian Buffer"
-    ]
-  },
-  {
-    "objectID": "bmps/01_point_source.html",
-    "href": "bmps/01_point_source.html",
-    "title": "01. Point Source",
-    "section": "",
-    "text": "The location of point source is defined in [reach_bmp] section using point_source_shapefile. One example is given below.\n[reach_bmp]\npoint_source_shapefile = PointSource.shp\n\n\n\n\nOperation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients. The table must have following columns. The columns are case-insensitive and could be in any sequence.\n\nDATE\nFLOW\nSEDIMENT\nORGANICN\nORGANICP\nNO3\nNH3\nNO2\nMINERALP",
-    "crumbs": [
-      "BMPs",
-      "01. Point Source"
-    ]
-  },
-  {
-    "objectID": "bmps/01_point_source.html#location",
-    "href": "bmps/01_point_source.html#location",
-    "title": "01. Point Source",
-    "section": "",
-    "text": "The location of point source is defined in [reach_bmp] section using point_source_shapefile. One example is given below.\n[reach_bmp]\npoint_source_shapefile = PointSource.shp",
-    "crumbs": [
-      "BMPs",
-      "01. Point Source"
-    ]
-  },
-  {
-    "objectID": "bmps/01_point_source.html#attributes",
-    "href": "bmps/01_point_source.html#attributes",
-    "title": "01. Point Source",
-    "section": "",
-    "text": "Operation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients. The table must have following columns. The columns are case-insensitive and could be in any sequence.\n\nDATE\nFLOW\nSEDIMENT\nORGANICN\nORGANICP\nNO3\nNH3\nNO2\nMINERALP",
-    "crumbs": [
-      "BMPs",
-      "01. Point Source"
-    ]
-  },
-  {
-    "objectID": "bmps/03_reservoir.html",
-    "href": "bmps/03_reservoir.html",
-    "title": "03. Reservoir",
-    "section": "",
-    "text": "The location of reservoirs is defined by a point shapefile. The name of the shapefile is defined in the reach_bmp section of the model configuration file. An example is given below.\n[reach_bmp]\nreservoir_shapefile = reservoir.shp\n\n\n\nThe reservoir shapefile should have following attributes.\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\n\n\n\nThe routing method is defined in a separate section [reservoir]. This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database. There are two settings in this section.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\nAn example is given below.\n[reservoir]\nreservoir_flow_routing = RAT_RES\nreservoir_flow_data_folder = C:\\stc\\data\\reservoir",
-    "crumbs": [
-      "BMPs",
-      "03. Reservoir"
-    ]
-  },
-  {
-    "objectID": "bmps/03_reservoir.html#location",
-    "href": "bmps/03_reservoir.html#location",
-    "title": "03. Reservoir",
-    "section": "",
-    "text": "The location of reservoirs is defined by a point shapefile. The name of the shapefile is defined in the reach_bmp section of the model configuration file. An example is given below.\n[reach_bmp]\nreservoir_shapefile = reservoir.shp",
-    "crumbs": [
-      "BMPs",
-      "03. Reservoir"
-    ]
-  },
-  {
-    "objectID": "bmps/03_reservoir.html#attributes",
-    "href": "bmps/03_reservoir.html#attributes",
-    "title": "03. Reservoir",
-    "section": "",
-    "text": "The reservoir shapefile should have following attributes.\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.",
-    "crumbs": [
-      "BMPs",
-      "03. Reservoir"
-    ]
-  },
-  {
-    "objectID": "bmps/03_reservoir.html#routing-method",
-    "href": "bmps/03_reservoir.html#routing-method",
-    "title": "03. Reservoir",
-    "section": "",
-    "text": "The routing method is defined in a separate section [reservoir]. This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database. There are two settings in this section.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\nAn example is given below.\n[reservoir]\nreservoir_flow_routing = RAT_RES\nreservoir_flow_data_folder = C:\\stc\\data\\reservoir",
-    "crumbs": [
-      "BMPs",
-      "03. Reservoir"
-    ]
-  },
-  {
-    "objectID": "bmps/06_grassed_waterway.html",
-    "href": "bmps/06_grassed_waterway.html",
-    "title": "06 Grassed Waterway",
-    "section": "",
-    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
-    "crumbs": [
-      "BMPs",
-      "06 Grassed Waterway"
-    ]
-  },
-  {
-    "objectID": "bmps/06_grassed_waterway.html#location",
-    "href": "bmps/06_grassed_waterway.html#location",
-    "title": "06 Grassed Waterway",
-    "section": "",
-    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
-    "crumbs": [
-      "BMPs",
-      "06 Grassed Waterway"
-    ]
-  },
-  {
-    "objectID": "bmps/09_wetland.html",
-    "href": "bmps/09_wetland.html",
-    "title": "09. Isolated Wetland",
-    "section": "",
-    "text": "Isolated wetland is a reach bmp. Use defines the boundary and optional outlet using two shapefiles in reach_bmp section. One example is given below. Note that the wetland_outlet_shapefile is empty so the interface will delineate the outlet automatically.\n[reach_bmp]\nwetland_boundary_shapefile = wetland.shp\nwetland_outlet_shapefile =\n\n\n\nIt’s possible to filter the wetlands using a minimum area. This is done by wetland_min_area_ha in delineation section. The following example would skip all wetlands whose area is smaller than 0.1 ha.\n[delineation]\nwetland_min_area_ha = 0.1",
-    "crumbs": [
-      "BMPs",
-      "09. Isolated Wetland"
-    ]
-  },
-  {
-    "objectID": "bmps/09_wetland.html#location",
-    "href": "bmps/09_wetland.html#location",
-    "title": "09. Isolated Wetland",
-    "section": "",
-    "text": "Isolated wetland is a reach bmp. Use defines the boundary and optional outlet using two shapefiles in reach_bmp section. One example is given below. Note that the wetland_outlet_shapefile is empty so the interface will delineate the outlet automatically.\n[reach_bmp]\nwetland_boundary_shapefile = wetland.shp\nwetland_outlet_shapefile =",
-    "crumbs": [
-      "BMPs",
-      "09. Isolated Wetland"
-    ]
-  },
-  {
-    "objectID": "bmps/09_wetland.html#size-filter",
-    "href": "bmps/09_wetland.html#size-filter",
-    "title": "09. Isolated Wetland",
-    "section": "",
-    "text": "It’s possible to filter the wetlands using a minimum area. This is done by wetland_min_area_ha in delineation section. The following example would skip all wetlands whose area is smaller than 0.1 ha.\n[delineation]\nwetland_min_area_ha = 0.1",
-    "crumbs": [
-      "BMPs",
-      "09. Isolated Wetland"
-    ]
-  },
-  {
     "objectID": "bmps/19_tiledrain.html",
     "href": "bmps/19_tiledrain.html",
     "title": "19. Tile Drain",
@@ -475,6 +288,215 @@
     "crumbs": [
       "BMPs",
       "19. Tile Drain"
+    ]
+  },
+  {
+    "objectID": "bmps/09_wetland.html",
+    "href": "bmps/09_wetland.html",
+    "title": "09. Isolated Wetland",
+    "section": "",
+    "text": "Isolated wetland is a reach bmp. Use defines the boundary and optional outlet using two shapefiles in reach_bmp section. One example is given below. Note that the wetland_outlet_shapefile is empty so the interface will delineate the outlet automatically.\n[reach_bmp]\nwetland_boundary_shapefile = wetland.shp\nwetland_outlet_shapefile =\n\n\n\nIt’s possible to filter the wetlands using a minimum area. This is done by wetland_min_area_ha in delineation section. The following example would skip all wetlands whose area is smaller than 0.1 ha.\n[delineation]\nwetland_min_area_ha = 0.1",
+    "crumbs": [
+      "BMPs",
+      "09. Isolated Wetland"
+    ]
+  },
+  {
+    "objectID": "bmps/09_wetland.html#location",
+    "href": "bmps/09_wetland.html#location",
+    "title": "09. Isolated Wetland",
+    "section": "",
+    "text": "Isolated wetland is a reach bmp. Use defines the boundary and optional outlet using two shapefiles in reach_bmp section. One example is given below. Note that the wetland_outlet_shapefile is empty so the interface will delineate the outlet automatically.\n[reach_bmp]\nwetland_boundary_shapefile = wetland.shp\nwetland_outlet_shapefile =",
+    "crumbs": [
+      "BMPs",
+      "09. Isolated Wetland"
+    ]
+  },
+  {
+    "objectID": "bmps/09_wetland.html#size-filter",
+    "href": "bmps/09_wetland.html#size-filter",
+    "title": "09. Isolated Wetland",
+    "section": "",
+    "text": "It’s possible to filter the wetlands using a minimum area. This is done by wetland_min_area_ha in delineation section. The following example would skip all wetlands whose area is smaller than 0.1 ha.\n[delineation]\nwetland_min_area_ha = 0.1",
+    "crumbs": [
+      "BMPs",
+      "09. Isolated Wetland"
+    ]
+  },
+  {
+    "objectID": "bmps/06_grassed_waterway.html",
+    "href": "bmps/06_grassed_waterway.html",
+    "title": "06 Grassed Waterway",
+    "section": "",
+    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
+    "crumbs": [
+      "BMPs",
+      "06 Grassed Waterway"
+    ]
+  },
+  {
+    "objectID": "bmps/06_grassed_waterway.html#location",
+    "href": "bmps/06_grassed_waterway.html#location",
+    "title": "06 Grassed Waterway",
+    "section": "",
+    "text": "The location of the grassed waterway is defined in [reach_bmp] section using grass_waterway_shapefile. One example is given below. The shapefile must be polyline type.\n[reach_bmp]\ngrass_waterway_shapefile = GWW.shp",
+    "crumbs": [
+      "BMPs",
+      "06 Grassed Waterway"
+    ]
+  },
+  {
+    "objectID": "bmps/03_reservoir.html",
+    "href": "bmps/03_reservoir.html",
+    "title": "03. Reservoir",
+    "section": "",
+    "text": "The location of reservoirs is defined by a point shapefile. The name of the shapefile is defined in the reach_bmp section of the model configuration file. An example is given below.\n[reach_bmp]\nreservoir_shapefile = reservoir.shp\n\n\n\nThe reservoir shapefile should have following attributes.\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.\n\n\n\n\nThe routing method is defined in a separate section [reservoir]. This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database. There are two settings in this section.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\nAn example is given below.\n[reservoir]\nreservoir_flow_routing = RAT_RES\nreservoir_flow_data_folder = C:\\stc\\data\\reservoir",
+    "crumbs": [
+      "BMPs",
+      "03. Reservoir"
+    ]
+  },
+  {
+    "objectID": "bmps/03_reservoir.html#location",
+    "href": "bmps/03_reservoir.html#location",
+    "title": "03. Reservoir",
+    "section": "",
+    "text": "The location of reservoirs is defined by a point shapefile. The name of the shapefile is defined in the reach_bmp section of the model configuration file. An example is given below.\n[reach_bmp]\nreservoir_shapefile = reservoir.shp",
+    "crumbs": [
+      "BMPs",
+      "03. Reservoir"
+    ]
+  },
+  {
+    "objectID": "bmps/03_reservoir.html#attributes",
+    "href": "bmps/03_reservoir.html#attributes",
+    "title": "03. Reservoir",
+    "section": "",
+    "text": "The reservoir shapefile should have following attributes.\n\nid - The reservoir id\nop - operation date in yyyy-mm-dd format\nsa_em - Emergency surface area\nv_em - Emergency volume\nsa_pr - Principal surface area\nv_pr - Principal volume\nfile - The external file name used for rating curve or outflow time series. File extension is not included.",
+    "crumbs": [
+      "BMPs",
+      "03. Reservoir"
+    ]
+  },
+  {
+    "objectID": "bmps/03_reservoir.html#routing-method",
+    "href": "bmps/03_reservoir.html#routing-method",
+    "title": "03. Reservoir",
+    "section": "",
+    "text": "The routing method is defined in a separate section [reservoir]. This section defines the flow routing method for reservoir and the flow data folder where the external files are located. For RAT_RES, MDO_RES and MMO_RES, external files are required. It’s assumed that these files are all in required csv format available in reservoir_flow_data_folder. The reservoir file column define the file name without extension. The system will read the data and import to bmp database. There are two settings in this section.\n\nreservoir_flow_routing - The flow routing method. Select one of RAT_RES, MDO_RES, MMO_RES, AAR_RES and TRR_RES.\nreservoir_flow_data_folder - The folder where the external flow data is saved.\n\nAn example is given below.\n[reservoir]\nreservoir_flow_routing = RAT_RES\nreservoir_flow_data_folder = C:\\stc\\data\\reservoir",
+    "crumbs": [
+      "BMPs",
+      "03. Reservoir"
+    ]
+  },
+  {
+    "objectID": "bmps/01_point_source.html",
+    "href": "bmps/01_point_source.html",
+    "title": "01. Point Source",
+    "section": "",
+    "text": "The location of point source is defined in [reach_bmp] section using point_source_shapefile. One example is given below.\n[reach_bmp]\npoint_source_shapefile = PointSource.shp\n\n\n\n\nOperation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients. The table must have following columns. The columns are case-insensitive and could be in any sequence.\n\nDATE\nFLOW\nSEDIMENT\nORGANICN\nORGANICP\nNO3\nNH3\nNO2\nMINERALP",
+    "crumbs": [
+      "BMPs",
+      "01. Point Source"
+    ]
+  },
+  {
+    "objectID": "bmps/01_point_source.html#location",
+    "href": "bmps/01_point_source.html#location",
+    "title": "01. Point Source",
+    "section": "",
+    "text": "The location of point source is defined in [reach_bmp] section using point_source_shapefile. One example is given below.\n[reach_bmp]\npoint_source_shapefile = PointSource.shp",
+    "crumbs": [
+      "BMPs",
+      "01. Point Source"
+    ]
+  },
+  {
+    "objectID": "bmps/01_point_source.html#attributes",
+    "href": "bmps/01_point_source.html#attributes",
+    "title": "01. Point Source",
+    "section": "",
+    "text": "Operation - The operation date in YYYY-MM-DD format\nTableName - The table name in hydroclimate database that defines time series of the flow, sediment and nutrients. The table must have following columns. The columns are case-insensitive and could be in any sequence.\n\nDATE\nFLOW\nSEDIMENT\nORGANICN\nORGANICP\nNO3\nNH3\nNO2\nMINERALP",
+    "crumbs": [
+      "BMPs",
+      "01. Point Source"
+    ]
+  },
+  {
+    "objectID": "bmps/05_riparian_buffer.html",
+    "href": "bmps/05_riparian_buffer.html",
+    "title": "05. Riparian Buffer",
+    "section": "",
+    "text": "Riparian buffers are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nriparian_buffer_shapefile = buffer.shp",
+    "crumbs": [
+      "BMPs",
+      "05. Riparian Buffer"
+    ]
+  },
+  {
+    "objectID": "bmps/05_riparian_buffer.html#location",
+    "href": "bmps/05_riparian_buffer.html#location",
+    "title": "05. Riparian Buffer",
+    "section": "",
+    "text": "Riparian buffers are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nriparian_buffer_shapefile = buffer.shp",
+    "crumbs": [
+      "BMPs",
+      "05. Riparian Buffer"
+    ]
+  },
+  {
+    "objectID": "bmps/07_vegetation_filter_strip.html",
+    "href": "bmps/07_vegetation_filter_strip.html",
+    "title": "07. Vegetaion Filter Strip",
+    "section": "",
+    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
+    "crumbs": [
+      "BMPs",
+      "07. Vegetaion Filter Strip"
+    ]
+  },
+  {
+    "objectID": "bmps/07_vegetation_filter_strip.html#location",
+    "href": "bmps/07_vegetation_filter_strip.html#location",
+    "title": "07. Vegetaion Filter Strip",
+    "section": "",
+    "text": "Vegetation filter strips are defined using a polygon shapefile in structure_bmp section. One example is given below.\n[structure_bmp]\nfilter_strip_shapefile = filter_strip.shp",
+    "crumbs": [
+      "BMPs",
+      "07. Vegetaion Filter Strip"
+    ]
+  },
+  {
+    "objectID": "bmps/12_crop_management.html",
+    "href": "bmps/12_crop_management.html",
+    "title": "12. Crop Management",
+    "section": "",
+    "text": "12. Crop Management\nCrop management BMPs specifies the crop rotation, fertilizer application, tillage and gazing on a field. As this data is highly customized, it’s usually prepared manually and imported to bmp database.\nAAFC crop inventory provides crop distribution each year based on remote sensing technology. Combined with default crop rotation, fertilizer application, tillage and gazing fro crop type, it’s possible to setup the crop management BMPs automatically. To use this feature, setup the crop_rotation section in the model configuration file in crop_rotation section. The setting items are given below.\n\nmethod - the only option now is crop_inventory.\nAAFC_crop_inventory_folder - the folder the crop inventory GeoTIFF files reside. The file name must be the year, e.g. 2025.tif.\nfirst_year - the starting year of inventory data to read.\nlast_year - the ending year of inventory data to read.\ninclude_grazing - the flag for grazing generation. By default it’s false.\n\nOne example is given below.\n[crop_rotation]\nmethod = crop_inventory\nAAFC_crop_inventory_folder = C:\\Work\\Git\\imWEBs\\imWEBs-Python\\notebooks\\stc\\data\\crop_inventory \nfirst_year = 1991\nlast_year = 2010\ninclude_grazing = False\nUsers will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It’s also required to have same coordination system as other input files.",
+    "crumbs": [
+      "BMPs",
+      "12. Crop Management"
+    ]
+  },
+  {
+    "objectID": "bmps/21_26_manure_adjustment.html",
+    "href": "bmps/21_26_manure_adjustment.html",
+    "title": "21. Manure Adjustment",
+    "section": "",
+    "text": "Six manure adjustment BMPs are included in imWEBs. They are generated in a similar fashion.\n\nManure Incorporation within 48 hours\nManure Application Setback\nNo application on snow\nSpring application rather than fall application\nApplication based on soil nitrogen limit\nApplication based on soil phosphorus limit\n\n\n\n\n\n\n\nWarning\n\n\n\nThese BMPs are not supported in the subarea-based engine.\n\n\n\n\n\nThe only input for each BMP is the location specified using a polygon shapefile defined in [manure_adjustment_bmp] section. One example is given below.\n[manure_adjustment_bmp]\nmanure_adjustment_incorporation_within_48h_shapefile = h48.shp\nmanure_adjustment_application_setback_shapefile = setback.shp\nmanure_adjustment_no_application_on_snow_shapefile = no_on_snow.shp\nmanure_adjustment_spring_rather_than_fall_shapefile = spring.shp\nmanure_adjustment_based_on_n_limit_shapefile = n_limit.shp\nmanure_adjustment_based_on_p_limit_shapefile = p_limit.shp",
+    "crumbs": [
+      "BMPs",
+      "21. Manure Adjustment"
+    ]
+  },
+  {
+    "objectID": "bmps/21_26_manure_adjustment.html#location",
+    "href": "bmps/21_26_manure_adjustment.html#location",
+    "title": "21. Manure Adjustment",
+    "section": "",
+    "text": "The only input for each BMP is the location specified using a polygon shapefile defined in [manure_adjustment_bmp] section. One example is given below.\n[manure_adjustment_bmp]\nmanure_adjustment_incorporation_within_48h_shapefile = h48.shp\nmanure_adjustment_application_setback_shapefile = setback.shp\nmanure_adjustment_no_application_on_snow_shapefile = no_on_snow.shp\nmanure_adjustment_spring_rather_than_fall_shapefile = spring.shp\nmanure_adjustment_based_on_n_limit_shapefile = n_limit.shp\nmanure_adjustment_based_on_p_limit_shapefile = p_limit.shp",
+    "crumbs": [
+      "BMPs",
+      "21. Manure Adjustment"
     ]
   },
   {

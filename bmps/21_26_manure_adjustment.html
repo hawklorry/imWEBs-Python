@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>vegetation_filter_strip – imWEBs</title>
+<title>manure_adjustment – imWEBs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../bmps/09_wetland.html" rel="next">
-<link href="../bmps/06_grassed_waterway.html" rel="prev">
+<link href="../bmps/27_manure_storage.html" rel="next">
+<link href="../bmps/19_tiledrain.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -164,7 +164,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../bmps/07_vegetation_filter_strip.html" class="sidebar-item-text sidebar-link active">
+  <a href="../bmps/07_vegetation_filter_strip.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">07. Vegetaion Filter Strip</span></a>
   </div>
 </li>
@@ -188,7 +188,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../bmps/21_26_manure_adjustment.html" class="sidebar-item-text sidebar-link">
+  <a href="../bmps/21_26_manure_adjustment.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">21. Manure Adjustment</span></a>
   </div>
 </li>
@@ -240,12 +240,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#vegetaion-filter-strip" id="toc-vegetaion-filter-strip" class="nav-link active" data-scroll-target="#vegetaion-filter-strip">07. Vegetaion Filter Strip</a>
+  <li><a href="#manure-adjustment" id="toc-manure-adjustment" class="nav-link active" data-scroll-target="#manure-adjustment">21. Manure Adjustment</a>
   <ul class="collapse">
   <li><a href="#location" id="toc-location" class="nav-link" data-scroll-target="#location">Location</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/07_vegetation_filter_strip.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="07_vegetation_filter_strip.ipynb" download="07_vegetation_filter_strip.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/21_26_manure_adjustment.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="21_26_manure_adjustment.ipynb" download="21_26_manure_adjustment.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -253,13 +253,41 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="vegetaion-filter-strip" class="level1">
-<h1>07. Vegetaion Filter Strip</h1>
+<section id="manure-adjustment" class="level1">
+<h1>21. Manure Adjustment</h1>
+<p>Six manure adjustment BMPs are included in imWEBs. They are generated in a similar fashion.</p>
+<ol type="1">
+<li><p>Manure Incorporation within 48 hours</p></li>
+<li><p>Manure Application Setback</p></li>
+<li><p>No application on snow</p></li>
+<li><p>Spring application rather than fall application</p></li>
+<li><p>Application based on soil nitrogen limit</p></li>
+<li><p>Application based on soil phosphorus limit</p></li>
+</ol>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>These BMPs are not supported in the subarea-based engine.</p>
+<p><img src="..\img/manure_adjustment_not_supported.png" class="img-fluid"></p>
+</div>
+</div>
 <section id="location" class="level2">
 <h2 class="anchored" data-anchor-id="location">Location</h2>
-<p>Vegetation filter strips are defined using a <strong>polygon</strong> shapefile in <strong>structure_bmp</strong> section. One example is given below.</p>
-<p><em>[structure_bmp]</em></p>
-<p><em>filter_strip_shapefile</em> <em>= filter_strip.shp</em></p>
+<p>The only input for each BMP is the location specified using a polygon shapefile defined in [<strong>manure_adjustment_bmp</strong>] section. One example is given below.</p>
+<p><em>[manure_adjustment_bmp]</em></p>
+<p><em>manure_adjustment_incorporation_within_48h_shapefile = h48.shp</em></p>
+<p><em>manure_adjustment_application_setback_shapefile = setback.shp</em></p>
+<p><em>manure_adjustment_no_application_on_snow_shapefile = no_on_snow.shp</em></p>
+<p><em>manure_adjustment_spring_rather_than_fall_shapefile = spring.shp</em></p>
+<p><em>manure_adjustment_based_on_n_limit_shapefile = n_limit.shp</em></p>
+<p><em>manure_adjustment_based_on_p_limit_shapefile = p_limit.shp</em></p>
 
 
 </section>
@@ -688,13 +716,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../bmps/06_grassed_waterway.html" class="pagination-link" aria-label="06 Grassed Waterway">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">06 Grassed Waterway</span>
+      <a href="../bmps/19_tiledrain.html" class="pagination-link" aria-label="19. Tile Drain">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">19. Tile Drain</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../bmps/09_wetland.html" class="pagination-link" aria-label="09. Isolated Wetland">
-        <span class="nav-page-text">09. Isolated Wetland</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../bmps/27_manure_storage.html" class="pagination-link" aria-label="27. Manure Storage">
+        <span class="nav-page-text">27. Manure Storage</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -706,7 +734,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2025 University of Guelph</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/07_vegetation_filter_strip.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/21_26_manure_adjustment.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
