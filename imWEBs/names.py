@@ -514,7 +514,15 @@ class Names:
 
         #margnial and pasture crop land
         "marginal_crop_land_shapefile": marginalCroplandShpName,
-        "pasture_crop_land_shapefile": pastureCropLandShpName
+        "pasture_crop_land_shapefile": pastureCropLandShpName,
+
+        #manure adjustment bmp
+        "manure_adjustment_incorporation_within_48h_shapefile": manure48hShpName,
+        "manure_adjustment_application_setback_shapefile": manureSetbackShpName,
+        "manure_adjustment_no_application_on_snow_shapefile": manureNoOnSnowShpName,
+        "manure_adjustment_spring_rather_than_fall_shapefile": manureSpringShpName,
+        "manure_adjustment_based_on_n_limit_shapefile": manureNLimitShpName,
+        "manure_adjustment_based_on_p_limit_shapefile": manurePLimitShpName
     }
 
     @staticmethod

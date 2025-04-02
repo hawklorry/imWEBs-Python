@@ -205,6 +205,34 @@ class Inputs(FolderBase):
 
 #endregion
 
+#region Manure Adjustment
+
+    @property
+    def manure_adjustment_incorporation_within_48h_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_incorporation_within_48h_shapefile"))
+
+    @property
+    def manure_adjustment_application_setback_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_application_setback_shapefile"))
+    
+    @property
+    def manure_adjustment_no_application_on_snow_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_no_application_on_snow_shapefile"))
+    
+    @property
+    def manure_adjustment_spring_rather_than_fall_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_spring_rather_than_fall_shapefile"))
+    
+    @property
+    def manure_adjustment_based_on_n_limit_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_based_on_n_limit_shapefile"))
+    
+    @property
+    def manure_adjustment_based_on_p_limit_vector(self)->Vector:
+        return self.get_vector(Names.get_standard_file_name("manure_adjustment_based_on_p_limit_shapefile"))
+
+#endregion
+
     @property
     def bmp_types(self):
         bmps = []
@@ -244,6 +272,20 @@ class Inputs(FolderBase):
             bmps.append(BMPType.BMP_TYPE_MANURE_STORAGE)
         if self.feedlot_boundary_vector is not None:
             bmps.append(BMPType.BMP_TYPE_MANURE_FEEDLOT)
+
+        #manure adjustment
+        if self.manure_adjustment_incorporation_within_48h_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_MI48H)
+        if self.manure_adjustment_application_setback_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_MSETBACK)
+        if self.manure_adjustment_no_application_on_snow_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_NO_ONSNOW)
+        if self.manure_adjustment_spring_rather_than_fall_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_NO_FALL)
+        if self.manure_adjustment_based_on_n_limit_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_NITROGEN_LIMIT)
+        if self.manure_adjustment_based_on_p_limit_vector is not None:
+            bmps.append(BMPType.BMP_TYPE_PHOSPHORUS_LIMIT)
 
         return bmps  
 

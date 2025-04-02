@@ -18,7 +18,7 @@ class ModelConfig(Config):
     """
 
     #the sections that are files
-    file_sections = ["watershed","lookup","database","reach_bmp","structure_bmp","non_structure_bmp"]
+    file_sections = ["watershed","lookup","database","reach_bmp","structure_bmp","non_structure_bmp","manure_adjustment_bmp"]
 
     def __init__(self, config_file:str = None):
         super().__init__(config_file)
@@ -189,6 +189,15 @@ class ModelConfig(Config):
                 "marginal_crop_land_buffer_size_m",
                 "marginal_crop_land_slope_threshold_percentage",
                 "marginal_crop_land_grass_type"],
+
+            "manure_adjustment_bmp":[
+                "manure_adjustment_incorporation_within_48h_shapefile",
+                "manure_adjustment_application_setback_shapefile",
+                "manure_adjustment_no_application_on_snow_shapefile",
+                "manure_adjustment_spring_rather_than_fall_shapefile", 
+                "manure_adjustment_based_on_n_limit_shapefile", 
+                "manure_adjustment_based_on_p_limit_shapefile" 
+            ],
 
             #crop rotation
             "crop_rotation":["method",

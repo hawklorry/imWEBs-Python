@@ -14,6 +14,7 @@ from .subbasin_multiplier import SubbasinMultiplier
 from .outlet_drainage import OutletDrainage
 from ...delineation.structure import Structure
 from ...names import Names
+from ...bmp.bmp_manure_adjustment import ManureAdjustmentBMPType, ManureAdjustmentBMP
 from ...bmp.bmp_areal_manure_feedlot import ArealBMPManureFeedlot
 from ...bmp.bmp_areal_manure_storage import ArealBMPManureStorage
 from ...bmp.bmp_reach_manure_catch_basin import ReachBMPManureCatchBasin
@@ -142,6 +143,9 @@ class BMPDatabase(DatabaseBase):
 
         #create marginal crop bmps
         self.__create_bmp_marginal_crop(outputs)
+
+        #create manure adjustment
+        self.__create_bmp_manure_adjustment(outputs)
 
         #create bmp_scenarios table
         self.__create_bmp_scenarios(outputs)
@@ -540,6 +544,21 @@ class BMPDatabase(DatabaseBase):
 
         df = BMP.generate_bmp_scenarios_df(bmp_types)
         self.save_table(Names.bmp_table_name_scenarios, df)
+
+#region Manure Adjustment
+
+    def __create_bmp_manure_adjustment(self, outputs:Outputs):
+        for type in ManureAdjustmentBMPType:
+            raster = outputs.get_manure_adjustment_raster(type)
+
+            if raster is not None:
+                logger.info(f"Creating manure adjustment bmp: {type} ... ")
+
+                bmp = ManureAdjustmentBMP(raster, type)
+                self.save_table(bmp.table_name, bmp.manure_adjustment_df)               
+
+
+#endregion
 
 #region Crop Rotation
 

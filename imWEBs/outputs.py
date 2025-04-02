@@ -19,6 +19,7 @@ from .database.bmp.subarea import SubArea
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
 from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 import geopandas as gpd
+from .bmp.bmp_manure_adjustment import ManureAdjustmentBMPType
 
 import logging
 logger = logging.getLogger(__name__)
@@ -1611,8 +1612,6 @@ class Outputs(FolderBase):
 
 #endregion
 
-#endregion
-
 #region interpolation
 
 #endregion
@@ -1822,6 +1821,78 @@ class Outputs(FolderBase):
                             "TopographyWeight","LateralWidth"]]
 
 #endregion
+
+#region Manure Adjustment BMP
+
+    def __get_manure_adjustment_raster(self, raster_name:str, vector:Vector)->Raster:
+        raster = self.get_raster(raster_name)
+
+        if raster is None and vector is not None:
+            raster = VectorExtension.vector_to_raster(vector, self.dem_clipped_raster_for_model)
+        
+            #assign the field id
+            raster = raster.con("value > 0", self.field_raster, raster.configs.nodata)
+
+            #remove the area covered by marginal crop land and pasture land in the future
+            if self.marginal_crop_land_orginal_field_raster is not None:
+                no_data = raster.configs.nodata
+                for row in range(self.marginal_crop_land_orginal_field_raster.configs.rows):
+                    for col in range(self.marginal_crop_land_orginal_field_raster.configs.columns):
+                        if self.marginal_crop_land_orginal_field_raster[row, col] > 0:
+                            raster[row, col] = no_data
+
+            raster = self.save_raster(raster, raster_name, True, True)
+
+        return raster
+
+    def get_manure_adjustment_raster(self, manure_adjustment_type:ManureAdjustmentBMPType):
+        if manure_adjustment_type == ManureAdjustmentBMPType.INCORPORATION_WITHIN_48H:
+            return self.manure_adjustment_incorporation_within_48h_raster
+        elif manure_adjustment_type == ManureAdjustmentBMPType.APPLICATION_SETBACK:
+            return self.manure_adjustment_application_setback_raster
+        elif manure_adjustment_type == ManureAdjustmentBMPType.NO_APPLICATION_ON_SNOW:
+            return self.manure_adjustment_no_application_on_snow_raster
+        elif manure_adjustment_type == ManureAdjustmentBMPType.SPRING_APPLICATION:
+            return self.manure_adjustment_spring_rather_than_fall_raster
+        elif manure_adjustment_type == ManureAdjustmentBMPType.APPLICATION_ON_N_LIMIT:
+            return self.manure_adjustment_based_on_n_limit_raster
+        elif manure_adjustment_type == ManureAdjustmentBMPType.APPLICATION_ON_P_LIMIT:
+            return self.manure_adjustment_based_on_p_limit_raster
+
+
+    @property
+    def manure_adjustment_incorporation_within_48h_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manure48hRasName, 
+                                                   self.inputs.manure_adjustment_incorporation_within_48h_vector)
+
+
+    @property
+    def manure_adjustment_application_setback_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manureSetbackRasName, 
+                                                   self.inputs.manure_adjustment_application_setback_vector)
+    
+    @property
+    def manure_adjustment_no_application_on_snow_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manureNoOnSnowRasName, 
+                                                   self.inputs.manure_adjustment_no_application_on_snow_vector)
+    
+    @property
+    def manure_adjustment_spring_rather_than_fall_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manureSpringRasName, 
+                                                   self.inputs.manure_adjustment_spring_rather_than_fall_vector)
+    
+    @property
+    def manure_adjustment_based_on_n_limit_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manureNLimitRasname, 
+                                                   self.inputs.manure_adjustment_based_on_n_limit_vector)
+    
+    @property
+    def manure_adjustment_based_on_p_limit_raster(self)->Raster:
+        return self.__get_manure_adjustment_raster(Names.manurePLimitRasname, 
+                                                   self.inputs.manure_adjustment_based_on_p_limit_vector)
+
+#endregion
+
 
     @property
     def offsite_watering_raster(self)->Raster:
