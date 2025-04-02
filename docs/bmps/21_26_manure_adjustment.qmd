@@ -1,0 +1,39 @@
+# 21. Manure Adjustment
+
+Six manure adjustment BMPs are included in imWEBs. They are generated in a similar fashion.
+
+1.  Manure Incorporation within 48 hours
+
+2.  Manure Application Setback
+
+3.  No application on snow
+
+4.  Spring application rather than fall application
+
+5.  Application based on soil nitrogen limit
+
+6.  Application based on soil phosphorus limit
+
+::: callout-warning
+These BMPs are not supported in the subarea-based engine.
+
+![](/img/manure_adjustment_not_supported.png)
+:::
+
+## Location
+
+The only input for each BMP is the location specified using a polygon shapefile defined in \[**manure_adjustment_bmp**\] section. One example is given below.
+
+*\[manure_adjustment_bmp\]*
+
+*manure_adjustment_incorporation_within_48h_shapefile = h48.shp*
+
+*manure_adjustment_application_setback_shapefile = setback.shp*
+
+*manure_adjustment_no_application_on_snow_shapefile = no_on_snow.shp*
+
+*manure_adjustment_spring_rather_than_fall_shapefile = spring.shp*
+
+*manure_adjustment_based_on_n_limit_shapefile = n_limit.shp*
+
+*manure_adjustment_based_on_p_limit_shapefile = p_limit.shp*

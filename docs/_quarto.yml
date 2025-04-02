@@ -31,6 +31,7 @@ website:
         - bmps/09_wetland.qmd
         - bmps/12_crop_management.qmd
         - bmps/19_tiledrain.qmd
+        - bmps/21_26_manure_adjustment.qmd
         - bmps/27_manure_storage.qmd
         - bmps/28_manure_catch_basin.qmd
         - bmps/29_manure_feedlot.qmd

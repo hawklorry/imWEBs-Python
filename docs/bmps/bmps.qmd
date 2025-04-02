@@ -9,7 +9,7 @@
 4.  Manure Adjustment
 
 |  |  |  |  |
-|:---------------:|:--------------------:|:---------------:|:---------------:|
+|:---------------:|:-------------------:|:---------------:|:---------------:|
 | **ID** | **Name** | **Type** | **Code** |
 | 1 | [Point source](01_point_source.qmd) | 1 | PTSR |
 | 2 | Stream flow diversion | 1 | SFDV |
@@ -31,12 +31,12 @@
 | 18 | Irrigation management | 3 | IRRMG |
 | 19 | [Tile drain management](19_tiledrain_qmd) | 2 | TLDMG |
 | 20 | Urban management | 2 | URBMG |
-| 21 | Manure incorporation with 48h | 4 | MI48H |
-| 22 | Manure application setback | 4 | MASB |
-| 23 | No application on snow | 4 | NAOS |
-| 24 | Spring application rather than fall application | 4 | SAFA |
-| 25 | Application based on soil nitrogen limit | 4 | ASNL |
-| 26 | Application based on soil phosphorous limit | 4 | ASPL |
+| 21 | [Manure incorporation with 48h](21_26_manure_adjustment.qmd) | 4 | MI48H |
+| 22 | [Manure application setback](21_26_manure_adjustment.qmd) | 4 | MASB |
+| 23 | [No application on snow](21_26_manure_adjustment.qmd) | 4 | NAOS |
+| 24 | [Spring application rather than fall application](21_26_manure_adjustment.qmd) | 4 | SAFA |
+| 25 | [Application based on soil nitrogen limit](21_26_manure_adjustment.qmd) | 4 | ASNL |
+| 26 | [Application based on soil phosphorous limit](21_26_manure_adjustment.qmd) | 4 | ASPL |
 | 27 | [Manure storage capacity and design](27_manure_storage.qmd) | 3 | MSCD |
 | 28 | [Manure catch basin/impondment](28_manure_catch_basin.qmd) | 1 | MCBI |
 | 29 | [Manure feedlot](29_manure_feedlot.qmd) | 3 | FDLT |
