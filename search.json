@@ -170,6 +170,34 @@
     ]
   },
   {
+    "objectID": "bmps/34_35_36_pasture_crop_land.html",
+    "href": "bmps/34_35_36_pasture_crop_land.html",
+    "title": "34. Pasture Crop Land",
+    "section": "",
+    "text": "The pasture crop land BMP is flagged using pasture_crop_land_simulation in pasture_crop_land section. This BMP will be used if it’s set to YES. The default value is NO. One example is given below.\n[pasture_crop_land]\npasture_crop_land_simulation = YES\n\n\n\nPature crop lands could be defined by users or created with specified criteria.\n\n\nThe user-defined pasture crop land shapefile could be specified using pasture_crop_shapefile in the pasture_crop_land section. One example is given below.\n[pasture_crop_land]\npasture_crop_shapefile = pasture_crop.shp\n\n\n\nIf the user doesn’t specify the pasture crop land location, the system will use all the lands where the landuse is tame grass. User has option to limit the landuse ids using pasture_crop_land_landuse_ids option. Multiple ids should be separated with comma, e.g. 10, 11, 12. The default value is empty, which means all tame grass landuses will be used.\n\n\n\n\nThe grass type applied to pasture crop lands is specified using pasture_crop_land_grass_type section in pasture_crop_land section. One example is given below. The default crop, fertilizer and tillage management data of the specified grass type will be applied to all pasture crop lands.\n[pasture_crop_land]\npasture_crop_land_grass_type = 36"
+  },
+  {
+    "objectID": "bmps/34_35_36_pasture_crop_land.html#flag",
+    "href": "bmps/34_35_36_pasture_crop_land.html#flag",
+    "title": "34. Pasture Crop Land",
+    "section": "",
+    "text": "The pasture crop land BMP is flagged using pasture_crop_land_simulation in pasture_crop_land section. This BMP will be used if it’s set to YES. The default value is NO. One example is given below.\n[pasture_crop_land]\npasture_crop_land_simulation = YES"
+  },
+  {
+    "objectID": "bmps/34_35_36_pasture_crop_land.html#location",
+    "href": "bmps/34_35_36_pasture_crop_land.html#location",
+    "title": "34. Pasture Crop Land",
+    "section": "",
+    "text": "Pature crop lands could be defined by users or created with specified criteria.\n\n\nThe user-defined pasture crop land shapefile could be specified using pasture_crop_shapefile in the pasture_crop_land section. One example is given below.\n[pasture_crop_land]\npasture_crop_shapefile = pasture_crop.shp\n\n\n\nIf the user doesn’t specify the pasture crop land location, the system will use all the lands where the landuse is tame grass. User has option to limit the landuse ids using pasture_crop_land_landuse_ids option. Multiple ids should be separated with comma, e.g. 10, 11, 12. The default value is empty, which means all tame grass landuses will be used."
+  },
+  {
+    "objectID": "bmps/34_35_36_pasture_crop_land.html#grass-type",
+    "href": "bmps/34_35_36_pasture_crop_land.html#grass-type",
+    "title": "34. Pasture Crop Land",
+    "section": "",
+    "text": "The grass type applied to pasture crop lands is specified using pasture_crop_land_grass_type section in pasture_crop_land section. One example is given below. The default crop, fertilizer and tillage management data of the specified grass type will be applied to all pasture crop lands.\n[pasture_crop_land]\npasture_crop_land_grass_type = 36"
+  },
+  {
     "objectID": "bmps/29_manure_feedlot.html",
     "href": "bmps/29_manure_feedlot.html",
     "title": "29. Manure Feedlot",

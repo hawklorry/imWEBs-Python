@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>pasture_land – imWEBs</title>
+<title>pasture_crop_land – imWEBs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -234,16 +234,60 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="34_35_36_37_pasture_land.ipynb" download="34_35_36_37_pasture_land.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#pasture-crop-land" id="toc-pasture-crop-land" class="nav-link active" data-scroll-target="#pasture-crop-land">34. Pasture Crop Land</a>
+  <ul class="collapse">
+  <li><a href="#flag" id="toc-flag" class="nav-link" data-scroll-target="#flag">Flag</a></li>
+  <li><a href="#location" id="toc-location" class="nav-link" data-scroll-target="#location">Location</a>
+  <ul class="collapse">
+  <li><a href="#user-defined" id="toc-user-defined" class="nav-link" data-scroll-target="#user-defined">User-defined</a></li>
+  <li><a href="#system-generated" id="toc-system-generated" class="nav-link" data-scroll-target="#system-generated">System-generated</a></li>
+  </ul></li>
+  <li><a href="#grass-type" id="toc-grass-type" class="nav-link" data-scroll-target="#grass-type">Grass Type</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/34_35_36_pasture_crop_land.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="34_35_36_pasture_crop_land.ipynb" download="34_35_36_pasture_crop_land.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
 
+<section id="pasture-crop-land" class="level1">
+<h1>34. Pasture Crop Land</h1>
+<section id="flag" class="level2">
+<h2 class="anchored" data-anchor-id="flag">Flag</h2>
+<p>The pasture crop land BMP is flagged using <strong>pasture_crop_land_simulation</strong> in <strong>pasture_crop_land</strong> section. This BMP will be used if it’s set to YES. The default value is NO. One example is given below.</p>
+<p><em>[pasture_crop_land]</em></p>
+<p><em>pasture_crop_land_simulation = YES</em></p>
+</section>
+<section id="location" class="level2">
+<h2 class="anchored" data-anchor-id="location">Location</h2>
+<p>Pature crop lands could be defined by users or created with specified criteria.</p>
+<section id="user-defined" class="level3">
+<h3 class="anchored" data-anchor-id="user-defined">User-defined</h3>
+<p>The user-defined pasture crop land shapefile could be specified using <strong>pasture_crop_shapefile</strong> in the <strong>pasture_crop_land</strong> section. One example is given below.</p>
+<p><em>[pasture_crop_land]</em></p>
+<p><em>pasture_crop_shapefile = pasture_crop.shp</em></p>
+</section>
+<section id="system-generated" class="level3">
+<h3 class="anchored" data-anchor-id="system-generated">System-generated</h3>
+<p>If the user doesn’t specify the pasture crop land location, the system will use all the lands where the landuse is tame grass. User has option to limit the landuse ids using <strong>pasture_crop_land_landuse_ids</strong> option. Multiple ids should be separated with comma, e.g.&nbsp;10, 11, 12. The default value is empty, which means all tame grass landuses will be used.</p>
+</section>
+</section>
+<section id="grass-type" class="level2">
+<h2 class="anchored" data-anchor-id="grass-type">Grass Type</h2>
+<p>The grass type applied to pasture crop lands is specified using <strong>pasture_crop_land_grass_type</strong> section in <strong>pasture_crop_land</strong> section. One example is given below. The default crop, fertilizer and tillage management data of the specified grass type will be applied to all pasture crop lands.</p>
+<p><em>[pasture_crop_land]</em></p>
+<p><em>pasture_crop_land_grass_type = 36</em></p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -674,7 +718,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
 <p>© 2025 University of Guelph</p>
-<div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/34_35_36_37_pasture_land.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/34_35_36_pasture_crop_land.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div></div>
     <div class="nav-footer-right">
       &nbsp;
     </div>
