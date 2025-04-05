@@ -1,0 +1,33 @@
+# 34. Pasture Crop Land
+
+## Flag
+
+The pasture crop land BMP is flagged using **pasture_crop_land_simulation** in **pasture_crop_land** section. This BMP will be used if it's set to YES. The default value is NO. One example is given below.
+
+*\[pasture_crop_land\]*
+
+*pasture_crop_land_simulation = YES*
+
+## Location
+
+Pature crop lands could be defined by users or created with specified criteria.
+
+### User-defined
+
+The user-defined pasture crop land shapefile could be specified using **pasture_crop_shapefile** in the **pasture_crop_land** section. One example is given below.
+
+*\[pasture_crop_land\]*
+
+*pasture_crop_shapefile = pasture_crop.shp*
+
+### System-generated
+
+If the user doesn't specify the pasture crop land location, the system will use all the lands where the landuse is tame grass. User has option to limit the landuse ids using **pasture_crop_land_landuse_ids** option. Multiple ids should be separated with comma, e.g. 10, 11, 12. The default value is empty, which means all tame grass landuses will be used.
+
+## Grass Type
+
+The grass type applied to pasture crop lands is specified using **pasture_crop_land_grass_type** section in **pasture_crop_land** section. One example is given below. The default crop, fertilizer and tillage management data of the specified grass type will be applied to all pasture crop lands.
+
+*\[pasture_crop_land\]*
+
+*pasture_crop_land_grass_type = 36*

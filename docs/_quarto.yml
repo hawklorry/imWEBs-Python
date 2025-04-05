@@ -36,6 +36,7 @@ website:
         - bmps/28_manure_catch_basin.qmd
         - bmps/29_manure_feedlot.qmd
         - bmps/30_31_32_marginal_crop_land.qmd
+        - bmps/34_35_36_pasture_crop_land.qmd
         - bmps/39_offsite_watering.qmd
         - bmps/41_wascob.qmd      
 format:

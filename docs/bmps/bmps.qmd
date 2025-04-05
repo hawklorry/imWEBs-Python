@@ -44,10 +44,10 @@
 | 31 | [Marginal fertilizer management](30_31_32_marginal_crop_land) | 3 | MCLFM |
 | 32 | [Marginal tillage management](30_31_32_marginal_crop_land) | 3 | MCLTM |
 | 33 | Wintering site management | 3 | WSMG |
-| 34 | [Pasture crop management](34_35_36_37_pasture_land.qmd) | 3 | PSCM |
-| 35 | [Pasture fertilizer management](34_35_36_37_pasture_land.qmd) | 3 | PSFM |
-| 36 | [Pasture tillage management](34_35_36_37_pasture_land.qmd) | 3 | PSTM |
-| 37 | [Pasture grazing management](34_35_36_37_pasture_land.qmd) | 3 | PSGM |
+| 34 | [Pasture crop management](34_35_36_pasture_crop_land.qmd) | 3 | PSCM |
+| 35 | [Pasture fertilizer management](34_35_36_pasture_crop_land.qmd) | 3 | PSFM |
+| 36 | [Pasture tillage management](34_35_36_pasture_crop_land.qmd) | 3 | PSTM |
+| 37 | Pasture grazing management | 3 | PSGM |
 | 38 | Dugout | 2 | DGOT |
 | 39 | [Off site watering](39_offsite_watering.qmd) | 0 | OFSW |
 | 40 | Managed access including fencing | 1 | MAIF |
