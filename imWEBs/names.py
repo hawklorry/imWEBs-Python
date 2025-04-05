@@ -422,15 +422,6 @@ class Names:
     winteringSiteShpName = "winteringSite" + shapefile_extension
     winteringSiteRasterName = winteringSiteShpName.replace(shapefile_extension,raster_extension)
 
-    #Pasture
-    pastureCropLandRasName = "PastureCropland" + raster_extension
-    pastureCropLandShpName = "PastureCropland" + shapefile_extension
-    # pastureLandH5RasterName = "PasCropland_H5" + raster_extension
-
-    #Pasture grazing
-    pastureGrazingRasterName = "pastureGrazing" + raster_extension
-    pastureGrazingShpName = "pastureGrazing" + shapefile_extension
-
     #Manure Setback
     manure48hShpName = "manure_within_48h" + shapefile_extension
     manure48hRasName = manure48hShpName.replace(shapefile_extension, raster_extension)
@@ -467,6 +458,15 @@ class Names:
     marginalCroplandShpName = "marginal_crop_land" + shapefile_extension
     marginalCroplandOriginalFieldRasName = "marginal_crop_land_original_field" + raster_extension
     marginalCroplandSeparatedFieldRasName = "marginal_crop_land_separated_field" + raster_extension
+
+    #Pasture crop land
+    pastureCropLandShpName = "pasture_crop_land" + shapefile_extension
+    pastureCropLandOriginalFieldRasName = "pasture_crop_land_original_field" + raster_extension
+    pastureCropLandSeparatedFieldRasName = "pasture_crop_land_separated_field" + raster_extension
+
+    #Pasture grazing
+    pastureGrazingRasterName = "pastureGrazing" + raster_extension
+    pastureGrazingShpName = "pastureGrazing" + shapefile_extension
 
     #standard names
     config_item_standard_name_lookup = {

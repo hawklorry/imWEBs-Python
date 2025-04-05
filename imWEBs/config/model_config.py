@@ -190,6 +190,13 @@ class ModelConfig(Config):
                 "marginal_crop_land_slope_threshold_percentage",
                 "marginal_crop_land_grass_type"],
 
+            "pasture_crop_land":[
+                "pasture_crop_land_simulation",
+                "pasture_crop_land_shapefile",
+                "pasture_crop_land_landuse_ids",
+                "pasture_crop_land_grass_type"
+            ],
+
             "manure_adjustment_bmp":[
                 "manure_adjustment_incorporation_within_48h_shapefile",
                 "manure_adjustment_application_setback_shapefile",
@@ -210,6 +217,8 @@ class ModelConfig(Config):
             "model":["model_folder"]
         }
     
+#region marginal crop land
+
     @property
     def marginal_crop_land_simulation_property(self)->bool:
         value = self.get_config_value("marginal_crop_land_simulation", False)
@@ -242,6 +251,37 @@ class ModelConfig(Config):
     @property
     def marginal_crop_land_grass_type_property(self)->int:
         return int(self.get_config_value("marginal_crop_land_grass_type", 36))
+    
+#endregion
+
+#region pasture crop land
+
+    @property
+    def pasture_crop_land_simulation_property(self)->bool:
+        value = self.get_config_value("pasture_crop_land_simulation", False)
+        
+        if value is None:
+            return False
+        
+        if isinstance(value, str) and (str(value).lower() == "yes" or str(value).lower() == "true"):
+            return True
+        
+        return False
+    
+    @property
+    def pasture_crop_land_landuse_ids_property(self):
+        value = self.get_config_value("pasture_crop_land_landuse_ids", optional = True)
+         
+        if isinstance(value, str) and len(value) > 0:
+            return [int(id) for id in value.split(",")]
+        
+        return None
+
+    @property
+    def pasture_crop_land_grass_type_property(self)->int:
+        return int(self.get_config_value("pasture_crop_land_grass_type", 36))
+    
+#endregion
 
     def delineate_watershed(self):
         """watershed delineation""" 
@@ -253,7 +293,11 @@ class ModelConfig(Config):
             marginal_crop_land_non_agriculture_landuse_ids = self.marginal_crop_land_non_agriculture_landuse_ids_property,
             marginal_crop_land_buffer_size_m = self.marginal_crop_land_buffer_size_m_property,
             marginal_crop_land_slope_threshold_percentage = self.marginal_crop_land_slope_threshold_percentage_property,
-            marginal_crop_land_grass_type = self.marginal_crop_land_grass_type_property)
+            marginal_crop_land_grass_type = self.marginal_crop_land_grass_type_property,
+            pasture_crop_land_simulation = self.pasture_crop_land_simulation_property,
+            pasture_crop_land_ids=self.pasture_crop_land_landuse_ids_property,
+            pasture_crop_land_grass_type=self.pasture_crop_land_grass_type_property
+            )
 
     def generate_parameters(self):
         """watershed delineation""" 

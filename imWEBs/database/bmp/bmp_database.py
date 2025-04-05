@@ -36,37 +36,14 @@ from .bmp_02_flow_diversion import FlowDiversion
 from .bmp_03_reservoir import Reservoir
 from .bmp_05_riparian_buffer import RiparianBuffer
 from .bmp_07_vegetation_filter_strip import VegetationFilterStrip
-# from .bmp_06_grass_waterway import GrassWaterWay
-# from .bmp_07_vegetation_filter_strip import FilterStrip
 from .bmp_09_isolated_wetland import Wetland
-# from .bmp_12_crop_management import CropManagement, CropParameter
-# from .bmp_14_tillage_management import TillageManagement, TillageParameter
-# from .bmp_15_fertilizer_management import FertlizerManagement, FertilizerParameter
-# from .bmp_16_grazing_management import GrazingManagement
-# from .bmp_18_irrigation_management import irrigation_management, irrigation_parameter
 from .bmp_19_tile_drain_management import TileDrainParameter
-# from .bmp_21_manure_incorporation_within_48h import ManureIncorporationWithin48hManagemet
-# from .bmp_22_manure_application_setback import ManureApplicationSetbackManagement
-# from .bmp_23_no_application_on_snow import ManureNoApplicaitonOnSnowManagement
-# from .bmp_24_spring_application_rather_than_fall_application import ManureSpringApplicationRatherThanFallApplicationManagement
-# from .bmp_25_applicaiton_based_on_soil_nitrogen_limit import ManureApplicationBasedOnSoliNitrogenLimitManagement
-# from .bmp_26_applicaiton_based_on_soil_phosphorous_limit import ManureApplicationBasedOnPhosphorousLimitManagement
 from .bmp_27_manure_storage import ManureStorageParameter
 from .bmp_28_manure_catch_basin import ManureCatchBasinParameter
 from .bmp_29_manure_feedlot import ManureFeedlot, ManureFeedlotManagement
-# from .bmp_30_marginal_crop_management import MarginalCropManagement
-# from .bmp_31_marginal_fertilizer_management import MarginalFertilizerManagement
-# from .bmp_32_marginal_tillage_management import MarginalTillageManagement
-# from .bmp_33_wintering_site_management import WinteringSiteManagement, WinteringSiteParameter
-# from .bmp_34_pasture_crop_management import PastureCropManagement
-# from .bmp_35_pasture_fertilizer_management import PastureFertilizerManagement
-# from .bmp_36_pasture_tillage_management import Pasture_tillage_management
-# from .bmp_37_pasture_grazing_management import PastureGrazingManagement, PastureGrazingParameter
-# from .bmp_38_dugout import DugoutParameter
 from .bmp_39_offsite_watering import OffsiteWateringParameter
 from .bmp_40_managed_access_including_fencing import ManagedAccessIncludingFencingParameter
 from .bmp_41_wascob import Wascob
-#from .bmp_42_water_use import 
 import os
 import gc
 
@@ -141,8 +118,9 @@ class BMPDatabase(DatabaseBase):
         self.__create_reach_lookup()
         self.__create_bmp_reach_bmp(outputs, reach_bmps_subbasins)
 
-        #create marginal crop bmps
+        #create marginal and pasture crop bmps
         self.__create_bmp_marginal_crop(outputs)
+        self.__create_bmp_pasture_crop(outputs)
 
         #create manure adjustment
         self.__create_bmp_manure_adjustment(outputs)
@@ -535,6 +513,10 @@ class BMPDatabase(DatabaseBase):
             bmp_types.append(BMPType.BMP_TYPE_CROP_MAR)
             bmp_types.append(BMPType.BMP_TYPE_FERTILIZER_MAR)
             bmp_types.append(BMPType.BMP_TYPE_TILLAGE_MAR)
+        if outputs.pasture_crop_land_separated_field_raster is not None:
+            bmp_types.append(BMPType.BMP_TYPE_CROP_PS)
+            bmp_types.append(BMPType.BMP_TYPE_FERTILIZER_PS)
+            bmp_types.append(BMPType.BMP_TYPE_TILLAGE_PS)           
         if include_crop_rotation:
             bmp_types.append(BMPType.BMP_TYPE_CROP)
             bmp_types.append(BMPType.BMP_TYPE_FERTILIZER)
@@ -561,6 +543,23 @@ class BMPDatabase(DatabaseBase):
 #endregion
 
 #region Crop Rotation
+
+    def __create_bmp_pasture_crop(self, outputs:Outputs):
+        if outputs.pasture_crop_land_separated_field_raster is None:
+            return
+        
+        logger.info("Creating pasture crop bmps ... ")
+
+        crop = SingleCrop(outputs.pasture_crop_land_separated_field_raster, outputs.pasture_crop_land_grass_type)
+
+        logger.info("   Crop Management ... ")
+        self.save_table(Names.bmp_table_name_pasture_crop_management, crop.crop_management_df)
+
+        logger.info("   Fertilizer Management ... ")
+        self.save_table(Names.bmp_table_name_pasture_fertilizer_management, crop.fertilizer_management_df)
+
+        logger.info("   Tillage Management ... ")
+        self.save_table(Names.bmp_table_name_pasture_tillage_management, crop.tillage_management_df)
 
     def __create_bmp_marginal_crop(self, outputs:Outputs):
         if outputs.marginal_crop_land_separated_field_raster is None:

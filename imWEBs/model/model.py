@@ -59,7 +59,11 @@ class Model:
                             marginal_crop_land_non_agriculture_landuse_ids = None,
                             marginal_crop_land_buffer_size_m = 100,
                             marginal_crop_land_slope_threshold_percentage = 7,
-                            marginal_crop_land_grass_type = 36):
+                            marginal_crop_land_grass_type = 36,
+                            pasture_crop_land_simulation = False,
+                            pasture_crop_land_ids = None,
+                            pasture_crop_land_grass_type = 36
+                            ):
         """watershed delineation""" 
         self.outputs.delineate_watershed(stream_threshold_area_ha, 
                                          wetland_min_area_ha, 
@@ -68,7 +72,10 @@ class Model:
                                          marginal_crop_land_non_agriculture_landuse_ids, 
                                          marginal_crop_land_buffer_size_m, 
                                          marginal_crop_land_slope_threshold_percentage,
-                                         marginal_crop_land_grass_type)
+                                         marginal_crop_land_grass_type,
+                                         pasture_crop_land_simulation,
+                                         pasture_crop_land_ids,
+                                         pasture_crop_land_grass_type)
 
     def generate_parameters(self, reservoir_flow_routing:str, reservoir_flow_data_folder:str):
         """generate parameters"""

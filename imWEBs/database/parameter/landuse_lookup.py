@@ -70,6 +70,10 @@ class LanduseLookup(ParameterTable):
     @property
     def is_agricultrual(self):
         return getattr(self, "IS_AGRICULTURAL") > 0
+    
+    @property
+    def is_tame_grass(self):
+        return getattr(self, "IsTameGrass") > 0
 
     @property
     def field_capacity(self):
