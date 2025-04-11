@@ -35,6 +35,9 @@ class imWEBs:
     def generate_scenario(self):
         self.scenario_config.generate_model_structure()
 
+    def generate_subarea_parameter_database(self):
+        self.scenario_config.generate_parameter_subarea_database()
+
     def generate_all(self):
         self.delineate_watershed()
         self.generate_parameters()

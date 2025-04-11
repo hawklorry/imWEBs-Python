@@ -264,7 +264,7 @@ class ScenarioConfig(Config):
 
         os.remove(reach_parameter_file_temp)
     
-    def __generate_parameter_subarea_database(self):
+    def generate_parameter_subarea_database(self):
         if self.model_type == "subarea":
             p = ParameterSubarea(self.model.outputs)
             p.generate()
@@ -285,7 +285,7 @@ class ScenarioConfig(Config):
         self.__generate_weight_file()
         self.__generate_parameter_h5()
         self.__generate_reach_parameter() 
-        self.__generate_parameter_subarea_database()       
+        self.generate_parameter_subarea_database()       
         self.__generate_bmp_database()
 
 
