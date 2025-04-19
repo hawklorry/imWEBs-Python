@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, select
 from ..database_base import DatabaseBase
 from .landuse_lookup import LanduseLookup
 from .soil_lookup import SoilLookup
+import os
 import logging
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,10 @@ class ParameterDatabase(DatabaseBase):
                       "LS_parameter",
                       "tile_drain"]
 
-    def __init__(self, database_file):
+    def __init__(self, database_file:str, model_input_folder:str):
+        """
+        model_input_folder is used to read user-defined parameter tables assuming the user-defined tables are saved in csv file with the same name.
+        """
         super().__init__(database_file) 
 
         self._lookup_tables = {}
@@ -35,6 +39,8 @@ class ParameterDatabase(DatabaseBase):
         self._non_agricultural_landuses = []
         self._tame_grass_landuses = []
 
+        self._model_input_folder = model_input_folder
+
     def __populate_default_tables(self):
         """populate default parameter tables from csv files"""
 
@@ -42,7 +48,7 @@ class ParameterDatabase(DatabaseBase):
         logger.info("Trying to load default tables to parameter database ...")
         for table in ParameterDatabase.default_tables:
             logger.info(table)
-            self.populate_defaults(table)
+            self.populate_defaults(table, os.path.join(self._model_input_folder, f"{table}.csv"))
 
 #region Soil and Landuse Parameters
 

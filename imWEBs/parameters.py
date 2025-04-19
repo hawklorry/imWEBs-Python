@@ -13,10 +13,10 @@ class Parameters(FolderBase):
     """all the parameters from parameter database and bmp database. It exposes necessary """
     GRASS_ID = 38
 
-    def __init__(self, database_folder:str)->None:
+    def __init__(self, database_folder:str, model_input_folder:str)->None:
         super().__init__(database_folder)
 
-        self.parameter_database = ParameterDatabase(self.get_file_path(Names.parameterDatabaseName))
+        self.parameter_database = ParameterDatabase(self.get_file_path(Names.parameterDatabaseName), model_input_folder)
         self.reach_width_parameters = {2: reach_width_depth_parameter(2, 1, 0.56),
                                        10: reach_width_depth_parameter(10, 1.2, 0.56),
                                        100: reach_width_depth_parameter(100, 1.4, 0.56)}

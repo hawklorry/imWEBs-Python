@@ -46,6 +46,7 @@ class Outputs(FolderBase):
 
         #delineation parameters
         self.stream_threshold_area_ha = 10
+        self.use_all_pour_points_from_stream_threshold = False
         self.main_stream_threshold_area_ha = 200            #threshold for main stream in ha
         self.design_storm_return_period = 2
         self.wetland_min_area_ha = 0.1
@@ -80,7 +81,7 @@ class Outputs(FolderBase):
     @property
     def parameter(self)->Parameters:
         if self.__parameters is None:
-            self.__parameters = Parameters(self.database_folder)
+            self.__parameters = Parameters(self.database_folder, self.inputs.folder)
 
         return self.__parameters
     
@@ -1047,8 +1048,41 @@ class Outputs(FolderBase):
                 base_raster = self.inputs.dem_raster)
             #raster = self.wbe.buffer_raster(raster, self.inputs.cell_size)
             raster = self.save_raster(raster, Names.streamNetworUserRasName, True, True)
+        return raster    
+ 
+    @property
+    def stream_pour_points_threshold_vector(self)->Raster:
+        vector = self.get_vector(Names.streamPourPointThresholdShpName)
+
+        if vector is None:
+            logger.info(f"Creating pour points with stream ({self.stream_threshold_area_ha}ha threshold) ...")
+            pour_points_vector = Delineation.get_pour_points(
+                self.stream_threshold_raster, 
+                self.flow_direction_raster, 
+                [structure.boundary_raster for structure in self.structures.values()])
+            
+            vector = self.save_vector(pour_points_vector, True, True)
+
+        return vector
+
+    @property
+    def stream_threshold_raster(self)->Raster:
+        """stream network delineated with fixed 200ha threshold to define the pour points."""
+
+        raster = self.get_raster(Names.streamThresholdRasName)
+   
+        if raster is None:       
+            #get streams from the flow accumuation 
+            logger.info(f"Extracting stream raster with threashold area of {self.stream_threshold_area_ha}ha ...")    
+            raster = self.wbe.extract_streams(
+                flow_accumulation = self.flow_acc_raster, 
+                threshold = self.stream_threshold_area_ha / self.inputs.cellsize_ha)
+                 
+            #save it
+            raster = self.save_raster(raster, Names.streamThresholdRasName, True, True)
+
         return raster
-    
+
     @property
     def stream_main_raster(self)->Raster:
         """stream network delineated with fixed 200ha threshold to define the pour points."""
@@ -1132,13 +1166,17 @@ class Outputs(FolderBase):
             #merge the pour points and user-provided reservoir and outlets
             outlet_vectors = []
 
-            #add stream outlets delineated using main stream
-            logger.info("Creating pour points with main stream (200ha threshold) ...")
-            pour_points_vector = Delineation.get_pour_points(
-                self.stream_main_raster, 
-                self.flow_direction_raster, 
-                [structure.boundary_raster for structure in self.structures.values()])
-            outlet_vectors.append(pour_points_vector)
+            #add stream outlets delineated using user-defined threshold
+            if self.use_all_pour_points_from_stream_threshold:
+                outlet_vectors.append(self.stream_pour_points_threshold_vector)
+            else:            
+                #add stream outlets delineated using main stream
+                logger.info("Creating pour points with main stream (200ha threshold) ...")
+                pour_points_vector = Delineation.get_pour_points(
+                    self.stream_main_raster, 
+                    self.flow_direction_raster, 
+                    [structure.boundary_raster for structure in self.structures.values()])
+                outlet_vectors.append(pour_points_vector)
             
             #add user-defined subbasin outlets and snap it to the stream network
             if self.inputs.outlet_vector is not None:
@@ -1911,8 +1949,14 @@ class Outputs(FolderBase):
                 self.save_raster(raster, Names.offsiteWinteringRasName)
         return raster
 
+    def generate_pour_points_based_on_threshold_and_structures(self,
+                            stream_threshold_area_ha:float = 10,   #stream thrshold area
+                            wetland_min_area_ha:float = 0.1):       #min wetland area
+        pour_points = self.stream_pour_points_threshold_vector
+
     def delineate_watershed(self,
                             stream_threshold_area_ha:float = 10,   #stream thrshold area
+                            use_all_pour_points_from_stream_threshold:bool = False,
                             wetland_min_area_ha:float = 0.1,       #min wetland area
                             design_storm_return_period = 2,        #design storm return period for reach width and depth
                             marginal_crop_land_simulation = False,
@@ -1929,6 +1973,7 @@ class Outputs(FolderBase):
         
         #read in delineation parameters
         self.stream_threshold_area_ha = stream_threshold_area_ha
+        self.use_all_pour_points_from_stream_threshold = use_all_pour_points_from_stream_threshold
         self.wetland_min_area_ha = wetland_min_area_ha
         self.design_storm_return_period = design_storm_return_period
 

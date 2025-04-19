@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseBase:
-    def __init__(self, database_file):
+    def __init__(self, database_file:str):
         # if not os.path.exists(database_file):
         #     raise ValueError(f"{database_file} doesn't exist.")
         
@@ -64,7 +64,7 @@ class DatabaseBase:
         df = pd.read_sql(query,self.engine)
         return df['name'].to_list()
 
-    def populate_defaults(self, table_name:str):
+    def populate_defaults(self, table_name:str, user_defined_file:str = None):
         """
         populate table from csv file, used to load the default tables, assuming the table name is same as the csv file name
         """
@@ -74,11 +74,14 @@ class DatabaseBase:
         #     return
 
         #try to find the corresponding csv file in the default folder
-        csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defaults", f"{table_name}.csv")
-
-        #raise error if the csv file doesn't exist
-        if not os.path.exists(csv_file):
-            raise ValueError(f"{csv_file} doesn't exist.")
+        if user_defined_file is not None and os.path.exists(user_defined_file):
+            csv_file = user_defined_file
+        else:
+            csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "defaults", f"{table_name}.csv")
+            
+            #raise error if the csv file doesn't exist
+            if not os.path.exists(csv_file):
+                raise ValueError(f"{csv_file} doesn't exist.")
         
         #load csv file and save to the database. It will replace the existing table.
         try:

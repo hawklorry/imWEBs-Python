@@ -51,8 +51,14 @@ class Model:
             self.__parameter_h5 = ParameterH5(os.path.join(self.model_output_folder, Names.parameteH5Name))
         return self.__parameter_h5
 
+    def generate_pour_points_based_on_threshold_and_structures(self,
+                            stream_threshold_area_ha:float = 10,   #stream thrshold area
+                            wetland_min_area_ha:float = 0.1):
+        self.outputs.generate_pour_points_based_on_threshold_and_structures(stream_threshold_area_ha, wetland_min_area_ha)
+
     def delineate_watershed(self,
                             stream_threshold_area_ha:float = 10,   #stream thrshold area
+                            use_all_pour_points_from_stream_threshold = False,
                             wetland_min_area_ha:float = 0.1,       #min wetland area
                             design_storm_return_period = 2,        #design storm return period for reach width and depth
                             marginal_crop_land_simulation = False,
@@ -66,6 +72,7 @@ class Model:
                             ):
         """watershed delineation""" 
         self.outputs.delineate_watershed(stream_threshold_area_ha, 
+                                         use_all_pour_points_from_stream_threshold,
                                          wetland_min_area_ha, 
                                          design_storm_return_period, 
                                          marginal_crop_land_simulation, 

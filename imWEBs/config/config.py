@@ -21,7 +21,7 @@ class Config:
                     raise ValueError(f"{config_name} couldn't be found in the config file.")
             return default_value
         
-        return getattr(self,config_name)
+        return default_value if (getattr(self,config_name) is None or (isinstance(getattr(self,config_name), str) and len(getattr(self,config_name)) == 0)) else getattr(self,config_name)
 
     def create_template(self, file_path:str):
         """

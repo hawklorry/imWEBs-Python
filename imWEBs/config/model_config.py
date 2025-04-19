@@ -18,7 +18,7 @@ class ModelConfig(Config):
     """
 
     #the sections that are files
-    file_sections = ["watershed","lookup","database","reach_bmp","structure_bmp","non_structure_bmp","manure_adjustment_bmp"]
+    file_sections = ["watershed","lookup","parameter","database","reach_bmp","structure_bmp","non_structure_bmp","manure_adjustment_bmp"]
 
     def __init__(self, config_file:str = None):
         super().__init__(config_file)
@@ -47,7 +47,7 @@ class ModelConfig(Config):
             for section, variables in self.config_variables.items():
                 for var in variables:
                     #logger.info(f"Reading Section: {section}, Variable: {var} ...")
-                    if section == "delineation":
+                    if section == "delineation" and var != "use_all_pour_points_from_stream_threshold":
                         value = Config.get_option_value_exactly(cf, section, var, valtyp=float)
                         setattr(self, var, value)
                         continue
@@ -83,7 +83,7 @@ class ModelConfig(Config):
                                     unique_id_vectors[var] = vectors[var]
                             if section == "database":
                                 databases[var] = value
-                            if section == "lookup":
+                            if section == "lookup" or section == "parameter":
                                 lookups[var] = value
                         else:
                             raise ValueError(f"{var} = {value} doesn't exist!")
@@ -142,6 +142,9 @@ class ModelConfig(Config):
             "lookup":["soil_lookup",
                       "landuse_lookup"],
 
+            #parameter
+            "parameter":["SoilLookup"],
+
             #db3 databases
             "database":["hydroclimate"],
 
@@ -178,6 +181,7 @@ class ModelConfig(Config):
 
             #delineation parameters
             "delineation":["stream_threshold_area_ha",
+                           "use_all_pour_points_from_stream_threshold",
                         "wetland_min_area_ha",
                         "wetland_riparian_contribution_area_ha",
                         "wetland_stream_buffer_distance_m"],
@@ -217,6 +221,22 @@ class ModelConfig(Config):
             "model":["model_folder"]
         }
     
+#region delineation
+
+    @property
+    def use_all_pour_points_from_stream_threshold_property(self)->bool:
+        value = self.get_config_value("use_all_pour_points_from_stream_threshold", False)
+        
+        if value is None:
+            return False
+        
+        if isinstance(value, str) and (str(value).lower() == "yes" or str(value).lower() == "true"):
+            return True
+        
+        return False
+
+#endregion
+
 #region marginal crop land
 
     @property
@@ -283,10 +303,16 @@ class ModelConfig(Config):
     
 #endregion
 
+    def generate_pour_points_based_on_threshold_and_structures(self):
+        self.model.generate_pour_points_based_on_threshold_and_structures(
+            stream_threshold_area_ha = float(self.get_config_value("stream_threshold_area_ha", 10)),
+            wetland_min_area_ha = float(self.get_config_value("wetland_min_area_ha", 0.1)))
+
     def delineate_watershed(self):
         """watershed delineation""" 
         self.model.delineate_watershed(
             stream_threshold_area_ha = float(self.get_config_value("stream_threshold_area_ha", 10)),
+            use_all_pour_points_from_stream_threshold = self.use_all_pour_points_from_stream_threshold_property,
             wetland_min_area_ha = float(self.get_config_value("wetland_min_area_ha", 0.1)),
             design_storm_return_period = 2,
             marginal_crop_land_simulation = self.marginal_crop_land_simulation_property,

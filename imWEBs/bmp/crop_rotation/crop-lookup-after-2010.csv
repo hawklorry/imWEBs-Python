@@ -11,6 +11,7 @@ Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
 130,Too Wet to be Seeded,Not Seeded,BARE,98
 131,Fallow,Not Seeded,BARE,98
 133,Greenfeed/Mixed Cereals,Cereals,BARL,31
+134,Other grains,Other Crops,OATS,32
 135,Millet,Other Crops,PMIL,34
 136,Oats,Cereals,OATS,32
 137,Rye,Cereals,RYE,30
@@ -19,6 +20,8 @@ Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
 145,Winter Wheat,Cereals,WWHT,28
 146,Spring Wheat,Cereals,SWHT,27
 147,Corn,Other Crops,CORN,19
+148,Tobacco,Other Crops,TOBC,68
+149,Ginseng,Other Crops,CRRT,72
 152,Camelina,Oilseeds,FLAX,65
 153,Canola/Rapeseed,Oilseeds,CANA,76
 154,Flaxseed,Oilseeds,FLAX,65
@@ -27,14 +30,22 @@ Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
 157,Sunflowers,Other Crops,SUNF,74
 158,Soybeans,Other Crops,SOYB,56
 162,Peas,Other Crops,PEAS,63
+163,Chickpeas,Other Crops,FPEA,62
 167,Beans,Other Crops,GRBN,84
 174,Lentils,Other Crops,LENT,60
+176,Tomatoes,Vegetables,TOMA,92
 177,Potatoes,Vegetables,POTA,70
 178,Sugarbeets,Other Crops,SUGC,26
 179,Other Vegetables,Vegetables,TOMA,92
+182,Blueberry,Fruit,STRW,91
+185,Other berries,Fruit,STRW,91
 188,Orchards,Fruit,APPL,93
+189,Other fruits,Fruit,ORCD,4
 190,Vineyards,Fruit,APPL,93
+191,Hops,Other Crops,TOBC,68
+192,Sod,Non-Crop,BLUG,39
 193,Herbs,Fruit,APPL,93
+194,Nursery,Non-Crop,FRST,Not proceed
 195,Buckwheat,Cereals,WWHT,28
 196,Canaryseed,Oilseeds,FLAX,65
 197,Hemp,Oilseeds,FLAX,65

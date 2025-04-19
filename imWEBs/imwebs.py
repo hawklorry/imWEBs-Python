@@ -20,6 +20,9 @@ class imWEBs:
         """
         self.model_config.delineate_watershed()
 
+    def generate_pour_points_based_on_threshold_and_structures(self):
+        self.model_config.generate_pour_points_based_on_threshold_and_structures()
+
     def generate_parameters(self):
         """
         watershed delineation

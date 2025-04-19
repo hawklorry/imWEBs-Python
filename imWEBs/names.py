@@ -144,8 +144,11 @@ class Names:
     parameterSubareaDatabaseName = "parameter_subarea" + sqlite_extension
 
     # Lookup
-    soilLookupName = "soilLookup" + lookup_extension
-    landuseLookupName = "landuseLookup" + lookup_extension
+    soilLookupName = "soil_id_lookup" + lookup_extension
+    landuseLookupName = "landuse_id_lookup" + lookup_extension
+
+    # parameter
+    parameterSoilLookupName = "SoilLookup" + lookup_extension
 
     # DEM
     demName = "dem" + raster_extension
@@ -171,10 +174,12 @@ class Names:
     # mainStreamRasName = "mainStream" + raster_extension   
     streamMainRasName = "stream_main" + raster_extension
     streamMainShpName = "stream_main" + shapefile_extension 
+    streamThresholdRasName = "stream_threshold" + raster_extension
     streamNetworkRasName = "stream_network" + raster_extension
     streamNetworkShpName = "stream_network" + shapefile_extension
     streamPourPointShpName = "stream_pour_point" + shapefile_extension
     streamPourPointRasName = "stream_pour_point" + raster_extension
+    streamPourPointThresholdShpName = "stream_pour_point_threshold" + shapefile_extension
     streamOrderRasName = "stream_order" + raster_extension
 
     # Reach
@@ -483,6 +488,9 @@ class Names:
         #lookup tables
         "soil_lookup":soilLookupName,
         "landuse_lookup":landuseLookupName,
+
+        #parameters
+        "SoilLookup":parameterSoilLookupName,
 
         #db3 database
         "hydroclimate":hydroclimateDatabasename,
