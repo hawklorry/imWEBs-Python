@@ -232,7 +232,7 @@ class RasterExtension:
         configs.data_type = RasterDataType.I64
         overlay_raster = wbe.new_raster(configs)
 
-        temp = np.zeros((rows, cols), dtype = int)
+        temp = np.zeros((rows, cols), dtype = np.int64)
         for row in range(rows):
             for col in range(cols):
                 if spatial1_ras[row, col] != no_data1 and spatial2_ras[row, col] != no_data2:

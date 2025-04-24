@@ -1061,7 +1061,7 @@ class Outputs(FolderBase):
                 self.flow_direction_raster, 
                 [structure.boundary_raster for structure in self.structures.values()])
             
-            vector = self.save_vector(pour_points_vector, True, True)
+            vector = self.save_vector(pour_points_vector,Names.streamPourPointThresholdShpName, True, True)
 
         return vector
 

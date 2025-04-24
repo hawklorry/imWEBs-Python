@@ -182,9 +182,7 @@ class ModelConfig(Config):
             #delineation parameters
             "delineation":["stream_threshold_area_ha",
                            "use_all_pour_points_from_stream_threshold",
-                        "wetland_min_area_ha",
-                        "wetland_riparian_contribution_area_ha",
-                        "wetland_stream_buffer_distance_m"],
+                        "wetland_min_area_ha"],
 
             "marginal_crop_land":[
                 "marginal_crop_land_simulation",

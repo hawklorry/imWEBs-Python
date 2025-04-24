@@ -162,9 +162,8 @@ This section defines the flow routing method for reservoir and the flow data fol
 The settings for watershed delineation.
 
 -   **stream_threshold_area_ha** - The threshold area for stream delineation in ha.
+-   **use_all_pour_points_from_stream_threshold** - The flag to use all pour points corresponding to **stream_threshold_area_ha** and structure. If false, a 200ha threshold will be used.
 -   **wetland_min_area_ha** - The min. wetland area in ha. Wetlands that are smaller than the threshold will be ignored.
--   **wetland_riparian_contribution_area_ha** - The threshold contribution area of riparian wetland in ha. **Not used**.
--   **wetland_stream_buffer_distance_m** - The wetland stream buffer distance in m. **Not used**.
 
 ## marginal_crop_land
 
