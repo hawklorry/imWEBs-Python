@@ -407,6 +407,18 @@ class Outputs(FolderBase):
 
         return raster 
 
+    @property
+    def field_clipped_vector(self)->Vector:
+        """Clipped field vector by subbasin"""
+        vector = self.get_vector(Names.fieldClippedShpName)
+
+        if vector is None:
+            if self.field_raster is not None:
+                vector = RasterExtension.raster_to_vector(self.field_raster)
+                self.save_vector(vector, Names.fieldClippedShpName)
+
+        return vector
+
 #endregion    
 
 #region Marginal Crop Land
@@ -1051,7 +1063,7 @@ class Outputs(FolderBase):
         return raster    
  
     @property
-    def stream_pour_points_threshold_vector(self)->Raster:
+    def stream_pour_points_threshold_vector(self)->Vector:
         vector = self.get_vector(Names.streamPourPointThresholdShpName)
 
         if vector is None:

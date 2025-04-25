@@ -237,7 +237,7 @@ class RasterExtension:
             for col in range(cols):
                 if spatial1_ras[row, col] != no_data1 and spatial2_ras[row, col] != no_data2:
                     id = spatial1_ras[row, col] + spatial2_ras[row, col] * raster1_max
-                    temp[row,col]  = int(id)
+                    temp[row,col]  = np.int64(id)
         
         for row in range(rows):
             for col in range(cols):

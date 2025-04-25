@@ -38,7 +38,7 @@ class FolderBase:
         self.rasters[file_name] = raster
         return raster
 
-    def save_vector(self, vector:Vector, file_name:str, overwrite = True, reload_from_file = False):
+    def save_vector(self, vector:Vector, file_name:str, overwrite = True, reload_from_file = False)->Vector:
         file_path = self.get_file_path(file_name)
 
         if os.path.exists(file_path) and not overwrite:
@@ -48,6 +48,7 @@ class FolderBase:
         if reload_from_file:
             vector = self.wbe.read_vector(file_path)    
         self.vectors[file_name] = vector
+        return vector
 
     def find_file(self, filename:str)->str:        
         file_path = os.path.join(self.folder,filename)
