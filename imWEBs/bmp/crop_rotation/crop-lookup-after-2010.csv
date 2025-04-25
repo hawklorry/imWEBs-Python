@@ -1,43 +1,60 @@
-Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
-20,Water,Non-Crop,,Not proceed
-30,Exposed Land,Non-Crop,,Not proceed
-34,Developed,Non-Crop,,Not proceed
+﻿Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
+10,Cloud,Non-Crop,,Not proceed
+20,Water,Non-Crop,WATR,Not proceed
+30,Exposed land/barren,Non-Crop,BARE,Not proceed
+34,Urban/developed,Non-Crop,URMD,Not proceed
 35,Greenhouses,Non-Crop (no nutrient loss),,Not proceed
 50,Shrubland,Non-Crop,,Not proceed
-80,Wetland,Non-Crop,,Not proceed
-110,Grassland,Non-Crop,,Not proceed
+60,Forest fire/burnt area ,Non-Crop,,Not proceed
+80,Wetland,Non-Crop,WETL,Not proceed
+85,Peatland,Non-Crop,,Not proceed
+110,Grassland,Non-Crop,RNGE,Not proceed
 120,Agriculture (undifferentiated),Cereals,AGRL,1
-122,Pasture / Forages,Forages,PAST,12
-130,Too Wet to be Seeded,Not Seeded,BARE,98
+122,Pasture/forages,Forages,PAST,12
+130,Too wet to be seeded,Not Seeded,BARE,98
 131,Fallow,Not Seeded,BARE,98
-133,Greenfeed/Mixed Cereals,Cereals,BARL,31
+132,Cereals,Cereals,RYE,30
+133,Barley,Cereals,BARL,31
 134,Other grains,Other Crops,OATS,32
 135,Millet,Other Crops,PMIL,34
 136,Oats,Cereals,OATS,32
 137,Rye,Cereals,RYE,30
 138,Spelt,Cereals,RYE,30
 139,Triticale,Cereals,RYE,30
-145,Winter Wheat,Cereals,WWHT,28
-146,Spring Wheat,Cereals,SWHT,27
+140,Wheat,Cereals,WWHT,28
+141,Switchgrass,Other Crops,SWCH,50
+142,Sorghum,Other Crops,GRSG,23
+143,Quinoa,Other Crops,PMIL,34
+145,Winter wheat,Cereals,WWHT,28
+146,Spring wheat,Cereals,SWHT,27
 147,Corn,Other Crops,CORN,19
 148,Tobacco,Other Crops,TOBC,68
 149,Ginseng,Other Crops,CRRT,72
+150,Oilseeds,Oilseeds,FLAX,65
+151,Borage,Oilseeds,FLAX,65
 152,Camelina,Oilseeds,FLAX,65
-153,Canola/Rapeseed,Oilseeds,CANA,76
+153,Canola/rapeseed,Oilseeds,CANA,76
 154,Flaxseed,Oilseeds,FLAX,65
 155,Mustard,Oilseeds,FLAX,65
 156,Safflower,Oilseeds,FLAX,65
-157,Sunflowers,Other Crops,SUNF,74
+157,Sunflower,Other Crops,SUNF,74
 158,Soybeans,Other Crops,SOYB,56
+160,Pulses,Other Crops,PEAS,63
+161,Other pulses,Other Crops,PEAS,63
 162,Peas,Other Crops,PEAS,63
 163,Chickpeas,Other Crops,FPEA,62
 167,Beans,Other Crops,GRBN,84
+168,Fababeans,Other Crops,GRBN,84
 174,Lentils,Other Crops,LENT,60
+175,Vegetables,Vegetables,TOMA,92
 176,Tomatoes,Vegetables,TOMA,92
 177,Potatoes,Vegetables,POTA,70
 178,Sugarbeets,Other Crops,SUGC,26
-179,Other Vegetables,Vegetables,TOMA,92
+179,Other vegetables,Vegetables,TOMA,92
+180,Fruits,Fruit,APPL,93
+181,Berries,Fruit,STRW,91
 182,Blueberry,Fruit,STRW,91
+183,Cranberry,Fruit,STRW,91
 185,Other berries,Fruit,STRW,91
 188,Orchards,Fruit,APPL,93
 189,Other fruits,Fruit,ORCD,4
@@ -49,7 +66,9 @@ Original ID,Land use name,Group,IMWEBs code,IMWEBs ID
 195,Buckwheat,Cereals,WWHT,28
 196,Canaryseed,Oilseeds,FLAX,65
 197,Hemp,Oilseeds,FLAX,65
-199,Other Crops,Other Crops,AGRL,1
-210,Coniferous,Non-Crop,,Not proceed
-220,Broadleaf,Non-Crop,,Not proceed
-230,Mixedwood,Non-Crop,,Not proceed
+198,Vetch,Other Crops,AGRL,1
+199,Other crops,Other Crops,AGRL,1
+200,Forest (undifferentiated),Non-Crop,FRST,Not proceed
+210,Coniferous,Non-Crop,FRSE,Not proceed
+220,Broadleaf,Non-Crop,FRSD,Not proceed
+230,Mixedwood,Non-Crop,FRST,Not proceed
