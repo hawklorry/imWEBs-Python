@@ -1769,7 +1769,7 @@ class Outputs(FolderBase):
         if raster is None:
             if self.field_raster is not None:
                 logging.info("Creating subarea raster and vector ...")
-                raster, raster1_max = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
+                raster, raster1_max, _ = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
                 
                 #re-order the id and return the old id to new id dict
                 old_id_to_new_id_dict = Delineation.reorder_raster_id(raster)

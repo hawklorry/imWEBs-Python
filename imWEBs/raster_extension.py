@@ -215,47 +215,63 @@ class RasterExtension:
         return feature_counts
     
     @staticmethod
-    def get_overlay_raster(spatial1_ras:Raster, spatial2_ras:Raster):
+    def get_overlay_raster(spatial1_ras:Raster, spatial2_ras:Raster, calculate_area:bool = False):
+        #get max of raster 1 and raster 2
         spatial1_ras_max = spatial1_ras.configs.maximum   
         if spatial1_ras_max == float('-inf') or spatial1_ras_max == float('inf'):
             spatial1_ras_max = RasterExtension.get_max_value(spatial1_ras)   
+
+        spatial2_ras_max = spatial2_ras.configs.maximum   
+        if spatial2_ras_max == float('-inf') or spatial2_ras_max == float('inf'):
+            spatial2_ras_max = RasterExtension.get_max_value(spatial2_ras)   
+
+        #get max overlay id
         raster1_max = int(math.pow(10, int(math.log10(spatial1_ras_max)) + 2))
+        max_id = spatial1_ras_max + spatial2_ras_max * raster1_max
+
+        #check if the max id exceed the limitation of int32
+        use_int64 = max_id > np.iinfo(np.int32).max
 
         #make a new raster with a unique id combining both raster 1 and raster 2
         rows = spatial1_ras.configs.rows
         cols = spatial1_ras.configs.columns
         no_data1 = spatial1_ras.configs.nodata
         no_data2 = spatial2_ras.configs.nodata
+        cell_area_ha = spatial1_ras.configs.resolution_x * spatial1_ras.configs.resolution_y / 10000
         
         wbe = WbEnvironment()
-        configs = spatial1_ras.configs
-        configs.data_type = RasterDataType.I64
+        configs = spatial1_ras.configs        
+        configs.data_type = RasterDataType.I64 if use_int64 else RasterDataType.I32
         overlay_raster = wbe.new_raster(configs)
+       
+        dict_area_ha = {}
 
-        temp = np.zeros((rows, cols), dtype = np.int64)
         for row in range(rows):
             for col in range(cols):
                 if spatial1_ras[row, col] != no_data1 and spatial2_ras[row, col] != no_data2:
                     id = spatial1_ras[row, col] + spatial2_ras[row, col] * raster1_max
-                    temp[row,col]  = np.int64(id)
-        
-        for row in range(rows):
-            for col in range(cols):
-                if temp[row,col] > 0:
-                    overlay_raster[row, col] = temp[row,col]                 
+                    id = np.int64(id) if use_int64 else np.int32(id)
+                    overlay_raster[row, col] = id
+
+                    if calculate_area:
+                        dict_area_ha[id] = dict_area_ha.get(id, 0) + cell_area_ha               
  
-        return overlay_raster, raster1_max
+        return overlay_raster, raster1_max, dict_area_ha
     
     @staticmethod
     def get_overlay_area(spatial1_ras:Raster, spatial2_ras:Raster, name1:str, name2:str, area_column_name = "")->pd.DataFrame:
         """
         Overlay raster 1 and raster 2 and calculate the area of each unique polygon as a pandas dataframe
         """
-        merged_raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
-        area_col = area_column_name if (area_column_name is not None and len(area_column_name) > 0) else Names.field_name_area
-        df = RasterExtension.get_category_area_ha_dataframe(merged_raster,area_col)
+        merged_raster, raster1_max, dict_area_ha = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras, True)
+        area_col = area_column_name if (area_column_name is not None and len(area_column_name) > 0) else Names.field_name_area        
+        #df = RasterExtension.get_category_area_ha_dataframe(merged_raster,area_col)
+        df = pd.DataFrame.from_dict(dict_area_ha, orient="index", columns = [area_col])
+        df.index.name = Names.field_name_id
         df[name1] = df.index % raster1_max
         df[name2] = (df.index - df[name1]) / raster1_max
+        df[name1] = df[name1].astype(int)
+        df[name2] = df[name2].astype(int)
 
         return df
     
@@ -274,43 +290,3 @@ class RasterExtension:
 
         #generate the dictionary and return
         return df_max_area.set_index("raster1")["raster2"].to_dict()
-
-    # @staticmethod
-    # def get_overlay_raster_without_multiparts(spatial1_ras:Raster, spatial2_ras:Raster, spatial1_id_column_name:str, spatial2_id_column_name:str)-> tuple[Raster, Vector]:
-    #     """
-    #     get overlayer raster and separate multiparts polygons. The values of the result raster will have ids starting from 1
-        
-    #     caution: this doesn't work probably due to the bugs in whitebox workflow
-        
-    #     """
-    #             #this will assign unique values for each unique combination of spatial1 and spatial2
-    #     raster, raster1_max = RasterExtension.get_overlay_raster(spatial1_ras, spatial2_ras)
-    #     wbe = WbEnvironment()
-    #     wbe.write_raster(raster, r"C:\Work\imWEBs\test\gg\watershed\output\test1.tif")
-    #     raster = wbe.read_raster(r"C:\Work\imWEBs\test\gg\watershed\output\test1.tif")
-
-    #     #convert to vector to separate multiparts
-    #     vector = RasterExtension.raster_to_vector(raster, "polygon", True)
-    #     wbe.write_vector(vector, r"C:\Work\imWEBs\test\gg\watershed\output\test1.shp")
-    #     vector = wbe.read_vector(r"C:\Work\imWEBs\test\gg\watershed\output\test.shp")
-
-    #     #convert to raster and use FID as the raster value
-    #     #in this raster, the multiparts will have differnt ids
-    #     raster = wbe.vector_polygons_to_raster(input = vector, field_name = Names.field_name_id, base_raster = spatial2_ras)
-        
-    #     wbe.write_raster(raster, r"C:\Work\imWEBs\test\gg\watershed\output\test2.tif")
-
-    #     #add and populate two foreign id columns and id column
-    #     vector.add_attribute_field(AttributeField(Names.field_name_id, FieldDataType.Int, 10, 0))
-    #     vector.add_attribute_field(AttributeField(spatial1_id_column_name, FieldDataType.Int, 10, 0))
-    #     vector.add_attribute_field(AttributeField(spatial2_id_column_name, FieldDataType.Int, 10, 0))
-
-    #     dict_spatial1 = RasterExtension.get_zonal_statistics(spatial1_ras, raster,"max","col1")["col1"].to_dict() 
-    #     dict_spatial2 = RasterExtension.get_zonal_statistics(spatial2_ras, raster,"max","col2")["col2"].to_dict() 
-
-    #     for i in range(vector.num_records):
-    #         vector.set_attribute_value(i,Names.field_name_id,FieldData.new_int(i + 1))
-    #         vector.set_attribute_value(i,spatial1_id_column_name,FieldData.new_int(int(dict_spatial1[i+1])))
-    #         vector.set_attribute_value(i,spatial2_id_column_name,FieldData.new_int(int(dict_spatial2[i+1])))
-
-    #     return (raster, vector)        

@@ -50,7 +50,7 @@ class StructureBMPTileDrain(BMP):
         """Get subbasin for each tile drain with the lowest average elevation. Only the portion inside the tile drain will be accounted."""
         if self.__dict_tile_drain_subbasin is None:
             #overlay tile drain and subbasin to get the area of the each unique combination.
-            tiledrain_subbasin_raster, tile_drain_max_id = RasterExtension.get_overlay_raster(self.bmp_raster, self.subbasin_raster)
+            tiledrain_subbasin_raster, tile_drain_max_id, _ = RasterExtension.get_overlay_raster(self.bmp_raster, self.subbasin_raster)
             df_tile_drain_subbasin_overlay_mean_elevation = RasterExtension.get_zonal_statistics(self.dem_raster, tiledrain_subbasin_raster,"mean")        
             df_tile_drain_subbasin_overlay_mean_elevation["tile_drain"] = df_tile_drain_subbasin_overlay_mean_elevation.index % tile_drain_max_id
             df_tile_drain_subbasin_overlay_mean_elevation["subbasin"] = (df_tile_drain_subbasin_overlay_mean_elevation.index - df_tile_drain_subbasin_overlay_mean_elevation["tile_drain"]) / tile_drain_max_id
