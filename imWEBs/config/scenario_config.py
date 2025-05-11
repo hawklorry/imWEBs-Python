@@ -107,6 +107,10 @@ class ScenarioConfig(Config):
         if self.end_date is None:
             self.end_date = database_end_date
 
+    @property 
+    def interpolation_radius(self)->int:
+        return int(self.get_config_value("radius", 10000000))
+
     @property
     def config_variables(self)->str:
         return {
@@ -145,7 +149,8 @@ class ScenarioConfig(Config):
                 #inverse_distance
                 #linear_triangle
                 #thiessen_polygon
-                "method"
+                "method",
+                "radius"
             ]
             }    
     
@@ -222,7 +227,7 @@ class ScenarioConfig(Config):
                 shutil.copyfile(os.path.join(weight_file_folder, previous_weight_file),os.path.join(weight_file_folder, weight_file))
             else:
                 #write the weight file
-                WriteWeightFile(self.method, 
+                WriteWeightFile(self.method, self.interpolation_radius,
                                 os.path.join(weight_file_folder, weight_file),
                                 self.model.outputs.mask_refined_with_subbasin_raster,
                                 [coordinates[id] for id in ids])

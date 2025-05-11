@@ -8,7 +8,7 @@ from whitebox_workflows import Raster
 import logging
 logger = logging.getLogger(__name__)
 
-def WriteWeightFile(method:str, weight_file:str,mask_raster:Raster, station_coordinates:list):
+def WriteWeightFile(method:str, radius:int, weight_file:str,mask_raster:Raster, station_coordinates:list):
     #get interpolation object based on method
     interploation = Interpolation(weight_file)
     if method == "average_uniform":
@@ -16,7 +16,7 @@ def WriteWeightFile(method:str, weight_file:str,mask_raster:Raster, station_coor
     elif method == "grid_interpolation":
         interploation = GridInterpolation(weight_file)
     elif method == "inverse_distance":
-        interploation = InverseDistance(weight_file)
+        interploation = InverseDistance(weight_file, radius)
     elif method == "linear_triangle":
         interploation = LinearTriangle(weight_file)
     elif method == "thiessen_polygon":
