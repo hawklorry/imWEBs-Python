@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
 import os
 import logging
@@ -36,6 +36,16 @@ class DatabaseBase:
             return pd.read_sql(f"select * from {table_name}", self.engine)
         else:
             return pd.read_sql(f"select {','.join(columns)} from {table_name}", self.engine)
+
+    def append_table(self, table_name:str, table_df:pd.DataFrame, dtype:list = None, index = False):
+        if table_df is None or len(table_df) <= 0:
+            return
+        table_df.to_sql(table_name, con = self.engine, if_exists='append',index=index, dtype=dtype,chunksize=1000)
+
+    def drop_table(self, table_name:str):
+        with self.engine.connect() as conn:
+            conn.execute(text(f"DROP TABLE IF EXISTS {table_name}"))
+            conn.commit()
 
     def save_table(self, table_name:str, table_df:pd.DataFrame, dtype:list = None, index = False):
         if table_df is None or len(table_df) <= 0:

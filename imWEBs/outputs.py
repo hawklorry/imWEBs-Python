@@ -1781,6 +1781,29 @@ class Outputs(FolderBase):
                 self.save_vector(vector, Names.subareaShpName, True, True)
         return raster
 
+    @property
+    def subarea_centroid_df(self)->pd.DataFrame:
+        df = self.get_df(Names.subareaCentroidCsvName)
+
+        if df is None and self.subarea_raster is not None:
+            #create subarea centroid shapefile for weight calculation
+            #geopandas is used here
+            gdf = gpd.read_file(self.get_file_path(Names.subareaShpName))
+            gdf["geometry"] = gdf["geometry"].buffer(0)
+            gdf_dissolved = gdf.dissolve(by="id")
+            gdf_dissolved["centroid"] = gdf_dissolved.geometry.centroid
+            centroid_gdf = gpd.GeoDataFrame(gdf_dissolved, geometry="centroid")
+            centroid_gdf = centroid_gdf.drop(columns=["geometry"])
+            centroid_gdf.to_file(self.get_file_path(Names.subareaCentroidShpName))
+
+            centroid_gdf["x"] = centroid_gdf.geometry.x
+            centroid_gdf["y"] = centroid_gdf.geometry.y
+            centroid_gdf.reset_index(inplace=True)
+            self.save_df(centroid_gdf[[Names.field_name_id,"x", "y"]], Names.subareaCentroidCsvName)
+
+            df = self.get_df(Names.subareaCentroidCsvName)
+
+        return df
 
     @property
     def subarea_vector(self)->Raster:

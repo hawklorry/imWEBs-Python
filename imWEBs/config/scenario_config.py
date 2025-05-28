@@ -11,12 +11,13 @@ from ..names import Names
 from datetime import date
 import pandas as pd
 from ..model.parameter_h5 import ParameterH5
-from ..interpolation.weight_file import WriteWeightFile
+from ..interpolation.weight import Weight
 from ..outputs import Outputs
 from ..model.model import Model
 import numpy as np
 import shutil
 from ..subarea.parameter_subarea import ParameterSubarea
+import h5py
 
 logger = logging.getLogger(__name__)
 
@@ -192,21 +193,23 @@ class ScenarioConfig(Config):
         config = ConfigFile(self.scenario_folder)
         config.write_file()
 
-    def __generate_weight_file(self):
+    def __generate_weight(self):
         logger.info(f"Creating weight file with method {self.method} ...")
         #create weight files use the climate stations selected by users
         coordinates = self.model.hydroclimate.station_coordinates
         previous_ids = []
-        previous_weight_file = ""        
-        precipitation_weight_file = ""
+        previous_weight_name = ""        
+        precipitation_weight_name = ""
 
         #we will create the weight file in the model output folder to facilitate parameter.h5 generation.
         #we will delete any previous weight file first
-        weight_file_folder = self.model.model_output_folder
-        for wf in [f for f in os.listdir(weight_file_folder) if "weight" in f and ".txt" in f]:
-            os.remove(os.path.join(weight_file_folder, wf))
+        parameter_h5_file = os.path.join(self.model.model_output_folder, Names.parameteH5Name)
+        if os.path.exists(parameter_h5_file):
+            with h5py.File(parameter_h5_file, 'w') as h5_file:
+                pass
 
         #start to write
+        logger.info(f"Adding weights to parameter.h5")
         for datatype, ids in self.data_type_station_ids.items():             
             #we only need one for temperature so skip for TIMIN 
             #same for wind speed and direction    
@@ -214,40 +217,53 @@ class ScenarioConfig(Config):
                 continue            
             
             #get weight file name
-            weight_file = f"weight_{datatype.lower()}.txt"
+            weight_name = f"weight_{datatype.lower()}"
             if datatype.upper() == "TMAX":
-                weight_file = "weight_t.txt"
+                weight_name = "weight_t"
             if datatype.upper() == "WS":
-                weight_file = "weight_w.txt"
+                weight_name = "weight_w"
 
-            logger.info(f"Writing {weight_file}")
+            logger.info(f"  -- {weight_name}")
 
             #just copy previous weight file if the stations are the same
             if len(previous_ids) > 0 and np.array_equal(np.sort(previous_ids), np.sort(ids)):
-                shutil.copyfile(os.path.join(weight_file_folder, previous_weight_file),os.path.join(weight_file_folder, weight_file))
+                h5 = ParameterH5(parameter_h5_file)
+                h5.duplicate(f"weight/{previous_weight_name}", f"weight/{weight_name}")
             else:
                 #write the weight file
-                WriteWeightFile(self.method, self.interpolation_radius,
-                                os.path.join(weight_file_folder, weight_file),
-                                self.model.outputs.mask_refined_with_subbasin_raster,
+                weight = Weight(self.method, self.interpolation_radius,
+                                parameter_h5_file,weight_name,
                                 [coordinates[id] for id in ids])
+                if self.model_type == "subarea":
+                    weight.generate_weight_subarea(self.model.outputs.subarea_centroid_df)
+                else:
+                    weight.generate_weight_cell(self.model.outputs.mask_refined_with_subbasin_raster)
             #save it
             previous_ids = ids
-            previous_weight_file = weight_file
+            previous_weight_name = weight_name
             if datatype.upper() == "P":
-                precipitation_weight_file = weight_file
+                precipitation_weight_name = weight_name
 
         #copy weight file p for pet
-        if "PET" not in self.data_type_station_ids and len(precipitation_weight_file) > 0:
-            logger.info("Writing weight_pet.txt")
-            shutil.copyfile(os.path.join(weight_file_folder, precipitation_weight_file),os.path.join(weight_file_folder, "weight_pet.txt"))
+        if "PET" not in self.data_type_station_ids and len(precipitation_weight_name) > 0:
+            logger.info("   -- weight_pet")
+            h5 = ParameterH5(parameter_h5_file)
+            h5.duplicate(f"weight/{precipitation_weight_name}", f"weight/weight_pet")
 
-    def __generate_parameter_h5(self):
+    def generate_parameter_h5(self):
         """
         generate parameter h5 file
         """
-        logger.info(f"Creating parameter.h5 ...")
-        ParameterH5.generate_parameter_h5(self.scenario_folder, self.model.model_output_folder)
+        #logger.info(f"Creating parameter.h5 ...")
+        h5 = ParameterH5(os.path.join(self.model.model_output_folder,Names.parameteH5Name))
+        h5.add_rasters(self.model.model_output_folder)
+
+        #copy parameter.h5
+        shutil.copy(os.path.join(self.model.model_output_folder,Names.parameteH5Name),
+                    os.path.join(self.scenario_folder,Names.parameteH5Name))       
+
+        #ParameterH5.generate_parameter_h5(self.scenario_folder, self.model.model_output_folder)
+
 
     def __generate_reach_parameter(self):
         """
@@ -271,7 +287,7 @@ class ScenarioConfig(Config):
     
     def generate_parameter_subarea_database(self):
         if self.model_type == "subarea":
-            p = ParameterSubarea(self.model.outputs)
+            p = ParameterSubarea(self.model.outputs, self.model.bmp_databaes, self.model.parameter_h5)
             p.generate()
 
     def __generate_bmp_database(self):
@@ -287,8 +303,8 @@ class ScenarioConfig(Config):
         self.__generate_file_in()
         self.__generate_file_out()
         self.__generate_config_fig()
-        self.__generate_weight_file()
-        self.__generate_parameter_h5()
+        self.__generate_weight()
+        self.generate_parameter_h5()
         self.__generate_reach_parameter() 
         self.generate_parameter_subarea_database()       
         self.__generate_bmp_database()

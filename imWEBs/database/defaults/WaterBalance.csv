@@ -29,3 +29,4 @@ MinGWStorage,Minimum groundwater storage (mm) below which irrigation will not be
 Surface_lag,Surface flow fraction that arrives subbasin outlet in one simulation step,-,ALL,1.0,0,AC,1.0,0.1,Y
 SR_Min,Minimum surface runoff that activates Surface_lag,mm,ALL,0.1,0,AC,5.0,0.01,Y
 LateralFlowSoilProfileLimit,Maximum laterflow (mm) is allowed to be generated in one time step.,mm,ALL,50.0,0,AC,100.0,0.0,Y
+wetland,wetland distribution,,ALL,-99,0,NC,1000,1,
