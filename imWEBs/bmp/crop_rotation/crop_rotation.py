@@ -30,8 +30,8 @@ class CropRotation(FolderBase):
     col_harvest_date = ('HarvestMon', 'HarvestDay')
     col_fertilizer_date = ('FerMon', 'FerDay')
     col_tillage_date = ('TillMon', 'TillDay')
-    value_use_planting_date = -1
-    value_30_after_harvest = -30
+    value_planting_date = -1000
+    value_harvest_date = -100
 
     def __init__(self, 
                  management_unit_vector:Vector,
@@ -66,8 +66,13 @@ class CropRotation(FolderBase):
         return file_path
 
     def __get_default_setup_df(self, file_name:str)->pd.DataFrame:
-        if file_name not in self.__default_setup_dfs:
-            df = pd.read_csv(self.__get_default_file_path(file_name))  
+        if file_name not in self.__default_setup_dfs:      
+            #search in the crop inventory folder first
+            setup_file_path = self.get_file_path(file_name)
+            if not os.path.exists(setup_file_path):
+                setup_file_path = self.__get_default_file_path(file_name)
+
+            df = pd.read_csv(setup_file_path)  
             if "crop-lookup" in file_name:
                 df = df[df[self.col_imwebs_crop_id]!= self.flag_not_proceed]
                 df[self.col_imwebs_crop_id] = df[self.col_imwebs_crop_id].astype(int)
@@ -76,7 +81,10 @@ class CropRotation(FolderBase):
         return self.__default_setup_dfs[file_name]
 
     def __get_crop_code_lookup_df(self, year):
-        return self.__get_default_setup_df("crop-lookup-before-2010.csv") if year <=2010 else self.__get_default_setup_df("crop-lookup-after-2010.csv")
+        try:
+            return self.__get_default_setup_df("crop-lookup.csv")
+        except:
+            return self.__get_default_setup_df("crop-lookup-before-2010.csv") if year <=2010 else self.__get_default_setup_df("crop-lookup-after-2010.csv")
 
     @property
     def domimant_crop_df(self)->pd.DataFrame:
@@ -258,19 +266,42 @@ class CropRotation(FolderBase):
         day_last = df.loc[index, f'{col_day}_Last']
         
         
-        #if one of the mon/day is -1, then planting month/day will be used
-        if mon_first == CropRotation.value_use_planting_date | day_first == CropRotation.value_use_planting_date | mon_last == CropRotation.value_use_planting_date | day_last == CropRotation.value_use_planting_date: 
-            df.loc[index, col_mon] = df.loc[index, CropRotation.col_planting_date[0]]
-            df.loc[index, col_day] = df.loc[index, CropRotation.col_planting_date[1]]
-        #if one of the mon/day is -30, then use 30 days after harvest date
-        elif mon_first == CropRotation.value_30_after_harvest | day_first == CropRotation.value_30_after_harvest| mon_last == CropRotation.value_30_after_harvest | day_last == CropRotation.value_30_after_harvest: 
-            offset = CropRotation.offset_days(df.loc[index, CropRotation.col_harvest_date[0]], df.loc[index, CropRotation.col_harvest_date[1]], 30)
-            df.loc[index, col_mon] = offset[0]
-            df.loc[index, col_day] = offset[1]        
+        new_month_day = None
+        if mon_first < 0 or day_first < 0 or mon_last < 0 or day_last < 0: 
+            if CropRotation.__is_referencing_harvest_date(mon_first) or \
+                CropRotation.__is_referencing_harvest_date(day_first) or \
+                CropRotation.__is_referencing_harvest_date(mon_first) or \
+                CropRotation.__is_referencing_harvest_date(day_first):
+                #after harvest day
+                days_after_harvest = CropRotation.__day_after_harvest(mon_first)
+                new_month_day = CropRotation.offset_days(df.loc[index, CropRotation.col_harvest_date[0]], df.loc[index, CropRotation.col_harvest_date[1]], days_after_harvest)
+            else:
+                #around plating day
+                days_related_to_planting = CropRotation.__day_related_to_planting(mon_first)
+                new_month_day = CropRotation.offset_days(df.loc[index, CropRotation.col_planting_date[0]], df.loc[index, CropRotation.col_planting_date[1]], days_related_to_planting)
         else:    
-            ran = CropRotation.create_random_date(mon_first, day_first, mon_last, day_last)    
-            df.loc[index, col_mon] = ran[0]
-            df.loc[index, col_day] = ran[1]
+            #random day
+            new_month_day = CropRotation.create_random_date(mon_first, day_first, mon_last, day_last)    
+            
+            
+        df.loc[index, col_mon] = new_month_day[0]
+        df.loc[index, col_day] = new_month_day[1]
+
+    @staticmethod
+    def __is_referencing_harvest_date(mon_day:int)->bool:
+        return mon_day < 0 and mon_day > CropRotation.value_harvest_date
+    
+    @staticmethod
+    def __day_after_harvest(mon_day:int)->int:
+        return mon_day - CropRotation.value_harvest_date
+    
+    @staticmethod
+    def __is_referencing_planting_date(mon_day:int)->bool:
+        return mon_day < CropRotation.value_harvest_date
+    
+    @staticmethod
+    def __day_related_to_planting(mon_day:int)->int:
+        return mon_day - CropRotation.value_planting_date
 
     @staticmethod
     def move_winter_wheat_planting_day(df, index):
