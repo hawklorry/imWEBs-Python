@@ -246,7 +246,14 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#crop-management" id="toc-crop-management" class="nav-link active" data-scroll-target="#crop-management">12. Crop Management</a></li>
+  <li><a href="#crop-management" id="toc-crop-management" class="nav-link active" data-scroll-target="#crop-management">12. Crop Management</a>
+  <ul class="collapse">
+  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a></li>
+  <li><a href="#user-defined-crop-lookup-table-and-default-management-data-for-crop-fertilizer-and-tillage" id="toc-user-defined-crop-lookup-table-and-default-management-data-for-crop-fertilizer-and-tillage" class="nav-link" data-scroll-target="#user-defined-crop-lookup-table-and-default-management-data-for-crop-fertilizer-and-tillage">User-defined crop lookup table and default management data for crop, fertilizer and tillage</a></li>
+  <li><a href="#random-date" id="toc-random-date" class="nav-link" data-scroll-target="#random-date">Random Date</a></li>
+  <li><a href="#negative-month-and-day" id="toc-negative-month-and-day" class="nav-link" data-scroll-target="#negative-month-and-day">Negative Month and Day</a></li>
+  <li><a href="#winter-wheat" id="toc-winter-wheat" class="nav-link" data-scroll-target="#winter-wheat">Winter Wheat</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/hawklorry/imWEBs-Python/edit/main/docs/bmps/12_crop_management.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="12_crop_management.ipynb" download="12_crop_management.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -275,8 +282,193 @@ first_year = 1991
 last_year = 2010
 include_grazing = False</code></pre>
 <p>Users will need to download the crop inventory data for the years they are interested and clipped to the watershed boundary. It’s also required to have same coordination system as other input files.</p>
+<section id="workflow" class="level2">
+<h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
+<p>The workflow is described below.</p>
+<p><img src="..\img/crop_rotation_diagram.png" class="img-fluid"></p>
+</section>
+<section id="user-defined-crop-lookup-table-and-default-management-data-for-crop-fertilizer-and-tillage" class="level2">
+<h2 class="anchored" data-anchor-id="user-defined-crop-lookup-table-and-default-management-data-for-crop-fertilizer-and-tillage">User-defined crop lookup table and default management data for crop, fertilizer and tillage</h2>
+<p>The system has default crop lookup table and default management data for crop, fertilizer and tillage. If users wants to use their own data, they could have these files in <strong>AAFC_crop_inventory_folder</strong> with the following file name. These files must follow the standard formats as given below.</p>
+<ul>
+<li><p><strong>crop-lookup.csv</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Original ID</th>
+<th>Land use name</th>
+<th>Group</th>
+<th>IMWEBs code</th>
+<th>IMWEBs ID</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>Cloud</td>
+<td>Non-Crop</td>
+<td></td>
+<td>Not proceed</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>crop-management.csv</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>CropCode</th>
+<th>Pervious Year</th>
+<th>PlantingMon_First</th>
+<th>PlantingDay_First</th>
+<th>PlantingMon_Last</th>
+<th>PlantingDay_Last</th>
+<th>HarvestMon_First</th>
+<th>HarvestDay_First</th>
+<th>HarvestMon_Last</th>
+<th>HarvestDay_Last</th>
+<th>HarvestEfficiency</th>
+<th>HarvestType</th>
+<th>HarvestIndexOverride</th>
+<th>CNOP</th>
+<th>StoverFraction</th>
+<th>IsGrain</th>
+<th>PRCOP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>5</td>
+<td>8</td>
+<td>5</td>
+<td>21</td>
+<td>9</td>
+<td>24</td>
+<td>10</td>
+<td>7</td>
+<td>0.85</td>
+<td>2</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>fertilizer-management.csv</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>CropCode</th>
+<th>FerMon_First</th>
+<th>FerDay_First</th>
+<th>FerMon_Last</th>
+<th>FerDay_Last</th>
+<th>FerType</th>
+<th>FerRate</th>
+<th>FerSurface</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>1</td>
+<td>70</td>
+<td>0.2</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>tillage-management.csv</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>CropCode</th>
+<th>TillMon_First</th>
+<th>TillDay_First</th>
+<th>TillMon_Last</th>
+<th>TillDay_Last</th>
+<th>TillCode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>-1000</td>
+<td>35</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>-70</td>
+<td>-70</td>
+<td>-70</td>
+<td>-70</td>
+<td>86</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+</section>
+<section id="random-date" class="level2">
+<h2 class="anchored" data-anchor-id="random-date">Random Date</h2>
+<p>To simulate the behavior of farmers, plating, harvest, fertilizer and tillage dates could be generate randomly between a starting and ending day defined in the table. In each table, the starting and ending month/day is defined. This is only applied when month and day value is valid month and day values.</p>
+</section>
+<section id="negative-month-and-day" class="level2">
+<h2 class="anchored" data-anchor-id="negative-month-and-day">Negative Month and Day</h2>
+<p>The month and day could be negative for fertilizer and tillage. It’s illustrated in the following diagram. In this case, all four month/day column should have the same value.</p>
+<p><img src="..\img/negative_fertilizer_tillage_month_day.png" class="img-fluid"></p>
+</section>
+<section id="winter-wheat" class="level2">
+<h2 class="anchored" data-anchor-id="winter-wheat">Winter Wheat</h2>
+<p>If the previous year column is 1 in crop_management.csv, the system assumes it’s planted in previous year. For example, if the dominant crop in a field is winter wheat in 2000, the year in crop_management table will be 1999. The imWEBs engine will see it planted in 1999 and harvested in 2000.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
