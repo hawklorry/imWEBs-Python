@@ -33,6 +33,10 @@ The workflow is described below.
 
 ![](/img/crop_rotation_diagram.png)
 
+::: callout-note
+If Growing_Days are defined in crop-management.csv, it will be used as the fixed growing days to calculate the harvest days beased on planting day.
+:::
+
 ## User-defined crop lookup table and default management data for crop, fertilizer and tillage
 
 The system has default crop lookup table and default management data for crop, fertilizer and tillage. If users wants to use their own data, they could have these files in **AAFC_crop_inventory_folder** with the following file name. These files must follow the standard formats as given below.
@@ -45,9 +49,9 @@ The system has default crop lookup table and default management data for crop, f
 
 -   **crop-management.csv**
 
-    | CropCode | Pervious Year | PlantingMon_First | PlantingDay_First | PlantingMon_Last | PlantingDay_Last | HarvestMon_First | HarvestDay_First | HarvestMon_Last | HarvestDay_Last | HarvestEfficiency | HarvestType | HarvestIndexOverride | CNOP | StoverFraction | IsGrain | PRCOP |
+    | CropCode | Pervious Year | PlantingMon_First | PlantingDay_First | PlantingMon_Last | PlantingDay_Last | HarvestMon_First | HarvestDay_First | HarvestMon_Last | HarvestDay_Last | Growing_Days | HarvestEfficiency | HarvestType | HarvestIndexOverride | CNOP | StoverFraction | IsGrain |
     |-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
-    | 1 | 0 | 5 | 8 | 5 | 21 | 9 | 24 | 10 | 7 | 0.85 | 2 | 0 | 1 | 0 | 1 | 1 |
+    | 1 | 0 | 5 | 8 | 5 | 21 | 9 | 24 | 10 | 7 | 139 | 0.85 | 2 | 0 | 1 | 0 | 1 |
 
 -   **fertilizer-management.csv**
 
