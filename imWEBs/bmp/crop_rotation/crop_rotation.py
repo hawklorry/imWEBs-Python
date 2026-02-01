@@ -157,7 +157,16 @@ class CropRotation(FolderBase):
                 CropRotation.populate_random_date(df_crop, index, self.col_planting_date[0], self.col_planting_date[1])
                 
                 #harvest dates
-                CropRotation.populate_random_date(df_crop, index, self.col_harvest_date[0], self.col_harvest_date[1])
+                if "Growing_Days" in df_crop.columns and not np.isnan(df_crop.loc[index, "Growing_Days"]) > 0 and int(df_crop.loc[index, "Growing_Days"]) > 0:
+                    #use fixed growing days
+                    new_month_day = CropRotation.offset_days(df_crop.loc[index, CropRotation.col_planting_date[0]], 
+                                                             df_crop.loc[index, CropRotation.col_planting_date[1]], 
+                                                             int(df_crop.loc[index, "Growing_Days"]))
+                    df_crop.loc[index, self.col_harvest_date[0]] = new_month_day[0]
+                    df_crop.loc[index, self.col_harvest_date[1]] = new_month_day[1]
+                else:
+                    #use random harvest day
+                    CropRotation.populate_random_date(df_crop, index, self.col_harvest_date[0], self.col_harvest_date[1])
 
             for index in df_crop.index: 
                 #change the planting date of crops that are planted in previous year
