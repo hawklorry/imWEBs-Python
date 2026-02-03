@@ -80,7 +80,7 @@ class RasterExtension:
         return dx, dy
 
     @staticmethod
-    def reclassify(raster:Raster, lookup_dict, mask_raster:Raster = None)->Raster:
+    def reclassify(raster:Raster, lookup_dict, mask_raster:Raster = None, use_float = False)->Raster:
         """
         reclassify raster with dictionary. 
 
@@ -88,7 +88,10 @@ class RasterExtension:
         """
 
         wbe = WbEnvironment()
-        mapped_raster = wbe.new_raster(raster.configs)
+        configs = raster.configs        
+        if use_float:
+            configs.data_type = RasterDataType.F32
+        mapped_raster = wbe.new_raster(configs)
         no_data = raster.configs.nodata
 
         dict = lookup_dict

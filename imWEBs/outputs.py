@@ -598,15 +598,33 @@ class Outputs(FolderBase):
     
     @property
     def soil_k_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AverageK","soil"), self.subbasin_raster)
+        raster = self.get_raster(Names.soilKName)
 
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AverageK","soil"), self.subbasin_raster, True)
+            raster = self.save_raster(raster, Names.soilKName, True, True)
+
+        return raster
+    
     @property
     def soil_porosity_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AveragePorosity","soil"), self.subbasin_raster)
+        raster = self.get_raster(Names.porosityName)
+
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AveragePorosity","soil"), self.subbasin_raster, True)
+            raster = self.save_raster(raster, Names.porosityName, True, True)
+
+        return raster
 
     @property
     def landuse_rootdepth_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+        raster = self.get_raster(Names.rootDepthName)
+
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+            raster = self.save_raster(raster, Names.rootDepthName, True, True)
+
+        return raster
 
     @property
     def mapped_landuse_original_raster(self)->Raster:
@@ -669,7 +687,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.fieldCapName)
         if raster is None:
-            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("FC1","soil"), self.subbasin_raster)
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("FC1","soil"), self.subbasin_raster, True)
             raster = self.save_raster(raster, Names.fieldCapName, True, True)      
 
         return raster
@@ -681,7 +699,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.manningName)
         if raster is None:
-            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster)
+            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster, True)
             raster = self.save_raster(raster, Names.manningName, True, True)
 
         return raster

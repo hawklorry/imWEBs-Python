@@ -218,6 +218,7 @@ class Names:
     residualIntMinName = "residualIntMin" + raster_extension
     runoffCoeffName = "runoffCoeff" + raster_extension
     porosityName = "porosity" + raster_extension
+    soilKName = "soilK" + raster_extension
     fieldCapName = "field_capacity" + raster_extension
     poreIndexName = "pore_index" + raster_extension
     wiltingPointName = "wilting_point" + raster_extension
