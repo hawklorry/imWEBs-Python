@@ -48,7 +48,17 @@ class ScenarioConfig(Config):
                     value = Config.get_option_value(cf, section, var)  
                     setattr(self, var, None)                  
                     if section == "climate_station" and value is not None and len(value.strip()) > 0:
-                        ids = [int(x) for x in value.split(",")]
+                        parts = [x.strip() for x in value.split(",")]
+                        if any(part == "" for part in parts):
+                            raise ValueError(
+                                f"Climate Station field {var} must be integers separated by comma (for example: 1,2,3)."
+                            )
+                        try:
+                            ids = [int(part) for part in parts]
+                        except ValueError as exc:
+                            raise ValueError(
+                                f"Climate Station field {var} must be integers separated by comma (for example: 1,2,3)."
+                            ) from exc
                         if var.upper() == "T":
                             setattr(self, "TMAX", ids)
                             setattr(self, "TMIN", ids)
