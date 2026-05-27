@@ -2177,7 +2177,7 @@ class MainWindow(QMainWindow):
         try:
             return version("imwebs-desktop")
         except PackageNotFoundError:
-            return "0.1.1"
+            return "0.1.2"
 
     def check_for_updates(self) -> None:
         if self._run_thread is not None:
@@ -2248,6 +2248,7 @@ class MainWindow(QMainWindow):
         )
         if response == QMessageBox.Yes:
             self._pending_update_download = payload
+            self._maybe_start_pending_update_download()
 
     def _on_update_check_failed(self, message: str) -> None:
         QMessageBox.warning(self, "Check Update", f"Could not check for updates.\n\n{message}")
@@ -2294,6 +2295,17 @@ class MainWindow(QMainWindow):
 
     def _on_update_download_failed(self, message: str) -> None:
         QMessageBox.warning(self, "Install Update", f"Could not download update installer.\n\n{message}")
+
+    def _maybe_start_pending_update_download(self) -> None:
+        if self._update_thread is not None:
+            return
+
+        pending_download = self._pending_update_download
+        if pending_download is None:
+            return
+
+        self._pending_update_download = None
+        self._start_update_download(pending_download)
 
     def _confirm_unsaved_before_switch(self) -> bool:
         if not self._has_unsaved_changes:
@@ -2658,10 +2670,8 @@ class MainWindow(QMainWindow):
             self._update_thread.deleteLater()
             self._update_thread = None
 
-        pending_download = self._pending_update_download
-        self._pending_update_download = None
-        if pending_download is not None:
-            self._start_update_download(pending_download)
+        if self._pending_update_download is not None:
+            self._maybe_start_pending_update_download()
             return
 
         self._update_step_ui()
