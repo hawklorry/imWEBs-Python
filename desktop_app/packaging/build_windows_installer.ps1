@@ -1,5 +1,5 @@
 param(
-    [string]$AppVersion = "0.1.0",
+    [string]$AppVersion = "0.1.1",
     [string]$PythonExe = "python",
     [switch]$SkipInstaller,
     [switch]$Quick,
@@ -102,6 +102,7 @@ try {
         "--windowed",
         "--name", "imWEBs-Desktop",
         "--collect-all", "imWEBs",
+        "--collect-all", "pyogrio",
         "--collect-submodules", "PySide6.QtCore",
         "--collect-submodules", "PySide6.QtGui",
         "--collect-submodules", "PySide6.QtWidgets",
