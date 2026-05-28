@@ -2177,7 +2177,7 @@ class MainWindow(QMainWindow):
         try:
             return version("imwebs-desktop")
         except PackageNotFoundError:
-            return "0.1.2"
+            return "0.1.3"
 
     def check_for_updates(self) -> None:
         if self._run_thread is not None:
