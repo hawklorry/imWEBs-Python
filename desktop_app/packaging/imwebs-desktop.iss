@@ -1,6 +1,6 @@
 #define MyAppName "imWEBs Desktop"
 #ifndef AppVersion
-  #define AppVersion "0.1.3"
+  #define AppVersion "0.1.4"
 #endif
 #ifndef SourceDir
   #error SourceDir must be provided: /DSourceDir=...

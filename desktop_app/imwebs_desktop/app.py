@@ -2174,10 +2174,24 @@ class MainWindow(QMainWindow):
         self._schedule_hybrid_prefetch()
 
     def _current_version(self) -> str:
+        if getattr(sys, "frozen", False):
+            try:
+                from imwebs_desktop import __version__ as bundled_version
+                if bundled_version:
+                    return str(bundled_version)
+            except Exception:
+                pass
+
         try:
             return version("imwebs-desktop")
         except PackageNotFoundError:
-            return "0.1.3"
+            try:
+                from imwebs_desktop import __version__ as bundled_version
+                if bundled_version:
+                    return str(bundled_version)
+            except Exception:
+                pass
+            return "0.1.4"
 
     def check_for_updates(self) -> None:
         if self._run_thread is not None:
