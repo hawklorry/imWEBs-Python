@@ -115,7 +115,7 @@ class Reservoir(BMPTable):
         self.NSED = 1
         self.D50 = 10
         self.NUTMETHOD = "RES_NUTR_BAL"
-        self.FILE = 0
+        self.FILE = ""
         self.PSETLR = 50
         self.NSETLR = 10
         self.CHLAR = 1

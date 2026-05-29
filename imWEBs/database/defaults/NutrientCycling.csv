@@ -58,3 +58,8 @@ organicP_coefficient,organic phosphorous adjustment coeffcient,-,NC_Q2K,1.0,0,AC
 nitrateLateralFlowConcLimit,Maximum laterflow NO3 concentraion,mg N/mm lateral flow,NC_Q2K,25.0,0,AC,100.0,0.0,Y
 gwOrganicN,Organic N concentration in groundwater loading to reach,mg/L,NR_Q2K,0.0,0,AC,5.0,0.0,Y
 gwOrganicP,Organic P concentration in groundwater loading to reach,mg/L,NR_Q2K,0.0,0,AC,5.0,0.0,Y
+bankPPCoef,Particulate P per tonne bank sediment,kg/t,ChannelRouting,0.2,0,M,2.0,0.0,Y
+bankDPCoef,Dissolved P per tonne bank sediment,kg/t,ChannelRouting,0.05,0,M,0.5,0.0,Y
+bankPNCoef,Particulate N per tonne bank sediment,kg/t,ChannelRouting,0.25,0,M,2.5,0.0,Y
+bankDNCoef,Dissolved N per tonne bank sediment,kg/t,ChannelRouting,1.0,0,M,10.0,0.0,Y
+bankEroFrac,Fraction of degradation that is bank erosion,-,ChannelRouting,0.5,0,M,1.0,0.0,Y

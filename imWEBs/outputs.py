@@ -407,6 +407,18 @@ class Outputs(FolderBase):
 
         return raster 
 
+    @property
+    def field_clipped_vector(self)->Vector:
+        """Clipped field vector by subbasin"""
+        vector = self.get_vector(Names.fieldClippedShpName)
+
+        if vector is None:
+            if self.field_raster is not None:
+                vector = RasterExtension.raster_to_vector(self.field_raster)
+                self.save_vector(vector, Names.fieldClippedShpName)
+
+        return vector
+
 #endregion    
 
 #region Marginal Crop Land
@@ -586,15 +598,33 @@ class Outputs(FolderBase):
     
     @property
     def soil_k_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AverageK","soil"), self.subbasin_raster)
+        raster = self.get_raster(Names.soilKName)
 
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AverageK","soil"), self.subbasin_raster, True)
+            raster = self.save_raster(raster, Names.soilKName, True, True)
+
+        return raster
+    
     @property
     def soil_porosity_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AveragePorosity","soil"), self.subbasin_raster)
+        raster = self.get_raster(Names.porosityName)
+
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("AveragePorosity","soil"), self.subbasin_raster, True)
+            raster = self.save_raster(raster, Names.porosityName, True, True)
+
+        return raster
 
     @property
     def landuse_rootdepth_raster(self)->Raster:
-        return RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+        raster = self.get_raster(Names.rootDepthName)
+
+        if raster is None:
+            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("ROOT_DEPTH","landuse"), self.subbasin_raster)
+            raster = self.save_raster(raster, Names.rootDepthName, True, True)
+
+        return raster
 
     @property
     def mapped_landuse_original_raster(self)->Raster:
@@ -657,7 +687,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.fieldCapName)
         if raster is None:
-            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("FC1","soil"), self.subbasin_raster)
+            raster = RasterExtension.reclassify(self.mapped_soil_raster, self.parameter.get_parameter_lookup("FC1","soil"), self.subbasin_raster, True)
             raster = self.save_raster(raster, Names.fieldCapName, True, True)      
 
         return raster
@@ -669,7 +699,7 @@ class Outputs(FolderBase):
         """
         raster = self.get_raster(Names.manningName)
         if raster is None:
-            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster)
+            raster = RasterExtension.reclassify(self.mapped_landuse_final_raster, self.parameter.get_parameter_lookup("MANNING","landuse"), self.subbasin_raster, True)
             raster = self.save_raster(raster, Names.manningName, True, True)
 
         return raster
@@ -1051,7 +1081,7 @@ class Outputs(FolderBase):
         return raster    
  
     @property
-    def stream_pour_points_threshold_vector(self)->Raster:
+    def stream_pour_points_threshold_vector(self)->Vector:
         vector = self.get_vector(Names.streamPourPointThresholdShpName)
 
         if vector is None:
@@ -1757,7 +1787,7 @@ class Outputs(FolderBase):
         if raster is None:
             if self.field_raster is not None:
                 logging.info("Creating subarea raster and vector ...")
-                raster, raster1_max = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
+                raster, raster1_max, _ = RasterExtension.get_overlay_raster(self.field_raster, self.subbasin_raster)
                 
                 #re-order the id and return the old id to new id dict
                 old_id_to_new_id_dict = Delineation.reorder_raster_id(raster)
@@ -1769,6 +1799,29 @@ class Outputs(FolderBase):
                 self.save_vector(vector, Names.subareaShpName, True, True)
         return raster
 
+    @property
+    def subarea_centroid_df(self)->pd.DataFrame:
+        df = self.get_df(Names.subareaCentroidCsvName)
+
+        if df is None and self.subarea_raster is not None:
+            #create subarea centroid shapefile for weight calculation
+            #geopandas is used here
+            gdf = gpd.read_file(self.get_file_path(Names.subareaShpName))
+            gdf["geometry"] = gdf["geometry"].buffer(0)
+            gdf_dissolved = gdf.dissolve(by="id")
+            gdf_dissolved["centroid"] = gdf_dissolved.geometry.centroid
+            centroid_gdf = gpd.GeoDataFrame(gdf_dissolved, geometry="centroid")
+            centroid_gdf = centroid_gdf.drop(columns=["geometry"])
+            centroid_gdf.to_file(self.get_file_path(Names.subareaCentroidShpName))
+
+            centroid_gdf["x"] = centroid_gdf.geometry.x
+            centroid_gdf["y"] = centroid_gdf.geometry.y
+            centroid_gdf.reset_index(inplace=True)
+            self.save_df(centroid_gdf[[Names.field_name_id,"x", "y"]], Names.subareaCentroidCsvName)
+
+            df = self.get_df(Names.subareaCentroidCsvName)
+
+        return df
 
     @property
     def subarea_vector(self)->Raster:

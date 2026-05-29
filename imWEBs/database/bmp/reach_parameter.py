@@ -52,6 +52,11 @@ class ReachParameter(BMPTable):
     b_bnk = Column(Float)
     MSK_X = Column(Float)
     MSK_col = Column(Float)
+    bank_PP_coef = Column(Float)
+    bank_DP_coef = Column(Float)
+    bank_PN_coef = Column(Float)
+    bank_DN_coef = Column(Float)
+    bank_Ero_frac = Column(Float)
 
     def __init__(self):
         self.main_side_slope = 0.5
@@ -83,6 +88,11 @@ class ReachParameter(BMPTable):
         self.b_bnk = 0.05
         self.MSK_X = 0
         self.MSK_col = 0
+        self.bank_PP_coef = 0.2
+        self.bank_DP_coef = 0.05
+        self.bank_PN_coef = 0.25
+        self.bank_DN_coef = 1.0
+        self.bank_Ero_frac = 0.5
         
     @staticmethod
     def get_columns():

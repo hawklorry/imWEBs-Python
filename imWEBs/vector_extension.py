@@ -247,7 +247,7 @@ class VectorExtension:
         """
         check if vector has attribute with given name
         """
-        fields = [field.name for field in vector.get_attribute_fields() if field.name.lower() == field_name.lower()]     
+        fields = [field.name for field in vector.get_attribute_fields() if field.name == field_name]     
         if len(fields) > 0:
             return True, fields[-1]
         else:
@@ -258,7 +258,7 @@ class VectorExtension:
         """check if vector has list of fields"""
         for field in field_names:
             if not VectorExtension.check_field_in_vector(vector, field)[0]:
-                raise ValueError(f"Couldn't find column {field} in {vector.file_name}. It should have following columns: {", ".join(field_names)}.")
+                raise ValueError(f"Couldn't find column {field} in {vector.file_name}. It should have following columns: {", ".join(field_names)}. Please note that the name is case senstive.")
         
     @staticmethod
     def vector_polygons_to_raster_with_boarder(polygon_vector:Vector, field_name:str, base_raster:Raster)->Raster:

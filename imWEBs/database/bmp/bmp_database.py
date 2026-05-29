@@ -477,10 +477,11 @@ class BMPDatabase(DatabaseBase):
 
         for res in reservoir.reservoirs:
             res.METHOD = flow_method
-            logger.info(f"Importing {res.FILE}.csv ...")
-            file_path = os.path.join(flow_data_folder, f"{res.FILE}.csv")
-            if os.path.exists(file_path):
-                self.save_table(res.FILE, pd.read_csv(file_path))
+            if flow_method in ReachBMPReservoir.FLOW_ROUTING_METHODS_REQUIRING_EXTERNAL_DATA and flow_data_folder is not None and res.FILE is not None and len(res.FILE) > 0:
+                logger.info(f"Importing {res.FILE}.csv ...")
+                file_path = os.path.join(flow_data_folder, f"{res.FILE}.csv")
+                if os.path.exists(file_path):
+                    self.save_table(res.FILE, pd.read_csv(file_path))
 
         Session = sessionmaker(bind=self.engine)
         with Session() as session:

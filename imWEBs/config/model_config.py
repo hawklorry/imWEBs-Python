@@ -272,6 +272,22 @@ class ModelConfig(Config):
     
 #endregion
 
+#crop rotation
+
+    @property
+    def crop_rotation_include_grazing_property(self)->bool:
+        value = self.get_config_value("include_grazing", False)
+        
+        if value is None:
+            return False
+        
+        if isinstance(value, str) and (str(value).lower() == "yes" or str(value).lower() == "true"):
+            return True
+        
+        return False
+
+#endregion
+
 #region pasture crop land
 
     @property
@@ -334,5 +350,5 @@ class ModelConfig(Config):
                 self.get_config_value("AAFC_crop_inventory_folder"),
                 int(self.get_config_value("first_year")),
                 int(self.get_config_value("last_year")),                
-                bool(self.get_config_value("include_grazing", False))
+                self.crop_rotation_include_grazing_property
             )

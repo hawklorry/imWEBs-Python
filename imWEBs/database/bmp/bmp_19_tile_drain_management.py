@@ -42,6 +42,10 @@ class TileDrainParameter:
         self.PRCTile = 0.75
         self.CNTile = 0.75
         self.GWT0 = 1000
+        self.gw0 = 1000
+        self.kg = 0.0035
+        self.base_ex = 1.1
+        self.gwmax = 500
 
     @staticmethod 
     def column_types()->dict:

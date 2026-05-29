@@ -5,13 +5,13 @@ from .vector_extension import VectorExtension
 from whitebox_workflows import Raster, Vector, VectorGeometryType
 from .lookup import Lookup
 import logging
-import numpy as np
 from .bmp.bmp_type import BMPType
 from .bmp.bmp_reach_reservoir import ReachBMPReservoir
 from .bmp.bmp_reach_point_source import ReachBMPPointSource
 from .bmp.bmp_reach_grass_waterway import ReachBMPGrassWaterWay
 from .bmp.bmp_structure_wascob import StructureBMPWascob
 from .bmp.bmp_structure_tile_drain import StructureBMPTileDrain
+from .bmp.bmp_manure_feedlot_validation import ManureFeedlotCatchBasinStorageValidator
 from .database.hydroclimate.hydroclimate_database import HydroClimateDatabase
 
 logger = logging.getLogger(__name__)
@@ -89,7 +89,7 @@ class Inputs(FolderBase):
     def landuse_lookup_csv(self):
         return self.find_file(Names.get_standard_file_name("landuse_lookup"))       
 
-#endregion 
+#endregion
 
 #region Reach BMP
 
@@ -339,7 +339,7 @@ class Inputs(FolderBase):
             raise ValueError("The landuse raster doesn't have same dimension as dem.")
         
         #valiate bmp inputs to make sure attributes are setup correctly
-        self.__check_manure_feedlot_catchbasin_storage()
+        self.check_manure_feedlot_catchbasin_storage()
         ReachBMPReservoir.validate(self.reservoir_vector)
         ReachBMPPointSource.validate(self.point_source_vector, self.hydroclimate_database)
         ReachBMPGrassWaterWay.validate(self.grass_waterway_vector)
@@ -352,51 +352,21 @@ class Inputs(FolderBase):
         self.lookup_landuse  = Lookup(self.landuse_lookup_csv, self.landuse_raster)
 
 
-    def __check_manure_feedlot_catchbasin_storage(self):
+    def check_manure_feedlot_catchbasin_storage(self):
         """
-        check manure feedlot catchbasin and storage.
-        Move this logic later to dedicated classes
-        
-        1. feedlot should have a cb column for catch basin id
-        2. manure storage should have feedlot column for source feedlot
-        3. feedlot outlet id should match the id in feedlot boundary 
+        Validate manure feedlot/catch basin/storage relationships.
+
+        1. Feedlot boundary has required feedlot fields.
+        2. Feedlot outlet ids match feedlot boundary ids.
+        3. Feedlot catch basin references exist in catch basin layer.
+        4. Manure storage feedlot references exist in feedlot layer.
         """
-
-        #feedlot boundary and feedlot outlet
-        if self.feedlot_boundary_vector is None:
-            return 
-        
-        #get all feedlot ids
-        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)     
-            
-        #make sure feedlot has all required columns
-        VectorExtension.check_fields_in_vector(self.feedlot_boundary_vector, Names.fields_feedlot)  
-        
-        #check feedlot outlet id
-        feedlot_ids = VectorExtension.get_unique_ids(self.feedlot_boundary_vector)     
-        if self.feedlot_outlet_vector is not None:
-            feedlot_outlet_ids = VectorExtension.get_unique_ids(self.feedlot_outlet_vector)
-
-            if not np.array_equal(feedlot_ids.sort(), feedlot_outlet_ids.sort()):
-                raise ValueError("The ids in feedlot and catch basin doesn't match. Each feedlot should have only one feedlot outlet. Please check. ")
-
-
-        #check catch basin column in feedlot
-        if self.catchbasin_vector is not None:
-            catch_basin_ids = VectorExtension.get_unique_ids(self.catchbasin_vector)
-            feedlot_catchbasin_ids = VectorExtension.get_unique_field_value(self.feedlot_boundary_vector, Names.field_name_feedlot_catch_basin)
-
-            for catch_basin in feedlot_catchbasin_ids.values():
-                if catch_basin not in catch_basin_ids:
-                    raise ValueError(f"Couldn't fine catch basin with id = {catch_basin}. Please check feedlot and catch basin shapefile.")
-                
-        #check feedlot column in manure storage 
-        if self.manure_storage_boundary_vector is not None:
-            manure_storage_feedlot_ids = VectorExtension.get_unique_field_value(self.manure_storage_boundary_vector, Names.field_name_feedlot)
-
-            for feedlot in manure_storage_feedlot_ids.values():
-                if feedlot not in feedlot_ids:
-                    raise ValueError(f"Couldn't fine feedlot with id = {catch_basin}. Please check feedlot and manure storage shapefile.")
+        ManureFeedlotCatchBasinStorageValidator.validate(
+            catch_basin_vector=self.catchbasin_vector,
+            feedlot_boundary_vector=self.feedlot_boundary_vector,
+            feedlot_outlet_vector=self.feedlot_outlet_vector,
+            manure_storage_boundary_vector=self.manure_storage_boundary_vector,
+        )
             
 
 

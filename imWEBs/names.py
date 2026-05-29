@@ -92,6 +92,8 @@ class Names:
     bmp_table_name_subarea_wascob_drainage_lookup = "SubareaWascobDrainageLookup"
     bmp_table_name_subarea_tile_drain_drainage_lookup = "SubareaTileDrainLookup"
 
+    bmp_table_name_subarea_unit_climate_weight = "UnitClimateWeight"
+
 
 
     #
@@ -216,6 +218,7 @@ class Names:
     residualIntMinName = "residualIntMin" + raster_extension
     runoffCoeffName = "runoffCoeff" + raster_extension
     porosityName = "porosity" + raster_extension
+    soilKName = "soilK" + raster_extension
     fieldCapName = "field_capacity" + raster_extension
     poreIndexName = "pore_index" + raster_extension
     wiltingPointName = "wilting_point" + raster_extension
@@ -270,7 +273,8 @@ class Names:
     # management unit
     subareaShpName = "subarea" + shapefile_extension
     subareaRasName = subareaShpName.replace(shapefile_extension, raster_extension)
-
+    subareaCentroidShpName = "subarea_centroid" + shapefile_extension
+    subareaCentroidCsvName = "subarea_centroid" + csv_extension
     #
 
 
@@ -532,6 +536,29 @@ class Names:
         "manure_adjustment_based_on_n_limit_shapefile": manureNLimitShpName,
         "manure_adjustment_based_on_p_limit_shapefile": manurePLimitShpName
     }
+
+    @staticmethod
+    def bmp_distributions()->list:
+        return [Names.remove_extension_from_raster_file(x) for x in 
+                [Names.fieldRasName, 
+                Names.marginalCroplandSeparatedFieldRasName, 
+                Names.pastureCropLandSeparatedFieldRasName,
+                Names.manureStorageRasName, 
+                Names.feedlotBoundaryProcessedRasName,
+                Names.riparianBufferPartRasterName,
+                Names.riparianBufferDrainageRasterName,
+                Names.filterStripPartRasterName,
+                Names.filterStripDrainageRasterName,
+                Names.dugoutRasName,
+                Names.wascobDrainageAreaRasName,
+                Names.tileDrainRasName,
+                Names.manure48hRasName,
+                Names.manureSetbackRasName,
+                Names.manureNoOnSnowRasName,
+                Names.manureSpringRasName,
+                Names.manureNLimitRasname,
+                Names.manurePLimitRasname]
+                ]
 
     @staticmethod
     def get_standard_file_name(item_name:str)->str:

@@ -7,10 +7,10 @@ from whitebox_workflows import Raster
 from ..raster_extension import RasterExtension
 
 class GridInterpolation(Interpolation):
-    def __init__(self, weight_file: str) -> None:
-        super().__init__(weight_file) 
+    def __init__(self, parameter_h5_file:str, weight_name:str) -> None:
+        super().__init__(parameter_h5_file, weight_name)
 
-    def write_weight_file(self, mask_raster:Raster, station_coordinates:list):
+    def write_weight(self, mask_raster:Raster, station_coordinates:list):
         rows = mask_raster.configs.rows
         cols = mask_raster.configs.columns
         numShapes = len(station_coordinates)
